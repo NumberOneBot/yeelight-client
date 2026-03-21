@@ -1,4 +1,5 @@
-export interface YeelightDevice {
+/** Raw data from SSDP discovery — internal use only */
+export interface DeviceInfo {
   id: string
   ip: string
   port: number
@@ -19,4 +20,28 @@ export type RpcResponse = {
   id: number
   result?: string[]
   error?: { code: number; message: string }
+}
+
+export interface TransitionOptions {
+  effect?: 'smooth' | 'sudden'
+  duration?: number
+}
+
+export interface ChannelState {
+  power: boolean
+  brightness: number
+  colorTemp: number | null
+  rgb: [number, number, number] | null
+  flowing: boolean
+}
+
+export interface DeviceCapabilities {
+  hasBackground: boolean
+  hasSegments: boolean
+}
+
+export interface ChannelCapabilities {
+  hasColor: boolean
+  hasColorTemp: boolean
+  hasFlow: boolean
 }

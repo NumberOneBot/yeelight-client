@@ -1,0 +1,23 @@
+{
+  "name": "yeelight-cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "yeelight": "./src/index.tsx"
+  },
+  "scripts": {
+    "dev": "bun run src/index.tsx",
+    "build:win": "bun build src/index.tsx --compile --target bun-windows-x64 --outfile ../../dist/yeelight-win.exe",
+    "build:mac": "bun build src/index.tsx --compile --target bun-darwin-arm64 --outfile ../../dist/yeelight-mac",
+    "build:mac-x64": "bun build src/index.tsx --compile --target bun-darwin-x64 --outfile ../../dist/yeelight-mac-x64",
+    "build": "pnpm run build:win ; pnpm run build:mac"
+  },
+  "dependencies": {
+    "ink": "^5.0.0",
+    "react": "^18.0.0",
+    "@types/react": "^18.0.0",
+    "minimist": "^1.2.8",
+    "@types/minimist": "^1.2.5",
+    "yeelight-control": "workspace:*"
+  }
+}

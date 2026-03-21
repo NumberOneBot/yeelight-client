@@ -1,5 +1,5 @@
 import * as dgram from 'node:dgram'
-import type { YeelightDevice } from './types.js'
+import type { DeviceInfo } from './types.js'
 
 const SSDP_ADDRESS = '239.255.255.250'
 const SSDP_PORT = 1982
@@ -15,7 +15,7 @@ const SEARCH_MESSAGE = [
   ''
 ].join('\r\n')
 
-function parseDeviceHeaders(raw: string): YeelightDevice | null {
+function parseDeviceHeaders(raw: string): DeviceInfo | null {
   const lines = raw.split('\r\n')
   const get = (key: string) =>
     lines
@@ -39,12 +39,10 @@ function parseDeviceHeaders(raw: string): YeelightDevice | null {
   }
 }
 
-export function discover(
-  timeoutMs = SSDP_TIMEOUT_MS
-): Promise<YeelightDevice[]> {
+export function discover(timeoutMs = SSDP_TIMEOUT_MS): Promise<DeviceInfo[]> {
   return new Promise((resolve, reject) => {
     const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true })
-    const devices: YeelightDevice[] = []
+    const devices: DeviceInfo[] = []
     const seen = new Set<string>()
 
     socket.on('error', reject)

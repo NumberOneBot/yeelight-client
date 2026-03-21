@@ -2,15 +2,35 @@
   "name": "yeelight-control",
   "version": "0.1.0",
   "type": "module",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "build": "tsup",
     "dev": "tsx src/index.ts",
-    "start": "tsx src/index.ts",
     "docs:dev": "pnpm --filter yeelight-control-docs dev",
-    "docs:build": "pnpm --filter yeelight-control-docs build"
+    "docs:build": "pnpm --filter yeelight-control-docs build",
+    "release": "pnpm build ; pnpm changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
     "@types/node": "^22.13.10",
     "prettier": "^3.8.1",
+    "tsup": "^8.5.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   }

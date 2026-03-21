@@ -1,0 +1,163 @@
+import { EventEmitter } from 'node:events'
+import {
+  capabilitiesFromProbe,
+  capabilitiesFromSupport
+} from './capabilities.js'
+import type { Capabilities } from './capabilities.js'
+import { LightChannel } from './channel.js'
+import { UnsupportedError } from './errors.js'
+import { discover as ssdpDiscover } from './discovery.js'
+import { Transport } from './transport.js'
+import type { ChannelState, DeviceCapabilities } from './types.js'
+
+const DEFAULT_PORT = 55443
+const PROBE_PROPS = ['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb']
+
+export class YeelightDevice extends EventEmitter {
+  private readonly transport: Transport
+  private readonly port: number
+
+  readonly id: string
+  readonly ip: string
+  readonly model: string
+  readonly name: string
+  readonly capabilities: DeviceCapabilities
+  readonly main: LightChannel
+  readonly background: LightChannel | null
+
+  private constructor(opts: {
+    id: string
+    ip: string
+    port: number
+    model: string
+    name: string
+    capabilities: Capabilities
+    transport: Transport
+  }) {
+    super()
+    this.transport = opts.transport
+    this.port = opts.port
+    this.id = opts.id
+    this.ip = opts.ip
+    this.model = opts.model
+    this.name = opts.name
+    this.capabilities = opts.capabilities.device
+
+    this.main = new LightChannel(
+      'main',
+      opts.capabilities.main,
+      opts.transport,
+      ''
+    )
+    this.background = opts.capabilities.background
+      ? new LightChannel(
+          'background',
+          opts.capabilities.background,
+          opts.transport,
+          'bg_'
+        )
+      : null
+
+    this.transport.on('disconnect', () => this.emit('disconnect'))
+    this.transport.on('props', (data: Partial<ChannelState>) =>
+      this.emit('props', data)
+    )
+  }
+
+  // ── Static factory methods ────────────────────────────────────────────────
+
+  /**
+   * Discovers devices on the LAN via SSDP multicast.
+   * Returns device objects populated from SSDP data — NOT yet connected.
+   * Call device.connect() before sending any commands.
+   */
+  static async discover(opts?: {
+    timeout?: number
+  }): Promise<YeelightDevice[]> {
+    const infos = await ssdpDiscover(opts?.timeout)
+
+    return infos.map((info) => {
+      const transport = new Transport()
+      const caps = capabilitiesFromSupport(info.support)
+      return new YeelightDevice({ ...info, capabilities: caps, transport })
+    })
+  }
+
+  /**
+   * Connects directly to a device by IP without discovery. Probes capabilities
+   * via get_prop.
+   */
+  static async connect(
+    ip: string,
+    port = DEFAULT_PORT
+  ): Promise<YeelightDevice> {
+    const transport = new Transport()
+    await transport.connect(ip, port)
+
+    const probeResult = await transport.send('get_prop', PROBE_PROPS)
+    const caps = capabilitiesFromProbe(probeResult)
+
+    return new YeelightDevice({
+      id: '',
+      ip,
+      port,
+      model: 'unknown',
+      name: '',
+      capabilities: caps,
+      transport
+    })
+  }
+
+  // ── Instance methods ───────────────────────────────────────────────────────
+
+  /**
+   * Connects (or reconnects) to the device. No-op if already connected.
+   * Typically only needed for devices returned by discover() after a reconnect.
+   */
+  async connect(): Promise<void> {
+    if (this.transport.isConnected()) return
+    await this.transport.connect(this.ip, this.port)
+  }
+
+  disconnect(): void {
+    this.transport.disconnect()
+  }
+
+  isConnected(): boolean {
+    return this.transport.isConnected()
+  }
+
+  /**
+   * Set left and right strip colors independently. lamp15 only.
+   * Throws UnsupportedError on devices without segment control.
+   */
+  async setSegments(
+    left: [number, number, number],
+    right: [number, number, number]
+  ): Promise<void> {
+    if (!this.capabilities.hasSegments) {
+      throw new UnsupportedError(
+        `Device '${this.model}' does not support segment control`
+      )
+    }
+    const leftInt =
+      ((left[0] & 0xff) << 16) | ((left[1] & 0xff) << 8) | (left[2] & 0xff)
+    const rightInt =
+      ((right[0] & 0xff) << 16) | ((right[1] & 0xff) << 8) | (right[2] & 0xff)
+    await this.transport.send('set_segment_rgb', [leftInt, rightInt])
+  }
+
+  // ── EventEmitter overloads for type safety ────────────────────────────────
+
+  on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
+  on(event: 'disconnect', listener: () => void): this
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(event: string, listener: (...args: any[]) => void): this {
+    return super.on(event, listener)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  off(event: string, listener: (...args: any[]) => void): this {
+    return super.off(event, listener)
+  }
+}

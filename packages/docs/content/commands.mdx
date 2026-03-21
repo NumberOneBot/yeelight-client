@@ -13,8 +13,8 @@ The lamp has **three independent control surfaces**:
 | #   | Zone                              | Type       | Commands                                      |
 | --- | --------------------------------- | ---------- | --------------------------------------------- |
 | 1   | Front light (screen bias)         | CT, no RGB | `set_power`, `set_bright`, `set_ct_abx`       |
-| 2   | Rear strip — both sides at once   | RGB        | `bg_set_rgb`, `bg_set_power`, `bg_set_bright` |
-| 3   | Rear strip — left and right sides | RGB        | `set_segment_rgb`                             |
+| 2   | Rear strip — both sides at once   | RGB + CT   | `bg_set_rgb`, `bg_set_power`, `bg_set_bright` |
+| 3   | Rear strip — left and right sides | RGB + CT   | `set_segment_rgb`                             |
 
 ---
 
@@ -41,7 +41,7 @@ set_segment_rgb(left_rgb, right_rgb)
 | ---------------------- | ----------------------------------------------- | ----------------- |
 | `set_power`            | `"on"\|"off"`, `"smooth"\|"sudden"`, `ms`       | Power on/off      |
 | `set_bright`           | `1-100`, `"smooth"\|"sudden"`, `ms`             | Brightness        |
-| `set_ct_abx`           | `kelvin(1700-6500)`, `"smooth"\|"sudden"`, `ms` | Color temperature |
+| `set_ct_abx`           | `kelvin(2700-6500)`, `"smooth"\|"sudden"`, `ms` | Color temperature |
 | `start_cf` / `stop_cf` | see [Flow section](/protocol#flow-animations)   | Animations        |
 | `toggle`               | —                                               | Toggle power      |
 | `set_default`          | —                                               | Save as default   |
@@ -66,9 +66,7 @@ set_segment_rgb(left_rgb, right_rgb)
 
 ## Both Zones
 
-| Method       | Description               |
-| ------------ | ------------------------- |
-| `dev_toggle` | Toggle both zones at once |
+`dev_toggle` — toggles both front light and rear strip simultaneously.
 
 ---
 
@@ -112,18 +110,9 @@ set_segment_rgb(left_rgb, right_rgb)
 
 ---
 
-## Complete Supported Methods List
+## Supported Methods
 
-```
-get_prop set_default set_power toggle set_ct_abx set_bright start_cf stop_cf
-set_scene cron_add cron_get cron_del set_adjust adjust_bright adjust_ct set_name
-bg_set_rgb bg_set_hsv bg_set_ct_abx bg_start_cf bg_stop_cf bg_set_scene
-bg_set_default bg_set_power bg_set_bright bg_set_adjust bg_adjust_bright
-bg_adjust_color bg_adjust_ct bg_toggle dev_toggle
-udp_sess_new udp_sess_keep_alive udp_chroma_sess_new set_segment_rgb
-```
-
-Notably absent: `set_music` — TCP music mode **is not available** on lamp15.
+The full list of 34 methods reported by `get_prop` is available in [python-miio specs.yaml](https://github.com/rytilahti/python-miio/blob/master/miio/integrations/yeelight/light/specs.yaml). Notable absence: `set_music` — TCP music mode is **not available** on lamp15.
 
 ---
 

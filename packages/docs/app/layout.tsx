@@ -2,6 +2,7 @@ import { Layout, Navbar } from 'nextra-theme-docs'
 import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
+import Logo from '../components/Logo'
 
 export const metadata = {
   title: {
@@ -20,11 +21,20 @@ export default async function RootLayout({
       <Head />
       <body>
         <Layout
-          navbar={<Navbar logo={<b>Yeelight Control</b>} />}
-          pageMap={await getPageMap()}
-          footer={
-            <p style={{ textAlign: 'center', opacity: 0.6 }}>MIT License</p>
+          navbar={
+            <Navbar
+              logo={
+                <span
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <Logo style={{ height: '48px', width: 'auto' }} />
+                  <b>Yeelight Control</b>
+                </span>
+              }
+            />
           }
+          pageMap={await getPageMap()}
+          footer={null}
           editLink={null}
           feedback={{ content: null }}
         >
