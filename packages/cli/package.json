@@ -8,10 +8,10 @@
   "scripts": {
     "dev": "bun run src/index.tsx",
     "prebuild:win": "magick -background none assets/icon-dark.svg -define icon:auto-resize=256,48,32,16 assets/icon-dark.ico",
-    "build:win": "bun build src/index.tsx --compile --target bun-windows-x64 --external react-devtools-core --outfile ../../dist/yeelight-win.exe",
+    "build:win": "bun build src/index.tsx --compile --target bun-windows-x64 --external react-devtools-core --outfile ../../dist/ylc.exe",
     "postbuild:win": "node scripts/set-icon.mjs",
-    "build:mac": "bun build src/index.tsx --compile --target bun-darwin-arm64 --external react-devtools-core --outfile ../../dist/yeelight-mac",
-    "build:mac-x64": "bun build src/index.tsx --compile --target bun-darwin-x64 --external react-devtools-core --outfile ../../dist/yeelight-mac-x64",
+    "build:mac-arm64": "bun build src/index.tsx --compile --target bun-darwin-arm64 --external react-devtools-core --outfile ../../dist/ylc",
+    "build:mac-x64": "bun build src/index.tsx --compile --target bun-darwin-x64 --external react-devtools-core --outfile ../../dist/ylc-x64",
     "build": "pnpm run build:win"
   },
   "devDependencies": {
