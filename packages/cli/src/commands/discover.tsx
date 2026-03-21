@@ -8,6 +8,7 @@ type DeviceInfo = {
   model: string
   main: string
   bg: string | null
+  segments: boolean
 }
 
 function channelCaps(caps: {
@@ -34,7 +35,8 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
             name: d.name,
             model: d.model,
             main: channelCaps(d.main.capabilities),
-            bg: d.background ? channelCaps(d.background.capabilities) : null
+            bg: d.background ? channelCaps(d.background.capabilities) : null,
+            segments: d.capabilities.hasSegments
           }))
         )
       })
@@ -65,10 +67,13 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
       {devices.map((d) => (
         <Box key={d.ip} gap={2}>
           <Text color="cyan">{d.ip}</Text>
-          <Text bold>{d.name}</Text>
+          <Text bold color="green">
+            {d.name}
+          </Text>
           <Text dimColor>
             {d.model} · main: {d.main}
             {d.bg ? ` · bg: ${d.bg}` : ''}
+            {d.segments ? ' · segments' : ''}
           </Text>
         </Box>
       ))}
