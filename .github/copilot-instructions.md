@@ -1,4 +1,4 @@
-# yeelight-control — AI Instructions
+# yeelight-client — AI Instructions
 
 ## What Is This Project?
 
