@@ -68,7 +68,7 @@ export function ColorCommand({
           bv = Number(raw[2])
           if ([rv, gv, bv].some((v) => isNaN(v) || v < 0 || v > 255)) {
             throw new Error(
-              'Provide #hex or three 0–255 values: yeelight color <r> <g> <b>'
+              'Provide #hex or three 0–255 values: ylc color <r> <g> <b>'
             )
           }
         }

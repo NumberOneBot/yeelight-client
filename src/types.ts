@@ -10,12 +10,6 @@ export interface DeviceInfo {
   support: string[]
 }
 
-export interface RpcCommand {
-  id: number
-  method: string
-  params: (string | number)[]
-}
-
 export type RpcResponse = {
   id: number
   result?: string[]

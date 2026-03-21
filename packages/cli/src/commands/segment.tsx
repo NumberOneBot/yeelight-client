@@ -36,7 +36,7 @@ export function SegmentCommand({
     ;(async () => {
       try {
         if (!left || !right) {
-          throw new Error('Usage: yeelight segment <#left> <#right>')
+          throw new Error('Usage: ylc segment <#left> <#right>')
         }
         const lc = parseHex(left)
         const rc = parseHex(right)
