@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Text, useApp } from 'ink'
-import { resolveDevice } from '../resolve.js'
+import { resolveDevice } from '../resolve'
 
 function parseHex(
   input: string

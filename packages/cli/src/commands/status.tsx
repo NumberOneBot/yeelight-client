@@ -1,6 +1,6 @@
 import React, { useEffect, useState, type ReactNode } from 'react'
 import { Box, Text, useApp } from 'ink'
-import { resolveDevice } from '../resolve.js'
+import { resolveDevice } from '../resolve'
 
 type ChanState = {
   power: boolean

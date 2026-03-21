@@ -10,7 +10,10 @@ type DeviceInfo = {
   bg: string | null
 }
 
-function channelCaps(caps: { hasColor: boolean; hasColorTemp: boolean }): string {
+function channelCaps(caps: {
+  hasColor: boolean
+  hasColorTemp: boolean
+}): string {
   if (caps.hasColor && caps.hasColorTemp) return 'rgb+ct'
   if (caps.hasColor) return 'rgb'
   if (caps.hasColorTemp) return 'ct'
