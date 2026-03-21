@@ -6,7 +6,7 @@ export function BrightnessCommand({
   value,
   ip,
   bg,
-  duration,
+  duration
 }: {
   value: number
   ip?: string
@@ -33,6 +33,11 @@ export function BrightnessCommand({
     })()
   }, [])
 
-  if (error) return <Text bold color="red">{error}</Text>
+  if (error)
+    return (
+      <Text bold color="red">
+        {error}
+      </Text>
+    )
   return null
 }
