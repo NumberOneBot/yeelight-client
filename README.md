@@ -9,7 +9,6 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/yeelight-control"><img src="https://img.shields.io/npm/v/yeelight-control" alt="npm" /></a>
   <a href="https://github.com/NumberOneBot/yeelight-control/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NumberOneBot/yeelight-control" alt="license" /></a>
 </p>
 
