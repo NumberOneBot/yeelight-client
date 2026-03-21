@@ -1,4 +1,5 @@
 import * as dgram from 'node:dgram'
+import * as os from 'node:os'
 import type { DeviceInfo } from './types.js'
 
 const SSDP_ADDRESS = '239.255.255.250'
@@ -39,6 +40,16 @@ function parseDeviceHeaders(raw: string): DeviceInfo | null {
   }
 }
 
+function physicalInterfaces(): string[] {
+  return Object.values(os.networkInterfaces())
+    .flat()
+    .filter(
+      (iface): iface is os.NetworkInterfaceInfo =>
+        !!iface && iface.family === 'IPv4' && !iface.internal
+    )
+    .map((iface) => iface.address)
+}
+
 export function discover(timeoutMs = SSDP_TIMEOUT_MS): Promise<DeviceInfo[]> {
   return new Promise((resolve, reject) => {
     const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true })
@@ -58,9 +69,20 @@ export function discover(timeoutMs = SSDP_TIMEOUT_MS): Promise<DeviceInfo[]> {
 
     socket.bind(() => {
       const buf = Buffer.from(SEARCH_MESSAGE)
-      socket.send(buf, 0, buf.length, SSDP_PORT, SSDP_ADDRESS, (err) => {
-        if (err) reject(err)
-      })
+
+      // Send M-SEARCH through every physical interface so the correct
+      // one reaches the lamp regardless of OS multicast routing.
+      const addresses = physicalInterfaces()
+      if (addresses.length === 0) addresses.push('0.0.0.0')
+
+      for (const addr of addresses) {
+        try {
+          socket.setMulticastInterface(addr)
+          socket.send(buf, 0, buf.length, SSDP_PORT, SSDP_ADDRESS)
+        } catch {
+          // interface doesn't support multicast — skip
+        }
+      }
 
       setTimeout(() => {
         socket.close()
