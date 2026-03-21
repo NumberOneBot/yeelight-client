@@ -17,10 +17,10 @@
 
 ## Packages
 
-| Package | Description |
-|---|---|
+| Package            | Description                                                |
+| ------------------ | ---------------------------------------------------------- |
 | `yeelight-control` | Core library — device discovery, connection, light control |
-| `yeelight-cli` | Terminal tool (`yeelight` command) |
+| `yeelight-cli`     | Terminal tool (`yeelight` command)                         |
 
 ## Requirements
 
@@ -49,7 +49,7 @@ await device.connect()
 // Main channel
 await device.main.setPower(true)
 await device.main.setBrightness(80)
-await device.main.setColorTemp(4000)           // Kelvin
+await device.main.setColorTemp(4000) // Kelvin
 await device.main.setRGB(255, 100, 0)
 await device.main.setHSV(30, 100)
 
@@ -106,28 +106,28 @@ device.on('disconnect', () => {
 
 ### API Reference
 
-| Method | Description |
-|---|---|
-| `YeelightDevice.discover(opts?)` | Discover devices on the LAN via SSDP |
-| `YeelightDevice.connect(ip, port?)` | Connect directly by IP |
-| `device.main` | Main light channel (`LightChannel`) |
-| `device.background` | Background channel or `null` |
-| `device.setSegments(left, right)` | Independent left/right colors (lamp15 only) |
-| `device.disconnect()` | Close the connection |
+| Method                              | Description                                 |
+| ----------------------------------- | ------------------------------------------- |
+| `YeelightDevice.discover(opts?)`    | Discover devices on the LAN via SSDP        |
+| `YeelightDevice.connect(ip, port?)` | Connect directly by IP                      |
+| `device.main`                       | Main light channel (`LightChannel`)         |
+| `device.background`                 | Background channel or `null`                |
+| `device.setSegments(left, right)`   | Independent left/right colors (lamp15 only) |
+| `device.disconnect()`               | Close the connection                        |
 
 **`LightChannel` methods:**
 
-| Method | Description |
-|---|---|
-| `setPower(on, opts?)` | Turn on/off |
-| `toggle()` | Toggle power |
-| `setBrightness(1–100, opts?)` | Set brightness |
+| Method                        | Description                         |
+| ----------------------------- | ----------------------------------- |
+| `setPower(on, opts?)`         | Turn on/off                         |
+| `toggle()`                    | Toggle power                        |
+| `setBrightness(1–100, opts?)` | Set brightness                      |
 | `setColorTemp(kelvin, opts?)` | Set color temperature (1700–6500 K) |
-| `setRGB(r, g, b, opts?)` | Set RGB color |
-| `setHSV(hue, sat, opts?)` | Set color via HSV |
-| `startFlow(flow)` | Start a color flow animation |
-| `stopFlow()` | Stop animation |
-| `getState()` | Read current state |
+| `setRGB(r, g, b, opts?)`      | Set RGB color                       |
+| `setHSV(hue, sat, opts?)`     | Set color via HSV                   |
+| `startFlow(flow)`             | Start a color flow animation        |
+| `stopFlow()`                  | Stop animation                      |
+| `getState()`                  | Read current state                  |
 
 All methods accept an optional `TransitionOptions` — `{ effect: 'smooth' \| 'sudden', duration: number }`.
 
@@ -190,6 +190,7 @@ pnpm dev                                    # library watch mode
 pnpm --filter yeelight-cli dev              # CLI dev
 pnpm --filter yeelight-control-docs dev     # docs dev server
 pnpm build                                  # build library
+pnpm --filter yeelight-cli build:win        # compile Windows binary (requires ImageMagick)
 ```
 
 ## License
