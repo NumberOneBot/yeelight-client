@@ -4,12 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "start": "tsx src/index.ts"
+    "start": "tsx src/index.ts",
+    "docs:dev": "pnpm --filter yeelight-control-docs dev",
+    "docs:build": "pnpm --filter yeelight-control-docs build"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@types/node": "^22.13.10",
+    "prettier": "^3.8.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3",
-    "@types/node": "^22.13.10"
+    "typescript": "^5.7.3"
   }
 }

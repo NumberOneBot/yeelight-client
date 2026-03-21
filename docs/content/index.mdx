@@ -1,0 +1,38 @@
+---
+title: Overview
+---
+
+# Yeelight Control
+
+A TypeScript library for local LAN control of Yeelight devices.
+
+## What this is
+
+A zero-dependency Node.js library that communicates with Yeelight WiFi devices directly over TCP — no cloud, no Xiaomi account, no external API.
+
+The library targets the Yeelight inter-operation protocol (port 55443, JSON-RPC over plain-text socket) and is built around a **channel abstraction** that works uniformly across the entire device lineup — from simple white bulbs to dual-zone light bars.
+
+## Downstream projects
+
+This library is the foundation for:
+
+- A **CLI executable** — single-command control from the terminal
+- A **desktop app** (macOS / Windows) — interactive UI with live state
+- A third project (TBD)
+
+## Target hardware
+
+Primary test device: **Yeelight Light Bar Pro** (`lamp15` / YLTD003) — the most capable device in the lineup, with a CT main channel and a dual-zone RGB rear strip.
+
+The library is designed to work with the full Yeelight lineup. See [API Reference](/architecture#device-compatibility-matrix) for the compatibility matrix.
+
+## Quick start
+
+```ts
+import { YeelightDevice } from 'yeelight-control'
+
+const [device] = await YeelightDevice.discover()
+
+await device.main.setColorTemp(4000)
+await device.background?.setRGB(255, 0, 128)
+```

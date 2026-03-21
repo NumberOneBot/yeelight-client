@@ -1,0 +1,243 @@
+---
+title: Protocol Reference
+---
+
+# Protocol Reference
+
+Protocol internals are documented in [YEELIGHT.md](https://github.com/your-repo/blob/main/YEELIGHT.md) in the repository root.
+
+
+
+| Property          | Value                           |
+| ----------------- | ------------------------------- |
+| Transport         | TCP                             |
+| Port              | `55443`                         |
+| Encoding          | UTF-8 plain text, no encryption |
+| Message delimiter | `\r\n`                          |
+| Discovery         | SSDP over UDP multicast         |
+| Rate limit        | ~10 commands/sec (TCP mode)     |
+
+LAN control must be explicitly enabled in the Yeelight mobile app:
+**Device → Settings → LAN Control**
+
+Official PDF spec (incomplete): `https://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf`
+
+---
+
+## Device Discovery (SSDP)
+
+Devices are discovered via SSDP (UPnP-style multicast).
+
+**M-SEARCH request** — send as UDP to `239.255.255.250:1982`:
+
+```
+M-SEARCH * HTTP/1.1\r\n
+HOST: 239.255.255.250:1982\r\n
+MAN: "ssdp:discover"\r\n
+ST: wifi_bulb\r\n
+\r\n
+```
+
+**Response** — HTTP/1.1 headers:
+
+| Header     | Example                        | Description                               |
+| ---------- | ------------------------------ | ----------------------------------------- |
+| `Location` | `yeelight://192.168.1.5:55443` | IP and port for TCP connection            |
+| `id`       | `0x000000000484af7d`           | Unique device identifier (hex)            |
+| `model`    | `lamp15`                       | Logical model name (not hardware SKU)     |
+| `name`     | `My Light Bar`                 | User-assigned name                        |
+| `power`    | `on`                           | Current power state                       |
+| `bright`   | `100`                          | Current brightness (1–100)                |
+| `ct`       | `4000`                         | Current color temperature (Kelvin)        |
+| `rgb`      | `16711680`                     | Current RGB as integer                    |
+| `support`  | `get_prop set_power ...`       | Space-separated list of supported methods |
+
+The `support` field is the **authoritative source** for what commands a device accepts.
+
+---
+
+## Command Format
+
+### Request
+
+```json
+{ "id": 1, "method": "set_bright", "params": [50, "smooth", 500] }
+```
+
+### Response (success)
+
+```json
+{ "id": 1, "result": ["ok"] }
+```
+
+### Response (error)
+
+```json
+{ "id": 3, "error": { "code": -1, "message": "unsupported method" } }
+```
+
+### Push notifications (unsolicited)
+
+```json
+{ "method": "props", "params": { "power": "on", "bright": "75" } }
+```
+
+Sent by the device whenever state changes from any source (physical button, another app, etc.).
+
+---
+
+## Device Model Registry
+
+The `model` field in SSDP identifies the logical device type — **not** the hardware SKU on the box.
+
+### Dual-zone devices (bg\_\* commands)
+
+Devices with a `background` channel — the most capable category:
+
+| Model       | Main channel   | Background channel |
+| ----------- | -------------- | ------------------ |
+| `lamp15`    | CT 2700–6500 K | RGB 1700–6500 K    |
+| `ceiling4`  | CT 2700–6500 K | RGB 1700–6500 K    |
+| `ceiling10` | CT 2700–6500 K | RGB 1700–6500 K    |
+| `ceiling19` | CT 2700–6500 K | RGB 1700–6500 K    |
+| `ceiling20` | CT 2700–6500 K | RGB 1700–6500 K    |
+
+### Color bulbs (RGB + CT)
+
+| Model                       | CT Range    | Notes         |
+| --------------------------- | ----------- | ------------- |
+| `color`                     | 1700–6500 K | YLDP02YL Gen1 |
+| `color1`–`color5`, `color7` | 1700–6500 K |               |
+| `colora`, `colorb`          | 1700–6500 K |               |
+| `colorc`                    | 2700–6500 K |               |
+
+### LED strips
+
+| Model    | CT Range    |
+| -------- | ----------- |
+| `strip1` | 1700–6500 K |
+| `strip2` | 1700–6500 K |
+| `strip4` | 2700–6500 K |
+| `strip6` | 2700–6500 K |
+
+### Bedside lamps
+
+| Model     | CT Range    | Night light |
+| --------- | ----------- | ----------- |
+| `bslamp1` | 1700–6500 K | ❌          |
+| `bslamp2` | 1700–6500 K | ✅ ⚠️       |
+| `bslamp3` | 1700–6500 K | ✅          |
+
+> ⚠️ `bslamp2` had LAN control forcibly removed in firmware 2.0.6_0041 by Xiaomi.
+
+### Ceiling lights (CT only)
+
+| Model                                              | CT Range    | Background |
+| -------------------------------------------------- | ----------- | ---------- |
+| `ceiling1`–`ceiling6`                              | 2700–6500 K | ❌         |
+| `ceiling10`                                        | 2700–6500 K | ✅         |
+| `ceiling13`, `ceiling15`, `ceiling18`, `ceiling24` | 2700–6500 K | ❌         |
+| `ceiling19`, `ceiling20`                           | 2700–6500 K | ✅         |
+| `ceiling22`                                        | 2600–6100 K | ❌         |
+| `ceila`, `ceil26`                                  | 2700–6500 K | ❌         |
+
+### Desk lamps
+
+| Model    | CT Range    | Color | Background |
+| -------- | ----------- | ----- | ---------- |
+| `lamp1`  | 2700–5000 K | ❌    | ❌         |
+| `lamp2`  | 2500–4800 K | ❌    | ❌         |
+| `lamp4`  | 2600–5000 K | ❌    | ❌         |
+| `lamp15` | 2700–6500 K | ❌    | ✅         |
+| `lamp22` | 2700–6500 K | ✅    | ❌         |
+
+### White-only bulbs
+
+| Model                              | CT Range    |
+| ---------------------------------- | ----------- |
+| `mono`                             | 2700 K only |
+| `mono1`, `mono5`, `mono6`, `monob` | 2700 K only |
+| `ct_bulb`, `ct2`                   | 2700–6500 K |
+
+---
+
+## Capability System
+
+Capability detection is based on which methods appear in the `support` SSDP field:
+
+| Group      | Methods                               | Capability                         |
+| ---------- | ------------------------------------- | ---------------------------------- |
+| Color      | `set_rgb`, `set_hsv`                  | Main channel supports RGB          |
+| Color temp | `set_ct_abx`                          | Main channel supports CT           |
+| Flow       | `start_cf`, `stop_cf`                 | Main channel supports animations   |
+| Background | `bg_set_power`, `bg_set_rgb`…         | Device has a background channel    |
+| Music mode | `set_music`                           | TCP music mode supported           |
+| Segment    | `set_segment_rgb`                     | Per-side control (lamp15-specific) |
+| UDP/Chroma | `udp_sess_new`, `udp_chroma_sess_new` | Razer Chroma integration           |
+
+---
+
+## Flow Animations
+
+```
+start_cf(count, action, flow_expression)
+bg_start_cf(count, action, flow_expression)
+```
+
+| Parameter | Values                                                              |
+| --------- | ------------------------------------------------------------------- |
+| `count`   | `0` = infinite, `N` = repeat N times                                |
+| `action`  | `0` = restore, `1` = stay on last frame, `2` = turn off             |
+| frame     | `duration_ms, mode, value, brightness` (mode: 1=RGB, 2=CT, 7=sleep) |
+
+Example — rainbow loop on background channel:
+
+```json
+{
+  "method": "bg_start_cf",
+  "params": [0, 0, "2000,1,16711680,100,2000,1,65280,100,2000,1,255,100"]
+}
+```
+
+---
+
+## Music Mode
+
+Music mode **inverts the TCP connection direction**: the lamp connects to a server the app opens. This removes the rate limit entirely.
+
+```json
+{ "method": "set_music", "params": [1, "192.168.1.100", 54321] }
+```
+
+Gated by `set_music` in the `support` field. **`lamp15` does not support music mode.**
+
+In music mode: the lamp does not respond to `get_prop` — state must be tracked locally.
+
+---
+
+## UDP / Chroma Mode
+
+For high-frequency reactive effects, the device has an undocumented UDP session mode used by Razer Synapse internally.
+
+| Method                | Description          |
+| --------------------- | -------------------- |
+| `udp_sess_new`        | Open a UDP session   |
+| `udp_sess_keep_alive` | Keepalive            |
+| `udp_chroma_sess_new` | Razer Chroma variant |
+
+Protocol not publicly documented.
+
+---
+
+## LAN Control Availability
+
+**Xiaomi forced Yeelight to remove LAN control from some devices post-sale:**
+
+| Device  | Firmware    | Status                                         |
+| ------- | ----------- | ---------------------------------------------- |
+| bslamp2 | 2.0.6_0041+ | Removed. Toggle disappeared from Yeelight app. |
+
+> _"lan control feature is from yeelight, xiaomi company takes it as a risk, so we have to disable it."_
+> — Yeelight staff, [forum.yeelight.com Feb 2021](https://forum.yeelight.com/t/topic/22664/14)
+
+Always use SSDP discovery as the source of truth — if a device doesn't respond to M-SEARCH, LAN is either disabled or removed.

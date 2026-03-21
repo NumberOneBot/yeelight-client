@@ -1,0 +1,136 @@
+---
+title: Commands — lamp15
+---
+
+# Commands Reference (lamp15 / YLTD003)
+
+> Determined empirically. Not all commands are in the official spec.
+
+## Physical Zones
+
+The lamp has **three independent control surfaces**:
+
+| #   | Zone                              | Type       | Commands                                      |
+| --- | --------------------------------- | ---------- | --------------------------------------------- |
+| 1   | Front light (screen bias)         | CT, no RGB | `set_power`, `set_bright`, `set_ct_abx`       |
+| 2   | Rear strip — both sides at once   | RGB        | `bg_set_rgb`, `bg_set_power`, `bg_set_bright` |
+| 3   | Rear strip — left and right sides | RGB        | `set_segment_rgb`                             |
+
+---
+
+## set_segment_rgb — Independent Side Control
+
+**Not in official docs** — determined empirically.
+
+```
+set_segment_rgb(left_rgb, right_rgb)
+```
+
+- `left_rgb`, `right_rgb` = `r * 65536 + g * 256 + b`
+- Brightness comes from `bg_set_bright`, not from RGB magnitude
+- RGB magnitude is **ignored** — only hue/saturation matter
+- `rgb(1,0,0)` and `rgb(255,0,0)` produce identically bright red
+- `0x000000` produces **undefined behavior** — avoid it
+- Calling `bg_set_rgb` afterward overrides and resets per-side state
+
+---
+
+## Front Light (CT only)
+
+| Method                 | Parameters                                      | Description       |
+| ---------------------- | ----------------------------------------------- | ----------------- |
+| `set_power`            | `"on"\|"off"`, `"smooth"\|"sudden"`, `ms`       | Power on/off      |
+| `set_bright`           | `1-100`, `"smooth"\|"sudden"`, `ms`             | Brightness        |
+| `set_ct_abx`           | `kelvin(1700-6500)`, `"smooth"\|"sudden"`, `ms` | Color temperature |
+| `start_cf` / `stop_cf` | see [Flow section](/protocol#flow-animations)   | Animations        |
+| `toggle`               | —                                               | Toggle power      |
+| `set_default`          | —                                               | Save as default   |
+
+---
+
+## Rear Strip — Global (`bg_*`)
+
+| Method           | Parameters                                             | Description                                 |
+| ---------------- | ------------------------------------------------------ | ------------------------------------------- |
+| `bg_set_power`   | `"on"\|"off"`, `"smooth"\|"sudden"`, `ms`              | Power on/off                                |
+| `bg_toggle`      | —                                                      | Toggle                                      |
+| `bg_set_bright`  | `1-100`, `"smooth"\|"sudden"`, `ms`                    | Brightness (applies to both sides)          |
+| `bg_set_rgb`     | `rgb_int`, `"smooth"\|"sudden"`, `ms`                  | Both sides same color, resets segment state |
+| `bg_set_hsv`     | `hue(0-359)`, `sat(0-100)`, `"smooth"\|"sudden"`, `ms` | Color via HSV                               |
+| `bg_set_ct_abx`  | `kelvin(1700-6500)`, `"smooth"\|"sudden"`, `ms`        | Color temperature                           |
+| `bg_start_cf`    | `count`, `action`, `flow_expression`                   | Start animation                             |
+| `bg_stop_cf`     | —                                                      | Stop animation                              |
+| `bg_set_default` | —                                                      | Save as default                             |
+
+---
+
+## Both Zones
+
+| Method       | Description               |
+| ------------ | ------------------------- |
+| `dev_toggle` | Toggle both zones at once |
+
+---
+
+## Properties (get_prop)
+
+```json
+{
+  "id": 1,
+  "method": "get_prop",
+  "params": ["power", "bright", "ct", "bg_power", "bg_rgb", "bg_bright"]
+}
+```
+
+| Property        | Description                                  |
+| --------------- | -------------------------------------------- |
+| `power`         | Front light: `"on"` / `"off"`                |
+| `bright`        | Front light brightness (1–100)               |
+| `ct`            | Front light color temp **(Kelvin, not RGB)** |
+| `flowing`       | `"1"` if animation active                    |
+| `bg_power`      | Rear strip: `"on"` / `"off"`                 |
+| `bg_bright`     | Rear strip brightness (1–100)                |
+| `bg_rgb`        | Rear strip color as rgb_int                  |
+| `bg_ct`         | Rear strip CT **(Kelvin, not RGB)**          |
+| `bg_color_mode` | `"1"`=RGB, `"2"`=CT, `"3"`=HSV               |
+| `bg_flowing`    | `"1"` if rear animation active               |
+| `active_mode`   | `"0"`=normal, `"1"`=night light              |
+| `name`          | Device name                                  |
+
+> `ct` and `bg_ct` are **Kelvin values** — do not treat as RGB integers.
+
+---
+
+## Utilities
+
+| Method     | Parameters     | Description    |
+| ---------- | -------------- | -------------- |
+| `set_name` | `"name"`       | Rename device  |
+| `cron_add` | `0`, `minutes` | Auto-off timer |
+| `cron_get` | `0`            | Read timer     |
+| `cron_del` | `0`            | Delete timer   |
+
+---
+
+## Complete Supported Methods List
+
+```
+get_prop set_default set_power toggle set_ct_abx set_bright start_cf stop_cf
+set_scene cron_add cron_get cron_del set_adjust adjust_bright adjust_ct set_name
+bg_set_rgb bg_set_hsv bg_set_ct_abx bg_start_cf bg_stop_cf bg_set_scene
+bg_set_default bg_set_power bg_set_bright bg_set_adjust bg_adjust_bright
+bg_adjust_color bg_adjust_ct bg_toggle dev_toggle
+udp_sess_new udp_sess_keep_alive udp_chroma_sess_new set_segment_rgb
+```
+
+Notably absent: `set_music` — TCP music mode **is not available** on lamp15.
+
+---
+
+## Known Limitations
+
+**No per-side brightness.** `set_segment_rgb` has no brightness parameter, and RGB magnitude is normalized away. Both sides always share the brightness set by `bg_set_bright`.
+
+**`bg_set_rgb` resets segments.** Once called, per-side values from `set_segment_rgb` are gone.
+
+**Rate limit: ~10 cmd/sec.** Exceeding it silently drops commands or closes the connection. For high-frequency effects, use UDP mode (undocumented).

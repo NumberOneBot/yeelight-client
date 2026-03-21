@@ -1,0 +1,198 @@
+---
+title: API Reference
+---
+
+# API Reference
+
+## Channel Abstraction
+
+All devices expose one or two independent **channels**. Each channel declares its own capabilities — consumer code never needs to check the device model.
+
+```
+YeelightDevice
+├── main: LightChannel         always present
+└── background: LightChannel | null   dual-zone devices only
+```
+
+---
+
+## YeelightDevice
+
+The main entry point. Handles discovery, connection, and exposes channels.
+
+```ts
+class YeelightDevice {
+  static discover(opts?: { timeout?: number }): Promise<YeelightDevice[]>
+  static connect(ip: string, port?: number): Promise<YeelightDevice>
+
+  readonly id: string
+  readonly ip: string
+  readonly model: string
+  readonly name: string
+  readonly capabilities: DeviceCapabilities
+
+  readonly main: LightChannel
+  readonly background: LightChannel | null
+
+  connect(): Promise<void>
+  disconnect(): void
+  isConnected(): boolean
+
+  on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
+  on(event: 'disconnect', listener: () => void): this
+  off(event: string, listener: Function): this
+}
+```
+
+**lamp15 extension** — only present when `capabilities.hasSegments`:
+
+```ts
+setSegments(
+  left: [number, number, number],
+  right: [number, number, number]
+): Promise<void>
+```
+
+---
+
+## LightChannel
+
+Primary unit of interaction. Wraps Transport with a command prefix (`""` for main, `"bg_"` for background).
+
+```ts
+class LightChannel {
+  readonly type: 'main' | 'background'
+  readonly capabilities: ChannelCapabilities
+
+  setPower(on: boolean, opts?: TransitionOptions): Promise<void>
+  toggle(opts?: TransitionOptions): Promise<void>
+  setBrightness(value: number, opts?: TransitionOptions): Promise<void>
+
+  // Requires capabilities.hasColorTemp — throws UnsupportedError otherwise
+  setColorTemp(kelvin: number, opts?: TransitionOptions): Promise<void>
+
+  // Requires capabilities.hasColor — throws UnsupportedError otherwise
+  setRGB(
+    r: number,
+    g: number,
+    b: number,
+    opts?: TransitionOptions
+  ): Promise<void>
+  setHSV(
+    hue: number,
+    saturation: number,
+    opts?: TransitionOptions
+  ): Promise<void>
+
+  // Requires capabilities.hasFlow — throws UnsupportedError otherwise
+  startFlow(flow: Flow): Promise<void>
+  stopFlow(): Promise<void>
+
+  getState(): Promise<ChannelState>
+}
+```
+
+Calling `setRGB()` on a CT-only channel throws `UnsupportedError` at call time, not silently at runtime.
+
+---
+
+## Flow Builder
+
+```ts
+class Flow {
+  static builder(): FlowBuilder
+
+  // Presets
+  static pulse(
+    r: number,
+    g: number,
+    b: number,
+    opts?: { count?: number; duration?: number }
+  ): Flow
+  static strobe(
+    r: number,
+    g: number,
+    b: number,
+    opts?: { count?: number }
+  ): Flow
+  static colorCycle(opts?: { duration?: number }): Flow
+  static candle(): Flow
+  static sunrise(durationMs: number): Flow
+}
+
+class FlowBuilder {
+  repeat(count: number): this
+  onEnd(action: 'recover' | 'stay' | 'off'): this
+  rgb(
+    r: number,
+    g: number,
+    b: number,
+    opts: { duration: number; brightness?: number }
+  ): this
+  colorTemp(
+    kelvin: number,
+    opts: { duration: number; brightness?: number }
+  ): this
+  sleep(ms: number): this
+  build(): Flow
+}
+```
+
+---
+
+## Errors
+
+```ts
+class UnsupportedError extends Error {} // method called on incapable channel
+class ConnectionError extends Error {} // TCP connect/send failure
+class DeviceError extends Error {
+  code: number // device responded with error object
+}
+```
+
+---
+
+## Shared Types
+
+```ts
+interface TransitionOptions {
+  effect?: 'smooth' | 'sudden' // default: 'smooth'
+  duration?: number // ms, default: 300
+}
+
+interface ChannelState {
+  power: boolean
+  brightness: number // 1–100
+  colorTemp: number | null // Kelvin, null if channel has no CT
+  rgb: [number, number, number] | null // null if channel has no color
+  flowing: boolean
+}
+```
+
+---
+
+## Exports
+
+```ts
+export { YeelightDevice } from 'yeelight-control'
+export { Flow, FlowBuilder } from 'yeelight-control'
+export { UnsupportedError, ConnectionError, DeviceError } from 'yeelight-control'
+export type { ChannelState, TransitionOptions } from 'yeelight-control'
+```
+
+`LightChannel` is not constructable directly — instances come from `device.main` / `device.background` only.
+
+---
+
+## Device Compatibility Matrix
+
+| Device type             | `main` capabilities | `background` | `setSegments` |
+| ----------------------- | ------------------- | ------------ | ------------- |
+| `mono`                  | brightness only     | —            | —             |
+| `ct_bulb`, `ceiling1`–N | CT                  | —            | —             |
+| `color`, `strip1`       | RGB + CT            | —            | —             |
+| `bslamp1`–3             | RGB + CT            | —            | —             |
+| `ceiling4/10/19/20`     | CT                  | RGB + CT     | —             |
+| `lamp15` (YLTD003)      | CT                  | RGB + CT     | ✅            |
+
+
