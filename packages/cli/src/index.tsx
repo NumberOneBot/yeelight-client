@@ -72,7 +72,7 @@ function HelpScreen() {
       <Box gap={1} marginBottom={1}>
         <Text bold>Usage:</Text>
         <Text color="magenta" bold>
-          yeelight
+          ylc
         </Text>
         <Text color="yellow">{'<command>'}</Text>
         <Text dimColor>[options]</Text>
@@ -145,7 +145,7 @@ async function main() {
     case 'power': {
       const state = rest[0]
       if (state !== 'on' && state !== 'off') {
-        console.error('Usage: yeelight power <on|off>')
+        console.error('Usage: ylc power <on|off>')
         process.exit(1)
       }
       await render(
@@ -163,7 +163,7 @@ async function main() {
     case 'br': {
       const val = Number(rest[0])
       if (!rest[0] || isNaN(val)) {
-        console.error('Usage: yeelight brightness <1-100>')
+        console.error('Usage: ylc brightness <1-100>')
         process.exit(1)
       }
       await render(
@@ -180,7 +180,7 @@ async function main() {
     case 'ct': {
       const kelvin = Number(rest[0])
       if (!rest[0] || isNaN(kelvin)) {
-        console.error('Usage: yeelight ct <kelvin>')
+        console.error('Usage: ylc ct <kelvin>')
         process.exit(1)
       }
       await render(

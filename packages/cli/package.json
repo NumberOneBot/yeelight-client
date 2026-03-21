@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "bin": {
-    "yeelight": "./src/index.tsx"
+    "ylc": "./src/index.tsx"
   },
   "scripts": {
     "dev": "bun run src/index.tsx",

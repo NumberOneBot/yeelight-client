@@ -16,10 +16,10 @@
 
 ## Packages
 
-| Package            | Description                                                |
-| ------------------ | ---------------------------------------------------------- |
+| Package           | Description                                                |
+| ----------------- | ---------------------------------------------------------- |
 | `yeelight-client` | Core library — device discovery, connection, light control |
-| `yeelight-cli`     | Terminal tool (`yeelight` command)                         |
+| `yeelight-cli`    | Terminal tool (`ylc` command)                              |
 
 ## Requirements
 
@@ -145,7 +145,7 @@ Or download a precompiled binary from [Releases](https://github.com/NumberOneBot
 ### Commands
 
 ```
-Usage: yeelight <command> [options]
+Usage: ylc <command> [options]
 
 Commands:
   discover                        Discover devices on the network
@@ -166,16 +166,16 @@ Options:
 ### Examples
 
 ```bash
-yeelight discover
-yeelight status --ip 192.168.1.42
-yeelight power on
-yeelight brightness 50 --duration 1000
-yeelight ct 3000
-yeelight color "#ff6400"
-yeelight color 255 100 0
-yeelight color "#ff640080"          # alpha channel → brightness
-yeelight segment "#ff0000" "#0000ff"
-yeelight power on --bg              # background channel
+ylc discover
+ylc status --ip 192.168.1.42
+ylc power on
+ylc brightness 50 --duration 1000
+ylc ct 3000
+ylc color "#ff6400"
+ylc color 255 100 0
+ylc color "#ff640080"          # alpha channel → brightness
+ylc segment "#ff0000" "#0000ff"
+ylc power on --bg              # background channel
 ```
 
 ---
