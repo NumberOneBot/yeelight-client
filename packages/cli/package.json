@@ -8,21 +8,22 @@
   "scripts": {
     "dev": "bun run src/index.tsx",
     "prebuild:win": "magick -background none assets/icon-dark.svg -define icon:auto-resize=256,48,32,16 assets/icon-dark.ico",
-    "build:win": "bun build src/index.tsx --compile --target bun-windows-x64 --external react-devtools-core --outfile ../../dist/ylc.exe",
+    "build:win": "bun build src/index.tsx --compile --target bun-windows-x64 --outfile dist/ylc.exe",
     "postbuild:win": "node scripts/set-icon.mjs",
-    "build:mac-arm64": "bun build src/index.tsx --compile --target bun-darwin-arm64 --external react-devtools-core --outfile ../../dist/ylc",
-    "build:mac-x64": "bun build src/index.tsx --compile --target bun-darwin-x64 --external react-devtools-core --outfile ../../dist/ylc-x64",
+    "build:mac-arm64": "bun build src/index.tsx --compile --target bun-darwin-arm64 --outfile dist/ylc",
+    "build:mac-x64": "bun build src/index.tsx --compile --target bun-darwin-x64 --outfile dist/ylc-x64",
     "build": "pnpm run build:win"
   },
   "devDependencies": {
-    "rcedit": "^5.0.2"
+    "rcedit": "^5.0.2",
+    "react-devtools-core": "^7.0.1"
   },
   "dependencies": {
-    "ink": "^5.0.0",
-    "react": "^18.0.0",
-    "@types/react": "^18.0.0",
-    "minimist": "^1.2.8",
     "@types/minimist": "^1.2.5",
+    "@types/react": "^18.0.0",
+    "ink": "^5.0.0",
+    "minimist": "^1.2.8",
+    "react": "^18.0.0",
     "yeelight-control": "workspace:*"
   }
 }
