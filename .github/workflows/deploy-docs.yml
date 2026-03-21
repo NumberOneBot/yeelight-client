@@ -33,9 +33,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build docs
-        run: pnpm --filter yeelight-control-docs build
+        run: pnpm --filter yeelight-client-docs build
         env:
-          NEXT_BASE_PATH: /yeelight-control
+          NEXT_BASE_PATH: /yeelight-client
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,4 +1,4 @@
-import { YeelightDevice } from 'yeelight-control'
+import { YeelightDevice } from 'yeelight-client'
 
 export async function resolveDevice(ip?: string): Promise<YeelightDevice> {
   if (ip) return YeelightDevice.connect(ip)

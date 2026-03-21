@@ -174,14 +174,14 @@ interface ChannelState {
 ## Exports
 
 ```ts
-export { YeelightDevice } from 'yeelight-control'
-export { Flow, FlowBuilder } from 'yeelight-control'
+export { YeelightDevice } from 'yeelight-client'
+export { Flow, FlowBuilder } from 'yeelight-client'
 export {
   UnsupportedError,
   ConnectionError,
   DeviceError
-} from 'yeelight-control'
-export type { ChannelState, TransitionOptions } from 'yeelight-control'
+} from 'yeelight-client'
+export type { ChannelState, TransitionOptions } from 'yeelight-client'
 ```
 
 `LightChannel` is not constructable directly — instances come from `device.main` / `device.background` only.

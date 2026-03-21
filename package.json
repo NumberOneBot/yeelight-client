@@ -1,5 +1,5 @@
 {
-  "name": "yeelight-control",
+  "name": "yeelight-client",
   "version": "0.1.0",
   "license": "MIT",
   "type": "module",
@@ -23,8 +23,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts",
-    "docs:dev": "pnpm --filter yeelight-control-docs dev",
-    "docs:build": "pnpm --filter yeelight-control-docs build",
+    "docs:dev": "pnpm --filter yeelight-client-docs dev",
+    "docs:build": "pnpm --filter yeelight-client-docs build",
     "release": "pnpm build ; pnpm changeset publish"
   },
   "devDependencies": {

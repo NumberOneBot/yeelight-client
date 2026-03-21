@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="packages/docs/public/logo.svg" width="80" alt="yeelight-control" />
+  <img src="packages/docs/public/logo.svg" width="80" alt="yeelight-client" />
 </p>
 
-<h1 align="center">yeelight-control</h1>
+<h1 align="center">yeelight-client</h1>
 
 <p align="center">
   TypeScript library + CLI for controlling Yeelight smart lights over LAN
 </p>
 
 <p align="center">
-  <a href="https://github.com/NumberOneBot/yeelight-control/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NumberOneBot/yeelight-control" alt="license" /></a>
+  <a href="https://github.com/NumberOneBot/yeelight-client/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NumberOneBot/yeelight-client" alt="license" /></a>
 </p>
 
 ---
@@ -18,7 +18,7 @@
 
 | Package            | Description                                                |
 | ------------------ | ---------------------------------------------------------- |
-| `yeelight-control` | Core library — device discovery, connection, light control |
+| `yeelight-client` | Core library — device discovery, connection, light control |
 | `yeelight-cli`     | Terminal tool (`yeelight` command)                         |
 
 ## Requirements
@@ -33,13 +33,13 @@
 ### Install
 
 ```bash
-npm install yeelight-control
+npm install yeelight-client
 ```
 
 ### Usage
 
 ```ts
-import { YeelightDevice } from 'yeelight-control'
+import { YeelightDevice } from 'yeelight-client'
 
 // Auto-discover on the LAN
 const [device] = await YeelightDevice.discover({ timeout: 3000 })
@@ -74,7 +74,7 @@ const device = await YeelightDevice.connect('192.168.1.42')
 ### Color flow
 
 ```ts
-import { YeelightDevice, Flow } from 'yeelight-control'
+import { YeelightDevice, Flow } from 'yeelight-client'
 
 // Pulse red 3 times
 const flow = Flow.pulse(255, 0, 0, { count: 3, duration: 400 })
@@ -140,7 +140,7 @@ All methods accept an optional `TransitionOptions` — `{ effect: 'smooth' \| 's
 npm install -g yeelight-cli
 ```
 
-Or download a precompiled binary from [Releases](https://github.com/NumberOneBot/yeelight-control/releases).
+Or download a precompiled binary from [Releases](https://github.com/NumberOneBot/yeelight-client/releases).
 
 ### Commands
 
@@ -187,7 +187,7 @@ pnpm install
 
 pnpm dev                                    # library watch mode
 pnpm --filter yeelight-cli dev              # CLI dev
-pnpm --filter yeelight-control-docs dev     # docs dev server
+pnpm --filter yeelight-client-docs dev      # docs dev server
 pnpm build                                  # build library
 pnpm --filter yeelight-cli build:win        # compile Windows binary (requires ImageMagick)
 ```

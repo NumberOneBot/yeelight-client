@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
-import { YeelightDevice } from 'yeelight-control'
+import { YeelightDevice } from 'yeelight-client'
 
 type DeviceInfo = {
   ip: string
