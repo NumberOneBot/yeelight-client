@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "rcedit": "^5.0.2",
-    "react-devtools-core": "^7.0.1"
+    "react-devtools-core": "^4.19.1"
   },
   "dependencies": {
     "@types/minimist": "^1.2.5",
