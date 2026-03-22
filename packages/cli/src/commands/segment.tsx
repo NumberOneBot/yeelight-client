@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Text, useApp } from 'ink'
+import { useApp } from 'ink'
 import { resolveDevice } from '../resolve'
+import { ErrorText } from '../components/ErrorText'
 
 function parseHex(input: string): { r: number; g: number; b: number } | null {
   if (!input.startsWith('#')) return null
@@ -55,11 +56,6 @@ export function SegmentCommand({
     })()
   }, [])
 
-  if (error)
-    return (
-      <Text bold color="red">
-        {error}
-      </Text>
-    )
+  if (error) return <ErrorText message={error} />
   return null
 }

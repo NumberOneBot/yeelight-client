@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Text, useApp } from 'ink'
+import { useApp } from 'ink'
 import { resolveDevice } from '../resolve'
+import { ErrorText } from '../components/ErrorText'
 
 export function PowerCommand({
   state,
@@ -33,11 +34,6 @@ export function PowerCommand({
     })()
   }, [])
 
-  if (error)
-    return (
-      <Text bold color="red">
-        {error}
-      </Text>
-    )
+  if (error) return <ErrorText message={error} />
   return null
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Text, useApp } from 'ink'
+import { useApp } from 'ink'
 import { resolveDevice } from '../resolve'
+import { ErrorText } from '../components/ErrorText'
 
 function parseHex(
   input: string
@@ -89,11 +90,6 @@ export function ColorCommand({
     })()
   }, [])
 
-  if (error)
-    return (
-      <Text bold color="red">
-        {error}
-      </Text>
-    )
+  if (error) return <ErrorText message={error} />
   return null
 }

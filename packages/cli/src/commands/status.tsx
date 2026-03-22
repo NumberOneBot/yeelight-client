@@ -1,22 +1,83 @@
 import React, { useEffect, useState, type ReactNode } from 'react'
 import { Box, Text, useApp } from 'ink'
+import type { ChannelState } from 'yeelight-client'
 import { resolveDevice } from '../resolve'
+import { ErrorText } from '../components/ErrorText'
 
-type ChanState = {
-  power: boolean
-  brightness: number
-  colorTemp: number | null
-  rgb: [number, number, number] | null
+type StatusData = {
+  ip: string
+  model: string
+  name: string
+  main: ChannelState
+  bg: ChannelState | null
+  hasSegments: boolean
+  support: string[]
+  raw: Record<string, string>
 }
 
-function toHex(n: number) {
+const rawPropNames = [
+  'power',
+  'bright',
+  'ct',
+  'rgb',
+  'hue',
+  'sat',
+  'color_mode',
+  'flowing',
+  'flow_params',
+  'bg_power',
+  'bg_bright',
+  'bg_ct',
+  'bg_rgb',
+  'bg_hue',
+  'bg_sat',
+  'bg_color_mode',
+  'bg_flowing',
+  'bg_flow_params',
+  'active_mode',
+  'nl_br',
+  'delayoff',
+  'music_on',
+  'save_state',
+  'name'
+]
+
+function hex2(n: number) {
   return n.toString(16).padStart(2, '0')
+}
+
+function rgbHex(r: number, g: number, b: number) {
+  return `#${hex2(r)}${hex2(g)}${hex2(b)}`
+}
+
+function ctToColor(kelvin: number): string {
+  const t = kelvin / 100
+  let r = t <= 66 ? 255 : 329.698727446 * (t - 60) ** -0.1332047592
+  r = Math.round(Math.max(0, Math.min(255, r)))
+  let g =
+    t <= 66
+      ? 99.4708025861 * Math.log(t) - 161.1195681661
+      : 288.1221695283 * (t - 60) ** -0.0755148492
+  g = Math.round(Math.max(0, Math.min(255, g)))
+  let b =
+    t >= 66
+      ? 255
+      : t <= 19
+        ? 0
+        : 138.5177312231 * Math.log(t - 10) - 305.0447927307
+  b = Math.round(Math.max(0, Math.min(255, b)))
+  if (kelvin > 5000) {
+    const cool = (kelvin - 5000) / 1500
+    r = Math.round(Math.max(0, r - cool * 45))
+    b = Math.round(Math.min(255, b + cool * 20))
+  }
+  return rgbHex(r, g, b)
 }
 
 function Row({ k, children }: { k: string; children: ReactNode }) {
   return (
-    <Box gap={1}>
-      <Box width={12}>
+    <Box>
+      <Box minWidth={14}>
         <Text dimColor>{k}</Text>
       </Box>
       {children}
@@ -24,10 +85,9 @@ function Row({ k, children }: { k: string; children: ReactNode }) {
   )
 }
 
-function Channel({ label, s }: { label: string; s: ChanState }) {
-  const hex = s.rgb
-    ? `#${toHex(s.rgb[0])}${toHex(s.rgb[1])}${toHex(s.rgb[2])}`
-    : undefined
+function Channel({ label, s }: { label: string; s: ChannelState }) {
+  const noColor = !!process.env.NO_COLOR
+  const hex = s.rgb ? rgbHex(...s.rgb) : undefined
   return (
     <Box flexDirection="column">
       <Text bold>{label}</Text>
@@ -43,12 +103,18 @@ function Channel({ label, s }: { label: string; s: ChanState }) {
         {s.colorTemp !== null && (
           <Row k="color temp">
             <Text color="yellow">{s.colorTemp}K</Text>
+            {!noColor && <Text color={ctToColor(s.colorTemp)}> ██</Text>}
           </Row>
         )}
         {s.rgb !== null && (
           <Row k="rgb">
-            <Text color="yellow">{s.rgb.join(', ')}</Text>
-            {!process.env.NO_COLOR && <Text color={hex}> ██</Text>}
+            <Text color="yellow">{hex}</Text>
+            {!noColor && <Text color={hex}> ██</Text>}
+          </Row>
+        )}
+        {s.flowing && (
+          <Row k="flowing">
+            <Text color="magenta">active</Text>
           </Row>
         )}
       </Box>
@@ -56,12 +122,15 @@ function Channel({ label, s }: { label: string; s: ChanState }) {
   )
 }
 
-export function StatusCommand({ ip }: { ip?: string }) {
+export function StatusCommand({
+  ip,
+  showRaw
+}: {
+  ip?: string
+  showRaw?: boolean
+}) {
   const { exit } = useApp()
-  const [data, setData] = useState<{
-    main: ChanState
-    bg: ChanState | null
-  } | null>(null)
+  const [data, setData] = useState<StatusData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -70,7 +139,17 @@ export function StatusCommand({ ip }: { ip?: string }) {
         const device = await resolveDevice(ip)
         const main = await device.main.getState()
         const bg = device.background ? await device.background.getState() : null
-        setData({ main, bg })
+        const raw = showRaw ? await device.getRawProps(rawPropNames) : {}
+        setData({
+          ip: device.ip,
+          model: device.model,
+          name: device.name,
+          main,
+          bg,
+          hasSegments: device.capabilities.hasSegments,
+          support: device.support,
+          raw
+        })
         device.disconnect()
       } catch (e: any) {
         setError(e.message)
@@ -81,18 +160,49 @@ export function StatusCommand({ ip }: { ip?: string }) {
     })()
   }, [])
 
-  if (error)
-    return (
-      <Text bold color="red">
-        {error}
-      </Text>
-    )
+  if (error) return <ErrorText message={error} />
   if (!data) return <Text dimColor>Connecting...</Text>
 
   return (
     <Box flexDirection="column" gap={1}>
+      <Box gap={2}>
+        <Text bold color="cyan">
+          {data.ip}
+        </Text>
+        {data.name && <Text bold>{data.name}</Text>}
+        {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
+      </Box>
       <Channel label="Main channel:" s={data.main} />
       {data.bg && <Channel label="Background channel:" s={data.bg} />}
+      {data.hasSegments && (
+        <Row k="segments">
+          <Text color="green">supported</Text>
+        </Row>
+      )}
+      {data.support.length > 0 && (
+        <Box flexDirection="column">
+          <Text bold>Supported commands</Text>
+          <Box marginLeft={2} flexWrap="wrap" gap={1}>
+            {data.support.map((cmd) => (
+              <Text key={cmd} color="cyan">
+                {cmd}
+              </Text>
+            ))}
+          </Box>
+        </Box>
+      )}
+      {showRaw && Object.keys(data.raw).length > 0 && (
+        <Box flexDirection="column">
+          <Text bold>Raw properties:</Text>
+          <Box marginLeft={2} flexDirection="column">
+            {Object.entries(data.raw).map(([k, v]) => (
+              <Row key={k} k={k}>
+                <Text dimColor>{v || '—'}</Text>
+              </Row>
+            ))}
+          </Box>
+        </Box>
+      )}
     </Box>
   )
 }

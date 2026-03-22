@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
+import { ErrorText } from '../components/ErrorText'
 
 type DeviceInfo = {
   ip: string
@@ -47,18 +48,11 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
       .finally(() => exit())
   }, [])
 
-  if (error)
-    return (
-      <Text bold color="red">
-        {error}
-      </Text>
-    )
+  if (error) return <ErrorText message={error} />
   if (!devices) return <Text dimColor>Scanning...</Text>
   if (devices.length === 0) {
     return (
-      <Text>
-        No devices found. Make sure <Text bold>LAN Control</Text> is enabled.
-      </Text>
+      <ErrorText message="No devices found. Make sure LAN Control is enabled." />
     )
   }
 
