@@ -20,7 +20,8 @@ export function DeviceMenuItem({
     )
   }
 
-  const hasSubmenu = row.kind === 'brightness' || row.kind === 'ct' || row.kind === 'rgb'
+  const hasSubmenu =
+    row.kind === 'brightness' || row.kind === 'ct' || row.kind === 'rgb'
   const isBack = row.kind === 'back'
 
   return (

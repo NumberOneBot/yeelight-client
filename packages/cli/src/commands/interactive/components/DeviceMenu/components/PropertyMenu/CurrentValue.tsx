@@ -12,7 +12,8 @@ export function CurrentValue({
 }) {
   const noColor = !!process.env.NO_COLOR
   if (!current) return <Text dimColor>…</Text>
-  if (prop === 'brightness') return <Text color="yellow">{current.brightness}%</Text>
+  if (prop === 'brightness')
+    return <Text color="yellow">{current.brightness}%</Text>
   if (prop === 'ct') {
     if (current.colorTemp === null) return <Text dimColor>—</Text>
     return (

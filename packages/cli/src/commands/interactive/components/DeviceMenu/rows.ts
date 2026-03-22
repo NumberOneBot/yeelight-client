@@ -27,7 +27,12 @@ export function buildRows(device: YeelightDevice): MenuRow[] {
     rows.push({ kind: 'rgb', label: 'Color', channel: 'main' })
 
   if (bg) {
-    rows.push({ kind: 'section', label: 'Background channel', channel: null, sep: true })
+    rows.push({
+      kind: 'section',
+      label: 'Background channel',
+      channel: null,
+      sep: true
+    })
     rows.push({ kind: 'power', label: 'Power', channel: 'bg' })
     rows.push({ kind: 'brightness', label: 'Brightness', channel: 'bg' })
     if (bg.capabilities.hasColorTemp)
@@ -36,6 +41,11 @@ export function buildRows(device: YeelightDevice): MenuRow[] {
       rows.push({ kind: 'rgb', label: 'Color', channel: 'bg' })
   }
 
-  rows.push({ kind: 'back', label: '↩ Back to devices', channel: null, sep: true })
+  rows.push({
+    kind: 'back',
+    label: '↩ Back to devices',
+    channel: null,
+    sep: true
+  })
   return rows
 }

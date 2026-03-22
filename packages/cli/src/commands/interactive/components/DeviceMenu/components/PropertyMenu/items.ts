@@ -2,7 +2,13 @@ export type Prop = 'brightness' | 'ct' | 'rgb'
 
 export type BrightnessItem = { kind: 'brightness'; value: number }
 export type CtItem = { kind: 'ct'; value: number }
-export type RgbItem = { kind: 'rgb'; label: string; r: number; g: number; b: number }
+export type RgbItem = {
+  kind: 'rgb'
+  label: string
+  r: number
+  g: number
+  b: number
+}
 export type BackItem = { kind: 'back' }
 export type PropItem = BrightnessItem | CtItem | RgbItem | BackItem
 

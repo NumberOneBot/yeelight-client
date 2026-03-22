@@ -26,8 +26,17 @@ export function PropertyMenu({
   onQuit: () => void
 }) {
   const ch = channel === 'bg' ? device.background! : device.main
-  const { liveState, executing, done, execError, hexMode, setHexMode, isCurrent, applyRGB, execute } =
-    usePropertyExec(ch, current, onBack)
+  const {
+    liveState,
+    executing,
+    done,
+    execError,
+    hexMode,
+    setHexMode,
+    isCurrent,
+    applyRGB,
+    execute
+  } = usePropertyExec(ch, current, onBack)
 
   const items = propItems(prop)
   const initialCursor = (() => {
@@ -41,7 +50,8 @@ export function PropertyMenu({
         <Text bold color="cyan">
           {device.ip}
         </Text>
-        <Text dimColor>({device.model})</Text>
+        {device.name && <Text bold>{device.name}</Text>}
+        {device.model !== 'unknown' && <Text dimColor>({device.model})</Text>}
       </Box>
 
       <Box gap={1} marginBottom={1}>

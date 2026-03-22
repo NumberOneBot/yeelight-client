@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
-import type { ChannelCapabilities, ChannelState } from 'yeelight-client'
+import type { ChannelState } from 'yeelight-client'
 import { resolveDevice } from '../resolve'
 import { ChannelStatus, PropRow } from '../components/ChannelStatus'
 import { Dots } from '../components/Dots'
@@ -11,9 +11,7 @@ type StatusData = {
   model: string
   name: string
   main: ChannelState
-  mainCaps: ChannelCapabilities
   bg: ChannelState | null
-  bgCaps: ChannelCapabilities | null
   support: string[]
   raw: Record<string, string>
 }
@@ -75,9 +73,7 @@ export function StatusCommand({
           model: device.model,
           name: device.name,
           main,
-          mainCaps: device.capabilities.main,
           bg,
-          bgCaps: device.capabilities.background,
           support: device.support,
           raw
         })
@@ -111,18 +107,17 @@ export function StatusCommand({
         {data.name && <Text bold>{data.name}</Text>}
         {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
       </Box>
-      <ChannelStatus label="Main channel" s={data.main} caps={data.mainCaps} />
+      <ChannelStatus label="Main channel" s={data.main} />
       {data.bg && (
         <ChannelStatus
           label="Background channel"
           s={data.bg}
-          caps={data.bgCaps ?? undefined}
         />
       )}
       {showCommands && data.support.length > 0 && (
         <Box flexDirection="column">
           <Text bold>Supported commands</Text>
-          <Box marginLeft={2}>
+          <Box marginLeft={2} marginTop={1}>
             <Text dimColor>{data.support.join(', ')}</Text>
           </Box>
         </Box>
@@ -130,9 +125,9 @@ export function StatusCommand({
       {showRaw && Object.keys(data.raw).length > 0 && (
         <Box flexDirection="column">
           <Text bold>Raw properties</Text>
-          <Box marginLeft={2} flexDirection="column">
+          <Box marginLeft={2} flexDirection="column" marginTop={1}>
             {Object.entries(data.raw).map(([k, v]) => (
-              <PropRow key={k} k={k}>
+              <PropRow key={k} k={k} dim>
                 <Text dimColor>{v || '—'}</Text>
               </PropRow>
             ))}

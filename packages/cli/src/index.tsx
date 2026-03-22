@@ -13,6 +13,7 @@ import {
   StatusCommand
 } from './commands'
 import { HelpScreen, CommandHelpScreen } from './help'
+import pkg from '../package.json'
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ['bg', 'help', 'version', 'raw', 'commands'],
@@ -24,7 +25,7 @@ const argv = minimist(process.argv.slice(2), {
 const [subcmd, ...rest] = argv._
 
 if (argv.version) {
-  console.log('0.1.0')
+  console.log(pkg.version)
   process.exit(0)
 }
 

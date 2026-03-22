@@ -113,7 +113,8 @@ export function DeviceMenu({
         <Text bold color="cyan">
           {device.ip}
         </Text>
-        <Text dimColor>({device.model})</Text>
+        {device.name && <Text bold>{device.name}</Text>}
+        {device.model !== 'unknown' && <Text dimColor>({device.model})</Text>}
       </Box>
 
       <SelectList

@@ -93,10 +93,14 @@ export function usePropertyExec(
         setDone(true)
         setLiveState((s) => {
           if (!s) return s
-          if (item.kind === 'brightness') return { ...s, brightness: item.value }
+          if (item.kind === 'brightness')
+            return { ...s, brightness: item.value }
           if (item.kind === 'ct') return { ...s, colorTemp: item.value }
           if (item.kind === 'rgb')
-            return { ...s, rgb: [item.r, item.g, item.b] as [number, number, number] }
+            return {
+              ...s,
+              rgb: [item.r, item.g, item.b] as [number, number, number]
+            }
           return s
         })
       })
@@ -104,5 +108,15 @@ export function usePropertyExec(
       .finally(() => setExecuting(false))
   }
 
-  return { liveState, executing, done, execError, hexMode, setHexMode, isCurrent, applyRGB, execute }
+  return {
+    liveState,
+    executing,
+    done,
+    execError,
+    hexMode,
+    setHexMode,
+    isCurrent,
+    applyRGB,
+    execute
+  }
 }
