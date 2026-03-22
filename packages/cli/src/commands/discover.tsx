@@ -5,21 +5,33 @@ import { ErrorText } from '../components/ErrorText'
 
 type DeviceInfo = {
   ip: string
-  name: string
   model: string
   main: string
   bg: string | null
   segments: boolean
 }
 
-function channelCaps(caps: {
-  hasColor: boolean
-  hasColorTemp: boolean
-}): string {
-  if (caps.hasColor && caps.hasColorTemp) return 'rgb+ct'
+type Caps = { hasColor: boolean; hasColorTemp: boolean }
+
+function channelCaps(caps: Caps): string {
+  if (caps.hasColor && caps.hasColorTemp) return 'ct+rgb'
   if (caps.hasColor) return 'rgb'
   if (caps.hasColorTemp) return 'ct'
   return 'brightness'
+}
+
+function CapsText({ value }: { value: string }) {
+  if (value === 'ct+rgb')
+    return (
+      <>
+        <Text color="cyanBright">ct</Text>
+        <Text dimColor>+</Text>
+        <Text color="redBright">rgb</Text>
+      </>
+    )
+  if (value === 'ct') return <Text color="cyanBright">ct</Text>
+  if (value === 'rgb') return <Text color="redBright">rgb</Text>
+  return <Text color="yellow">brightness</Text>
 }
 
 export function DiscoverCommand({ timeout }: { timeout: number }) {
@@ -33,7 +45,6 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
         setDevices(
           found.map((d) => ({
             ip: d.ip,
-            name: d.name,
             model: d.model,
             main: channelCaps(d.main.capabilities),
             bg: d.background ? channelCaps(d.background.capabilities) : null,
@@ -49,7 +60,12 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
   }, [])
 
   if (error) return <ErrorText message={error} />
-  if (!devices) return <Text dimColor>Scanning...</Text>
+  if (!devices)
+    return (
+      <Box marginTop={1}>
+        <Text dimColor>Scanning...</Text>
+      </Box>
+    )
   if (devices.length === 0) {
     return (
       <ErrorText message="No devices found. Make sure LAN Control is enabled." />
@@ -57,18 +73,28 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" marginTop={1}>
       {devices.map((d) => (
         <Box key={d.ip} gap={2}>
           <Text color="cyan">{d.ip}</Text>
-          <Text bold color="green">
-            {d.name}
-          </Text>
-          <Text dimColor>
-            {d.model} · main: {d.main}
-            {d.bg ? ` · bg: ${d.bg}` : ''}
-            {d.segments ? ' · segments' : ''}
-          </Text>
+          {d.model && <Text dimColor>({d.model})</Text>}
+          <Box gap={1}>
+            <Text dimColor>main:</Text>
+            <CapsText value={d.main} />
+            {d.bg && (
+              <>
+                <Text dimColor>·</Text>
+                <Text dimColor>bg:</Text>
+                <CapsText value={d.bg} />
+              </>
+            )}
+            {d.segments && (
+              <>
+                <Text dimColor>+</Text>
+                <Text color="green">segments</Text>
+              </>
+            )}
+          </Box>
         </Box>
       ))}
     </Box>

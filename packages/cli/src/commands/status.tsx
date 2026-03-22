@@ -137,10 +137,14 @@ function Channel({
 
 export function StatusCommand({
   ip,
-  showRaw
+  showRaw,
+  showCommands,
+  timeout
 }: {
   ip?: string
   showRaw?: boolean
+  showCommands?: boolean
+  timeout?: number
 }) {
   const { exit } = useApp()
   const [data, setData] = useState<StatusData | null>(null)
@@ -149,7 +153,10 @@ export function StatusCommand({
   useEffect(() => {
     ;(async () => {
       try {
-        const device = await resolveDevice(ip)
+        const device = await resolveDevice(ip, {
+          withSupport: showCommands,
+          timeout
+        })
         const main = await device.main.getState()
         const bg = device.background ? await device.background.getState() : null
         const raw = showRaw ? await device.getRawProps(rawPropNames) : {}
@@ -193,7 +200,7 @@ export function StatusCommand({
           hasSegments={data.hasSegments}
         />
       )}
-      {data.support.length > 0 && (
+      {showCommands && data.support.length > 0 && (
         <Box flexDirection="column">
           <Text bold>Supported commands:</Text>
           <Box marginLeft={2}>

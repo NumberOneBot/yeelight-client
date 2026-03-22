@@ -1,17 +1,20 @@
 #!/usr/bin/env bun
 import React from 'react'
-import { render, Box, Text, useApp } from 'ink'
+import { render } from 'ink'
 import minimist from 'minimist'
-import { DiscoverCommand } from './commands/discover.tsx'
-import { StatusCommand } from './commands/status.tsx'
-import { PowerCommand } from './commands/power.tsx'
-import { BrightnessCommand } from './commands/brightness.tsx'
-import { CtCommand } from './commands/ct.tsx'
-import { ColorCommand } from './commands/color.tsx'
-import { SegmentCommand } from './commands/segment.tsx'
+import {
+  DiscoverCommand,
+  StatusCommand,
+  PowerCommand,
+  BrightnessCommand,
+  CtCommand,
+  ColorCommand,
+  SegmentCommand
+} from './commands'
+import { HelpScreen, CommandHelpScreen } from './help'
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ['bg', 'help', 'version', 'raw'],
+  boolean: ['bg', 'help', 'version', 'raw', 'commands'],
   string: ['ip'],
   default: { duration: 0, timeout: 3000 },
   alias: { h: 'help', V: 'version' }
@@ -24,108 +27,16 @@ if (argv.version) {
   process.exit(0)
 }
 
-// ── Help components ────────────────────────────────────────────────────────────
-
-function Cmd({
-  name,
-  args,
-  desc
-}: {
-  name: string
-  args?: string
-  desc: string
-}) {
-  return (
-    <Box gap={1}>
-      <Box width={12}>
-        <Text color="cyan" bold>
-          {name}
-        </Text>
-      </Box>
-      <Box width={18}>
-        <Text color="yellow">{args ?? ''}</Text>
-      </Box>
-      <Text dimColor>{desc}</Text>
-    </Box>
-  )
-}
-
-function Opt({ flag, desc }: { flag: string; desc: string }) {
-  return (
-    <Box gap={1}>
-      <Box width={22}>
-        <Text color="cyan">{flag}</Text>
-      </Box>
-      <Text dimColor>{desc}</Text>
-    </Box>
-  )
-}
-
-function HelpScreen() {
-  const { exit } = useApp()
-  React.useEffect(() => {
-    exit()
-  }, [])
-
-  return (
-    <Box flexDirection="column" paddingY={1}>
-      <Box gap={1} marginBottom={1}>
-        <Text bold>Usage:</Text>
-        <Text color="magenta" bold>
-          ylc
-        </Text>
-        <Text color="yellow">{'<command>'}</Text>
-        <Text dimColor>[options]</Text>
-      </Box>
-
-      <Box marginBottom={1} flexDirection="column">
-        <Text bold>Commands:</Text>
-        <Box marginLeft={2} marginTop={1} flexDirection="column">
-          <Cmd name="discover" desc="Discover devices on the network" />
-          <Cmd name="status" desc="Show current device state" />
-          <Cmd name="power" args="<on|off>" desc="Turn on or off" />
-          <Cmd name="brightness" args="<1–100>" desc="Set brightness" />
-          <Cmd
-            name="ct"
-            args="<kelvin>"
-            desc="Set color temperature (1700–6500)"
-          />
-          <Cmd name="color" args="<#hex | r g b>" desc="Set RGB color" />
-          <Cmd
-            name="segment"
-            args="<left> <right>"
-            desc="Left/right segment colors (lamp15)"
-          />
-        </Box>
-      </Box>
-
-      <Box flexDirection="column">
-        <Text bold>Options:</Text>
-        <Box marginLeft={2} marginTop={1} flexDirection="column">
-          <Opt
-            flag="--ip <address>"
-            desc="Device IP (auto-discover if omitted)"
-          />
-          <Opt flag="--bg" desc="Target background channel" />
-          <Opt
-            flag="--duration <ms>"
-            desc="Transition duration in ms (default: 0)"
-          />
-          <Opt
-            flag="--timeout <ms>"
-            desc="Discovery timeout in ms (default: 3000)"
-          />
-        </Box>
-      </Box>
-    </Box>
-  )
-}
-
 // ── Routing ────────────────────────────────────────────────────────────────────
 
-const { ip, bg, duration, timeout, help, raw } = argv
+const { ip, bg, duration, timeout, help, raw, commands } = argv
 
 async function main() {
+  if (help && subcmd) {
+    await render(<CommandHelpScreen cmd={subcmd} />).waitUntilExit()
+    return
+  }
+
   if (help || !subcmd) {
     await render(<HelpScreen />).waitUntilExit()
     return
@@ -139,7 +50,14 @@ async function main() {
       break
 
     case 'status':
-      await render(<StatusCommand ip={ip} showRaw={raw} />).waitUntilExit()
+      await render(
+        <StatusCommand
+          ip={ip}
+          showRaw={raw}
+          showCommands={commands}
+          timeout={Number(timeout)}
+        />
+      ).waitUntilExit()
       break
 
     case 'power': {

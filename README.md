@@ -157,8 +157,8 @@ Commands:
   segment      <left> <right>     Left/right segment colors (lamp15)
 
 Options:
-  --ip <address>     Device IP (auto-discover if omitted)
   --bg               Target background channel
+  --ip <address>     Device IP (auto-discover if omitted)
   --duration <ms>    Transition duration in ms (default: 0)
   --timeout <ms>     Discovery timeout in ms (default: 3000)
 ```
@@ -171,8 +171,8 @@ ylc status --ip 192.168.1.42
 ylc power on
 ylc brightness 50 --duration 1000
 ylc ct 3000
-ylc color "#ff6400"
 ylc color 255 100 0
+ylc color "#ff6400"
 ylc color "#ff640080"          # alpha channel → brightness
 ylc segment "#ff0000" "#0000ff"
 ylc power on --bg              # background channel
