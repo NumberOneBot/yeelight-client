@@ -50,8 +50,6 @@ CT = color temperature (measured in Kelvin). The **CT Range** column shows the m
 
 > ⚠️ `bslamp2` had LAN control forcibly removed in firmware 2.0.6_0041 by Xiaomi.
 
-> ⚠️ `lamp1` ships with LAN Control disabled and has no toggle in the Yeelight app UI. It will not appear in discovery and port 55443 will be closed until LAN Control is enabled via `python-miio`: `miiocli yeelight --ip <ip> --token <token> set_developer_mode 1`.
-
 ### Ceiling lights
 
 | Model       | Known SKU(s)                                                           | CT Range    | Main | Background |
@@ -82,6 +80,8 @@ CT = color temperature (measured in Kelvin). The **CT Range** column shows the m
 | `lamp4`    | —                                                                    | 2600–5000 K | CT       | —          | —             |
 | `lamp15`   | [YLTD003](https://www.google.com/search?q=Yeelight+YLTD003&tbm=isch) | 2700–6500 K | CT       | RGB + CT   | ✓             |
 | `lamp22`   | —                                                                    | 2700–6500 K | RGB + CT | —          | —             |
+
+> ⚠️ `lamp1` ships with LAN Control disabled and has no toggle in the Yeelight app UI. It will not appear in discovery and port 55443 will be closed until LAN Control is enabled via `python-miio`: `miiocli yeelight --ip <ip> --token <token> set_developer_mode 1`.
 
 ---
 

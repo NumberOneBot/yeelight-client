@@ -43,7 +43,6 @@ export const rgbItems: PropItem[] = [
   { kind: 'rgb', label: 'violet', r: 150, g: 0, b: 255 },
   { kind: 'rgb', label: 'magenta', r: 255, g: 0, b: 200 },
   { kind: 'rgb', label: 'pink', r: 255, g: 0, b: 100 },
-  { kind: 'rgb', label: 'white', r: 255, g: 255, b: 255 },
   { kind: 'rgb', label: 'custom', r: -1, g: -1, b: -1 },
   { kind: 'back' as const }
 ]
