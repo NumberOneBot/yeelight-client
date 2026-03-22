@@ -10,7 +10,6 @@ type StatusData = {
   name: string
   main: ChannelState
   bg: ChannelState | null
-  hasSegments: boolean
   support: string[]
   raw: Record<string, string>
 }
@@ -85,15 +84,7 @@ function Row({ k, children }: { k: string; children: ReactNode }) {
   )
 }
 
-function Channel({
-  label,
-  s,
-  hasSegments
-}: {
-  label: string
-  s: ChannelState
-  hasSegments?: boolean
-}) {
+function Channel({ label, s }: { label: string; s: ChannelState }) {
   const noColor = !!process.env.NO_COLOR
   const hex = s.rgb ? rgbHex(...s.rgb) : undefined
   return (
@@ -123,11 +114,6 @@ function Channel({
         {s.flowing && (
           <Row k="flowing">
             <Text color="magenta">active</Text>
-          </Row>
-        )}
-        {hasSegments && (
-          <Row k="segments">
-            <Text color="green">supported</Text>
           </Row>
         )}
       </Box>
@@ -166,7 +152,6 @@ export function StatusCommand({
           name: device.name,
           main,
           bg,
-          hasSegments: device.capabilities.hasSegments,
           support: device.support,
           raw
         })
@@ -193,13 +178,7 @@ export function StatusCommand({
         {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
       </Box>
       <Channel label="Main channel:" s={data.main} />
-      {data.bg && (
-        <Channel
-          label="Background channel:"
-          s={data.bg}
-          hasSegments={data.hasSegments}
-        />
-      )}
+      {data.bg && <Channel label="Background channel:" s={data.bg} />}
       {showCommands && data.support.length > 0 && (
         <Box flexDirection="column">
           <Text bold>Supported commands:</Text>
