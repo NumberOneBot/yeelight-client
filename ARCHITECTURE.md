@@ -332,7 +332,7 @@ export type {
 
 | Device type             | `main` capabilities | `background` | `setSegments` |
 | ----------------------- | ------------------- | ------------ | ------------- |
-| `mono`                  | brightness only     | —            | —             |
+| `mono`                  | Brightness only     | —            | —             |
 | `ct_bulb`, `ceiling1`–N | CT                  | —            | —             |
 | `color`, `strip1`       | RGB + CT            | —            | —             |
 | `bslamp1`–3             | RGB + CT            | —            | —             |
