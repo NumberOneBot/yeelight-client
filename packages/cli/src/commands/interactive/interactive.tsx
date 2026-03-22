@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Box, Text, useApp, useInput } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
 import { Dots } from '../../components/Dots'
@@ -10,6 +10,7 @@ type Screen =
   | { id: 'pick' }
   | { id: 'connecting'; device: YeelightDevice }
   | { id: 'menu'; device: YeelightDevice }
+  | { id: 'disconnected' }
   | { id: 'error'; message: string }
 
 export function InteractiveCommand({ timeout }: { timeout: number }) {
@@ -21,10 +22,31 @@ export function InteractiveCommand({ timeout }: { timeout: number }) {
   const [pickerCursor, setPickerCursor] = useState<number | undefined>(
     undefined
   )
+  // Set to true before intentional disconnect so the listener doesn't fire
+  const leaving = useRef(false)
 
   // Keep stdin in raw mode at all times so useInput in child screens
   // always works after screen transitions (Ink/Windows stdin pause issue).
   useInput(() => {})
+
+  useEffect(() => {
+    if (screen.id !== 'menu') return
+    leaving.current = false
+    const { device } = screen
+    const onDisconnect = () => {
+      if (!leaving.current) setScreen({ id: 'disconnected' })
+    }
+    device.on('disconnect', onDisconnect)
+    return () => {
+      device.off('disconnect', onDisconnect)
+    }
+  }, [screen])
+
+  useEffect(() => {
+    if (screen.id !== 'disconnected') return
+    const t = setTimeout(() => setScreen({ id: 'pick' }), 2000)
+    return () => clearTimeout(t)
+  }, [screen])
 
   function onPick(device: YeelightDevice) {
     setScreen({ id: 'connecting', device })
@@ -35,16 +57,29 @@ export function InteractiveCommand({ timeout }: { timeout: number }) {
   }
 
   function onBack() {
-    if (screen.id === 'menu') screen.device.disconnect()
+    if (screen.id === 'menu') {
+      leaving.current = true
+      screen.device.disconnect()
+    }
     setScreen({ id: 'pick' })
   }
 
   function onQuit() {
-    if (screen.id === 'menu') screen.device.disconnect()
+    if (screen.id === 'menu') {
+      leaving.current = true
+      screen.device.disconnect()
+    }
     exit()
   }
 
   if (screen.id === 'error') return <ErrorText message={screen.message} />
+
+  if (screen.id === 'disconnected')
+    return (
+      <Box marginTop={1}>
+        <Text color="yellow">Connection lost. Returning to device list…</Text>
+      </Box>
+    )
 
   if (screen.id === 'pick')
     return (

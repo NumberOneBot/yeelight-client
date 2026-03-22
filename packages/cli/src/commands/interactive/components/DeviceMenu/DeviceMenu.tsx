@@ -30,7 +30,7 @@ function buildRows(device: YeelightDevice): MenuRow[] {
     { kind: 'brightness', label: 'Brightness', channel: 'main' }
   ]
   if (ch.capabilities.hasColorTemp)
-    rows.push({ kind: 'ct', label: 'Color Temp', channel: 'main' })
+    rows.push({ kind: 'ct', label: 'Color temp', channel: 'main' })
   if (ch.capabilities.hasColor)
     rows.push({ kind: 'rgb', label: 'Color', channel: 'main' })
 
@@ -44,7 +44,7 @@ function buildRows(device: YeelightDevice): MenuRow[] {
     rows.push({ kind: 'power', label: 'Power', channel: 'bg' })
     rows.push({ kind: 'brightness', label: 'Brightness', channel: 'bg' })
     if (bg.capabilities.hasColorTemp)
-      rows.push({ kind: 'ct', label: 'Color Temp', channel: 'bg' })
+      rows.push({ kind: 'ct', label: 'Color temp', channel: 'bg' })
     if (bg.capabilities.hasColor)
       rows.push({ kind: 'rgb', label: 'Color', channel: 'bg' })
   }
@@ -95,6 +95,13 @@ export function DeviceMenu({
     return () => clearTimeout(t)
   }, [toggleDone])
 
+  useEffect(() => {
+    const t = setInterval(() => {
+      device.getRawProps(['power']).catch(() => {})
+    }, 30_000)
+    return () => clearInterval(t)
+  }, [device])
+
   function handlePropertyDone(state: ChannelState | null) {
     if (subscreen && state) {
       if (subscreen.channel === 'bg') setBgState(state)
@@ -117,12 +124,10 @@ export function DeviceMenu({
       setToggleError(null)
       void ch
         .toggle()
-        .then(() => {
-          if (row.channel === 'bg') {
-            setBgState((s) => (s ? { ...s, power: !s.power } : s))
-          } else {
-            setMainState((s) => (s ? { ...s, power: !s.power } : s))
-          }
+        .then(() => ch.getState())
+        .then((state) => {
+          if (row.channel === 'bg') setBgState(state)
+          else setMainState(state)
           setToggleDone(true)
         })
         .catch((e: Error) => setToggleError(e.message))
