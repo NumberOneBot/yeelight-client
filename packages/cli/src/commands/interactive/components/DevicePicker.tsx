@@ -2,21 +2,26 @@ import React, { useEffect, useState } from 'react'
 import { Box, Text } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
 import { Dots } from '../../../components/Dots'
+import { HintBar } from './HintBar'
 import { channelCaps, DeviceRow } from '../../../components/DeviceRow'
 import { SelectList } from './SelectList'
 
-type PickerItem = YeelightDevice | { type: 'rescan' } | { type: 'quit' }
+type PickerItem = YeelightDevice | { type: 'rescan' }
 
 export function DevicePicker({
   timeout,
   initialDevices = null,
+  initialCursor,
   onDevicesFound,
+  onCursorChange,
   onSelect,
   onQuit
 }: {
   timeout: number
   initialDevices?: YeelightDevice[] | null
+  initialCursor?: number
   onDevicesFound?: (devices: YeelightDevice[]) => void
+  onCursorChange?: (cursor: number) => void
   onSelect: (device: YeelightDevice) => void
   onQuit: () => void
 }) {
@@ -48,16 +53,12 @@ export function DevicePicker({
       </Box>
     )
 
-  const navItems: PickerItem[] = [{ type: 'rescan' }, { type: 'quit' }]
+  const navItems: PickerItem[] = [{ type: 'rescan' }]
   const listItems: PickerItem[] = [...(devices ?? []), ...navItems]
 
   function handleSelect(item: PickerItem) {
     if ('type' in item) {
-      if (item.type === 'rescan') {
-        setScanKey((k) => k + 1)
-        return
-      }
-      onQuit()
+      setScanKey((k) => k + 1)
       return
     }
     onSelect(item)
@@ -80,17 +81,19 @@ export function DevicePicker({
       )}
       <SelectList<PickerItem>
         items={listItems}
+        initialCursor={initialCursor}
         onSelect={handleSelect}
-        onCancel={onQuit}
+        onQuit={onQuit}
+        onCursorChange={onCursorChange}
         renderItem={(item, focused) => {
           if ('type' in item)
             return (
-              <Box gap={1} marginTop={item.type === 'rescan' ? 1 : 0}>
+              <Box gap={1} marginTop={1}>
                 <Text color={focused ? 'cyan' : undefined}>
                   {focused ? '›' : ' '}
                 </Text>
                 <Text bold={focused} color={focused ? 'cyan' : undefined}>
-                  {item.type === 'rescan' ? '↺ Rescan' : '✕ Quit'}
+                  ↺ Rescan
                 </Text>
               </Box>
             )
@@ -116,9 +119,7 @@ export function DevicePicker({
         }}
       />
 
-      <Box marginTop={3}>
-        <Text dimColor>↑↓ navigate · Enter select · q quit</Text>
-      </Box>
+      <HintBar />
     </Box>
   )
 }

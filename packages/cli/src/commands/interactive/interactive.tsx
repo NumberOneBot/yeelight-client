@@ -3,7 +3,7 @@ import { Box, Text, useApp, useInput } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
 import { Dots } from '../../components/Dots'
 import { ErrorText } from '../../components/ErrorText'
-import { ActionMenu } from './components/ActionMenu'
+import { DeviceMenu } from './components/DeviceMenu'
 import { DevicePicker } from './components/DevicePicker'
 
 type Screen =
@@ -17,6 +17,9 @@ export function InteractiveCommand({ timeout }: { timeout: number }) {
   const [screen, setScreen] = useState<Screen>({ id: 'pick' })
   const [cachedDevices, setCachedDevices] = useState<YeelightDevice[] | null>(
     null
+  )
+  const [pickerCursor, setPickerCursor] = useState<number | undefined>(
+    undefined
   )
 
   // Keep stdin in raw mode at all times so useInput in child screens
@@ -48,7 +51,9 @@ export function InteractiveCommand({ timeout }: { timeout: number }) {
       <DevicePicker
         timeout={timeout}
         initialDevices={cachedDevices}
+        initialCursor={pickerCursor}
         onDevicesFound={setCachedDevices}
+        onCursorChange={setPickerCursor}
         onSelect={onPick}
         onQuit={onQuit}
       />
@@ -64,5 +69,5 @@ export function InteractiveCommand({ timeout }: { timeout: number }) {
       </Box>
     )
 
-  return <ActionMenu device={screen.device} onBack={onBack} onQuit={onQuit} />
+  return <DeviceMenu device={screen.device} onBack={onBack} onQuit={onQuit} />
 }
