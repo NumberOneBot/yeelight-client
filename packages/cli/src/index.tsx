@@ -3,13 +3,14 @@ import React from 'react'
 import { render } from 'ink'
 import minimist from 'minimist'
 import {
-  DiscoverCommand,
-  StatusCommand,
-  PowerCommand,
   BrightnessCommand,
-  CtCommand,
   ColorCommand,
-  SegmentCommand
+  CtCommand,
+  DiscoverCommand,
+  InteractiveCommand,
+  PowerCommand,
+  SegmentCommand,
+  StatusCommand
 } from './commands'
 import { HelpScreen, CommandHelpScreen } from './help'
 
@@ -121,6 +122,13 @@ async function main() {
     case 'segment':
       await render(
         <SegmentCommand left={rest[0]} right={rest[1]} ip={ip} />
+      ).waitUntilExit()
+      break
+
+    case 'interactive':
+    case 'i':
+      await render(
+        <InteractiveCommand timeout={Number(timeout)} />
       ).waitUntilExit()
       break
 

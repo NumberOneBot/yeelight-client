@@ -3,37 +3,7 @@ import { Box, Text, useApp } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
 import { Dots } from '../components/Dots'
 import { ErrorText } from '../components/ErrorText'
-
-type DeviceInfo = {
-  ip: string
-  model: string
-  main: string
-  bg: string | null
-  segments: boolean
-}
-
-type Caps = { hasColor: boolean; hasColorTemp: boolean }
-
-function channelCaps(caps: Caps): string {
-  if (caps.hasColor && caps.hasColorTemp) return 'ct+rgb'
-  if (caps.hasColor) return 'rgb'
-  if (caps.hasColorTemp) return 'ct'
-  return 'brightness'
-}
-
-function CapsText({ value }: { value: string }) {
-  if (value === 'ct+rgb')
-    return (
-      <>
-        <Text color="cyanBright">ct</Text>
-        <Text dimColor>+</Text>
-        <Text color="redBright">rgb</Text>
-      </>
-    )
-  if (value === 'ct') return <Text color="cyanBright">ct</Text>
-  if (value === 'rgb') return <Text color="redBright">rgb</Text>
-  return <Text color="yellow">brightness</Text>
-}
+import { channelCaps, DeviceInfo, DeviceRow } from '../components/DeviceRow'
 
 export function DiscoverCommand({ timeout }: { timeout: number }) {
   const { exit } = useApp()
@@ -64,7 +34,10 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
   if (!devices)
     return (
       <Box marginTop={1}>
-        <Text dimColor>Scanning<Dots /></Text>
+        <Text dimColor>
+          Scanning
+          <Dots />
+        </Text>
       </Box>
     )
   if (devices.length === 0) {
@@ -76,27 +49,7 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
   return (
     <Box flexDirection="column" marginTop={1}>
       {devices.map((d) => (
-        <Box key={d.ip} gap={2}>
-          <Text color="cyan">{d.ip}</Text>
-          {d.model && <Text dimColor>({d.model})</Text>}
-          <Box gap={1}>
-            <Text dimColor>main:</Text>
-            <CapsText value={d.main} />
-            {d.bg && (
-              <>
-                <Text dimColor>·</Text>
-                <Text dimColor>bg:</Text>
-                <CapsText value={d.bg} />
-              </>
-            )}
-            {d.segments && (
-              <>
-                <Text dimColor>+</Text>
-                <Text color="green">segments</Text>
-              </>
-            )}
-          </Box>
-        </Box>
+        <DeviceRow key={d.ip} device={d} />
       ))}
     </Box>
   )

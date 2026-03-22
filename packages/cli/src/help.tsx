@@ -84,6 +84,7 @@ export function HelpScreen() {
         <Box marginLeft={2} marginTop={1} flexDirection="column">
           <Cmd name="discover" desc="Discover devices on the network" />
           <Cmd name="status" desc="Show current device state" />
+          <Cmd name="interactive" desc="Interactive device control (TUI)" />
           <Cmd name="power" args="<on|off>" desc="Turn on or off" />
           <Cmd name="brightness" args="<1–100>" desc="Set brightness" />
           <Cmd
@@ -134,6 +135,22 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
     discover: (
       <>
         <UsageLine cmd="discover" />
+        <Text bold>Options:</Text>
+        <Box marginLeft={2} marginTop={1} flexDirection="column">
+          <Opt
+            flag="--timeout <ms>"
+            desc="Discovery timeout in ms (default: 3000)"
+          />
+        </Box>
+      </>
+    ),
+    interactive: (
+      <>
+        <UsageLine cmd="interactive" />
+        <Text dimColor>
+          Discover devices, pick one and control it interactively. \n Navigate
+          with ↑↓, confirm with Enter, quit with q.
+        </Text>
         <Text bold>Options:</Text>
         <Box marginLeft={2} marginTop={1} flexDirection="column">
           <Opt

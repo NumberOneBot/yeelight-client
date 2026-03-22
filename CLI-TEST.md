@@ -14,7 +14,38 @@
 
 ---
 
-## 1. discover
+## 1. interactive
+
+### 1.1 Launch
+
+```
+ylc interactive
+```
+
+- [ ] Shows `Scanning...` with animated dots
+- [ ] Lists discovered devices (IP, model, bg/seg tags)
+- [ ] ↑↓ moves cursor, Enter selects device
+- [ ] Shows `Connecting...` with animated dots
+- [ ] Shows action menu with device IP and model
+- [ ] Action menu shows relevant actions (ct/color filtered by capabilities)
+- [ ] Enter executes selected action, shows `✓ Done` briefly
+- [ ] `q` quits from any screen
+
+### 1.2 Alias
+
+```
+ylc i
+```
+
+- [ ] Same as `ylc interactive`
+
+### 1.3 Back navigation
+
+- [ ] `↩ back to devices` re-runs discovery and shows device list again
+
+---
+
+## 2. discover
 
 ### 1.1 Auto-discover
 
@@ -22,10 +53,10 @@
 ylc discover
 ```
 
-- [ ] Finds at least one device
-- [ ] Shows IP, device name, model in parentheses
-- [ ] Shows `background` tag if device has BG channel
-- [ ] Shows `segments` tag if device has segments
+- [x] Finds at least one device
+- [x] Shows IP, device name, model in parentheses
+- [x] Shows `background` tag if device has BG channel
+- [x] Shows `segments` tag if device has segments
 
 ### 1.2 Custom timeout
 
@@ -33,7 +64,7 @@ ylc discover
 ylc discover --timeout 5000
 ```
 
-- [ ] Runs ~5 seconds, then exits
+- [x] Runs ~5 seconds, then exits
 
 ### 1.3 Short timeout (no devices expected)
 
@@ -41,7 +72,7 @@ ylc discover --timeout 5000
 ylc discover --timeout 100
 ```
 
-- [ ] Exits quickly with "No devices found" message (not a crash)
+- [x] Exits quickly with "No devices found" message (not a crash)
 
 ---
 

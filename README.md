@@ -150,6 +150,7 @@ Usage: ylc <command> [options]
 Commands:
   discover                        Discover devices on the network
   status                          Show current device state
+  interactive                     Interactive device control (TUI)
   power        <on|off>           Turn on or off
   brightness   <1–100>            Set brightness
   ct           <kelvin>           Set color temperature (1700–6500)
@@ -167,6 +168,7 @@ Options:
 
 ```bash
 ylc discover
+ylc interactive
 ylc status --ip 192.168.1.42
 ylc power on
 ylc brightness 50 --duration 1000

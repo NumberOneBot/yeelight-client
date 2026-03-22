@@ -1,0 +1,68 @@
+import React, { useState } from 'react'
+import { Box, Text, useApp, useInput } from 'ink'
+import { YeelightDevice } from 'yeelight-client'
+import { Dots } from '../../components/Dots'
+import { ErrorText } from '../../components/ErrorText'
+import { ActionMenu } from './components/ActionMenu'
+import { DevicePicker } from './components/DevicePicker'
+
+type Screen =
+  | { id: 'pick' }
+  | { id: 'connecting'; device: YeelightDevice }
+  | { id: 'menu'; device: YeelightDevice }
+  | { id: 'error'; message: string }
+
+export function InteractiveCommand({ timeout }: { timeout: number }) {
+  const { exit } = useApp()
+  const [screen, setScreen] = useState<Screen>({ id: 'pick' })
+  const [cachedDevices, setCachedDevices] = useState<YeelightDevice[] | null>(
+    null
+  )
+
+  // Keep stdin in raw mode at all times so useInput in child screens
+  // always works after screen transitions (Ink/Windows stdin pause issue).
+  useInput(() => {})
+
+  function onPick(device: YeelightDevice) {
+    setScreen({ id: 'connecting', device })
+    void device
+      .connect()
+      .then(() => setScreen({ id: 'menu', device }))
+      .catch((e: Error) => setScreen({ id: 'error', message: e.message }))
+  }
+
+  function onBack() {
+    if (screen.id === 'menu') screen.device.disconnect()
+    setScreen({ id: 'pick' })
+  }
+
+  function onQuit() {
+    if (screen.id === 'menu') screen.device.disconnect()
+    exit()
+  }
+
+  if (screen.id === 'error') return <ErrorText message={screen.message} />
+
+  if (screen.id === 'pick')
+    return (
+      <DevicePicker
+        timeout={timeout}
+        initialDevices={cachedDevices}
+        onDevicesFound={setCachedDevices}
+        onSelect={onPick}
+        onQuit={onQuit}
+      />
+    )
+
+  if (screen.id === 'connecting')
+    return (
+      <Box marginTop={1}>
+        <Text dimColor>
+          Connecting
+          <Dots />
+        </Text>
+      </Box>
+    )
+
+  return <ActionMenu device={screen.device} onBack={onBack} onQuit={onQuit} />
+}

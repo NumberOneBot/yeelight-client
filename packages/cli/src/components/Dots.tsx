@@ -7,7 +7,10 @@ export function Dots() {
   const [frame, setFrame] = useState(0)
 
   useEffect(() => {
-    const timer = setInterval(() => setFrame(f => (f + 1) % frames.length), 400)
+    const timer = setInterval(
+      () => setFrame((f) => (f + 1) % frames.length),
+      400
+    )
     return () => clearInterval(timer)
   }, [])
 

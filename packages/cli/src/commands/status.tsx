@@ -189,7 +189,10 @@ export function StatusCommand({
   if (!data)
     return (
       <Box marginTop={1}>
-        <Text dimColor>Connecting<Dots /></Text>
+        <Text dimColor>
+          Connecting
+          <Dots />
+        </Text>
       </Box>
     )
 
