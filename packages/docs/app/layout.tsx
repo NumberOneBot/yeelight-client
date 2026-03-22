@@ -6,8 +6,8 @@ import Logo from '../components/Logo'
 
 export const metadata = {
   title: {
-    template: '%s – Yeelight Control',
-    default: 'Yeelight Control'
+    template: '%s – Yeelight Client',
+    default: 'Yeelight Client'
   }
 }
 
@@ -28,7 +28,7 @@ export default async function RootLayout({
                   style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                   <Logo style={{ height: '48px', width: 'auto' }} />
-                  <b>Yeelight Control</b>
+                  <b>Yeelight Client</b>
                 </span>
               }
             />
