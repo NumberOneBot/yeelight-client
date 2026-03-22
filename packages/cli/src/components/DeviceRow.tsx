@@ -22,12 +22,12 @@ export function CapsText({ value }: { value: string }) {
   if (value === 'ct+rgb')
     return (
       <>
-        <Text color="cyanBright">CT</Text>
-        <Text dimColor>+</Text>
         <Text color="redBright">RGB</Text>
+        <Text dimColor>+</Text>
+        <Text color="yellow">CT</Text>
       </>
     )
-  if (value === 'ct') return <Text color="cyanBright">CT</Text>
+  if (value === 'ct') return <Text color="yellow">CT</Text>
   if (value === 'rgb') return <Text color="redBright">RGB</Text>
   return <Text color="yellow">Brightness</Text>
 }

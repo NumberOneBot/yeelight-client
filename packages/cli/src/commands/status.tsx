@@ -1,7 +1,8 @@
-import React, { useEffect, useState, type ReactNode } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import type { ChannelCapabilities, ChannelState } from 'yeelight-client'
 import { resolveDevice } from '../resolve'
+import { ChannelStatus, PropRow } from '../components/ChannelStatus'
 import { Dots } from '../components/Dots'
 import { ErrorText } from '../components/ErrorText'
 
@@ -43,101 +44,6 @@ const rawPropNames = [
   'save_state',
   'name'
 ]
-
-function hex2(n: number) {
-  return n.toString(16).padStart(2, '0').toUpperCase()
-}
-
-function rgbHex(r: number, g: number, b: number) {
-  return `#${hex2(r)}${hex2(g)}${hex2(b)}`
-}
-
-function ctToColor(kelvin: number): string {
-  const t = kelvin / 100
-  let r = t <= 66 ? 255 : 329.698727446 * (t - 60) ** -0.1332047592
-  r = Math.round(Math.max(0, Math.min(255, r)))
-  let g =
-    t <= 66
-      ? 99.4708025861 * Math.log(t) - 161.1195681661
-      : 288.1221695283 * (t - 60) ** -0.0755148492
-  g = Math.round(Math.max(0, Math.min(255, g)))
-  let b =
-    t >= 66
-      ? 255
-      : t <= 19
-        ? 0
-        : 138.5177312231 * Math.log(t - 10) - 305.0447927307
-  b = Math.round(Math.max(0, Math.min(255, b)))
-  if (kelvin > 5000) {
-    const cool = (kelvin - 5000) / 1500
-    r = Math.round(Math.max(0, r - cool * 45))
-    b = Math.round(Math.min(255, b + cool * 20))
-  }
-  return rgbHex(r, g, b)
-}
-
-function Row({ k, children }: { k: string; children: ReactNode }) {
-  return (
-    <Box>
-      <Box minWidth={14}>
-        <Text dimColor>{k}</Text>
-      </Box>
-      {children}
-    </Box>
-  )
-}
-
-function Channel({
-  label,
-  s,
-  caps
-}: {
-  label: string
-  s: ChannelState
-  caps?: ChannelCapabilities
-}) {
-  const noColor = !!process.env.NO_COLOR
-  const hex = s.rgb ? rgbHex(...s.rgb) : undefined
-  return (
-    <Box flexDirection="column">
-      <Text bold>{label}</Text>
-      <Box marginLeft={2} flexDirection="column">
-        <Row k="power">
-          <Text bold color={s.power ? 'green' : 'red'}>
-            {s.power ? 'on' : 'off'}
-          </Text>
-        </Row>
-        <Row k="brightness">
-          <Text color="yellow">{s.brightness}%</Text>
-        </Row>
-        {s.colorTemp !== null && (
-          <Row k="color temp">
-            <Text color="yellow">{s.colorTemp}K</Text>
-            {!noColor && <Text color={ctToColor(s.colorTemp)}> ██</Text>}
-          </Row>
-        )}
-        {caps?.hasColor &&
-          caps.hasColorTemp &&
-          (s.rgb !== null || s.colorTemp !== null) && (
-            <Row k="color mode">
-              <Text color="yellow">{s.colorTemp !== null ? 'ct' : 'rgb'}</Text>
-            </Row>
-          )}
-        {s.rgb !== null && (
-          <Row k="rgb">
-            <Text color="yellow">{hex}</Text>
-            {!noColor && <Text color={hex}> ██</Text>}
-          </Row>
-        )}
-        {s.flowing && (
-          <Row k="flowing">
-            <Text color="magenta">active</Text>
-          </Row>
-        )}
-      </Box>
-    </Box>
-  )
-}
 
 export function StatusCommand({
   ip,
@@ -205,9 +111,9 @@ export function StatusCommand({
         {data.name && <Text bold>{data.name}</Text>}
         {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
       </Box>
-      <Channel label="Main channel:" s={data.main} caps={data.mainCaps} />
+      <ChannelStatus label="Main channel:" s={data.main} caps={data.mainCaps} />
       {data.bg && (
-        <Channel
+        <ChannelStatus
           label="Background channel:"
           s={data.bg}
           caps={data.bgCaps ?? undefined}
@@ -226,9 +132,9 @@ export function StatusCommand({
           <Text bold>Raw properties:</Text>
           <Box marginLeft={2} flexDirection="column">
             {Object.entries(data.raw).map(([k, v]) => (
-              <Row key={k} k={k}>
+              <PropRow key={k} k={k}>
                 <Text dimColor>{v || '—'}</Text>
-              </Row>
+              </PropRow>
             ))}
           </Box>
         </Box>
