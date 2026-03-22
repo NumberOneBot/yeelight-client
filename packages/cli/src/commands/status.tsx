@@ -111,17 +111,17 @@ export function StatusCommand({
         {data.name && <Text bold>{data.name}</Text>}
         {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
       </Box>
-      <ChannelStatus label="Main channel:" s={data.main} caps={data.mainCaps} />
+      <ChannelStatus label="Main channel" s={data.main} caps={data.mainCaps} />
       {data.bg && (
         <ChannelStatus
-          label="Background channel:"
+          label="Background channel"
           s={data.bg}
           caps={data.bgCaps ?? undefined}
         />
       )}
       {showCommands && data.support.length > 0 && (
         <Box flexDirection="column">
-          <Text bold>Supported commands:</Text>
+          <Text bold>Supported commands</Text>
           <Box marginLeft={2}>
             <Text dimColor>{data.support.join(', ')}</Text>
           </Box>
@@ -129,7 +129,7 @@ export function StatusCommand({
       )}
       {showRaw && Object.keys(data.raw).length > 0 && (
         <Box flexDirection="column">
-          <Text bold>Raw properties:</Text>
+          <Text bold>Raw properties</Text>
           <Box marginLeft={2} flexDirection="column">
             {Object.entries(data.raw).map(([k, v]) => (
               <PropRow key={k} k={k}>
