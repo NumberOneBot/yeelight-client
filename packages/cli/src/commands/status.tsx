@@ -1,6 +1,6 @@
 import React, { useEffect, useState, type ReactNode } from 'react'
 import { Box, Text, useApp } from 'ink'
-import type { ChannelState } from 'yeelight-client'
+import type { ChannelCapabilities, ChannelState } from 'yeelight-client'
 import { resolveDevice } from '../resolve'
 import { ErrorText } from '../components/ErrorText'
 
@@ -9,7 +9,9 @@ type StatusData = {
   model: string
   name: string
   main: ChannelState
+  mainCaps: ChannelCapabilities
   bg: ChannelState | null
+  bgCaps: ChannelCapabilities | null
   support: string[]
   raw: Record<string, string>
 }
@@ -84,7 +86,15 @@ function Row({ k, children }: { k: string; children: ReactNode }) {
   )
 }
 
-function Channel({ label, s }: { label: string; s: ChannelState }) {
+function Channel({
+  label,
+  s,
+  caps
+}: {
+  label: string
+  s: ChannelState
+  caps?: ChannelCapabilities
+}) {
   const noColor = !!process.env.NO_COLOR
   const hex = s.rgb ? rgbHex(...s.rgb) : undefined
   return (
@@ -105,6 +115,13 @@ function Channel({ label, s }: { label: string; s: ChannelState }) {
             {!noColor && <Text color={ctToColor(s.colorTemp)}> ██</Text>}
           </Row>
         )}
+        {caps?.hasColor &&
+          caps.hasColorTemp &&
+          (s.rgb !== null || s.colorTemp !== null) && (
+            <Row k="color mode">
+              <Text color="yellow">{s.colorTemp !== null ? 'ct' : 'rgb'}</Text>
+            </Row>
+          )}
         {s.rgb !== null && (
           <Row k="rgb">
             <Text color="yellow">{hex}</Text>
@@ -151,7 +168,9 @@ export function StatusCommand({
           model: device.model,
           name: device.name,
           main,
+          mainCaps: device.capabilities.main,
           bg,
+          bgCaps: device.capabilities.background,
           support: device.support,
           raw
         })
@@ -166,7 +185,12 @@ export function StatusCommand({
   }, [])
 
   if (error) return <ErrorText message={error} />
-  if (!data) return <Text dimColor>Connecting...</Text>
+  if (!data)
+    return (
+      <Box marginTop={1}>
+        <Text dimColor>Connecting...</Text>
+      </Box>
+    )
 
   return (
     <Box flexDirection="column" gap={1} marginTop={1}>
@@ -177,8 +201,14 @@ export function StatusCommand({
         {data.name && <Text bold>{data.name}</Text>}
         {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
       </Box>
-      <Channel label="Main channel:" s={data.main} />
-      {data.bg && <Channel label="Background channel:" s={data.bg} />}
+      <Channel label="Main channel:" s={data.main} caps={data.mainCaps} />
+      {data.bg && (
+        <Channel
+          label="Background channel:"
+          s={data.bg}
+          caps={data.bgCaps ?? undefined}
+        />
+      )}
       {showCommands && data.support.length > 0 && (
         <Box flexDirection="column">
           <Text bold>Supported commands:</Text>
