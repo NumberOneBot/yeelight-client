@@ -8,7 +8,7 @@ import { LightChannel } from './channel.js'
 import { UnsupportedError } from './errors.js'
 import { discover as ssdpDiscover } from './discovery.js'
 import { Transport } from './transport.js'
-import type { ChannelState, DeviceCapabilities } from './types.js'
+import type { ChannelState } from './types.js'
 
 const DEFAULT_PORT = 55443
 const PROBE_PROPS = ['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb']
@@ -22,7 +22,7 @@ export class YeelightDevice extends EventEmitter {
   readonly model: string
   readonly name: string
   readonly support: string[]
-  readonly capabilities: DeviceCapabilities
+  readonly capabilities: Capabilities
   readonly main: LightChannel
   readonly background: LightChannel | null
 
@@ -44,7 +44,7 @@ export class YeelightDevice extends EventEmitter {
     this.model = opts.model ?? 'unknown'
     this.name = opts.name ?? ''
     this.support = opts.support ?? []
-    this.capabilities = opts.capabilities.device
+    this.capabilities = opts.capabilities
     this.main = new LightChannel(
       'main',
       opts.capabilities.main,

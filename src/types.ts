@@ -29,11 +29,6 @@ export interface ChannelState {
   flowing: boolean
 }
 
-export interface DeviceCapabilities {
-  hasBackground: boolean
-  hasSegments: boolean
-}
-
 export interface ChannelCapabilities {
   hasColor: boolean
   hasColorTemp: boolean

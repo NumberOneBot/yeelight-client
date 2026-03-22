@@ -1,7 +1,8 @@
-import type { ChannelCapabilities, DeviceCapabilities } from './types.js'
+import type { ChannelCapabilities } from './types.js'
 
 export interface Capabilities {
-  device: DeviceCapabilities
+  hasBackground: boolean
+  hasSegments: boolean
   main: ChannelCapabilities
   background: ChannelCapabilities | null
 }
@@ -31,7 +32,8 @@ export function capabilitiesFromSupport(support: string[]): Capabilities {
     : null
 
   return {
-    device: { hasBackground, hasSegments },
+    hasBackground,
+    hasSegments,
     main,
     background
   }
@@ -66,7 +68,8 @@ export function capabilitiesFromProbe(propResults: string[]): Capabilities {
     : null
 
   return {
-    device: { hasBackground, hasSegments: false },
+    hasBackground,
+    hasSegments: false,
     main,
     background
   }
