@@ -129,9 +129,9 @@ export class LightChannel {
       await this.transport.send('get_prop', props)
 
     let rgbTuple: [number, number, number] | null = null
-    if (this.capabilities.hasColor && colorMode === '1' && rgb) {
+    if (this.capabilities.hasColor && colorMode !== '2' && rgb) {
       const v = parseInt(rgb, 10)
-      if (!isNaN(v)) {
+      if (!isNaN(v) && v > 0) {
         rgbTuple = [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
       }
     }

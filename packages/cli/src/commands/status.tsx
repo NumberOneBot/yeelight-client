@@ -43,7 +43,7 @@ const rawPropNames = [
 ]
 
 function hex2(n: number) {
-  return n.toString(16).padStart(2, '0')
+  return n.toString(16).padStart(2, '0').toUpperCase()
 }
 
 function rgbHex(r: number, g: number, b: number) {
@@ -85,7 +85,15 @@ function Row({ k, children }: { k: string; children: ReactNode }) {
   )
 }
 
-function Channel({ label, s }: { label: string; s: ChannelState }) {
+function Channel({
+  label,
+  s,
+  hasSegments
+}: {
+  label: string
+  s: ChannelState
+  hasSegments?: boolean
+}) {
   const noColor = !!process.env.NO_COLOR
   const hex = s.rgb ? rgbHex(...s.rgb) : undefined
   return (
@@ -115,6 +123,11 @@ function Channel({ label, s }: { label: string; s: ChannelState }) {
         {s.flowing && (
           <Row k="flowing">
             <Text color="magenta">active</Text>
+          </Row>
+        )}
+        {hasSegments && (
+          <Row k="segments">
+            <Text color="green">supported</Text>
           </Row>
         )}
       </Box>
@@ -164,7 +177,7 @@ export function StatusCommand({
   if (!data) return <Text dimColor>Connecting...</Text>
 
   return (
-    <Box flexDirection="column" gap={1}>
+    <Box flexDirection="column" gap={1} marginTop={1}>
       <Box gap={2}>
         <Text bold color="cyan">
           {data.ip}
@@ -173,21 +186,18 @@ export function StatusCommand({
         {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
       </Box>
       <Channel label="Main channel:" s={data.main} />
-      {data.bg && <Channel label="Background channel:" s={data.bg} />}
-      {data.hasSegments && (
-        <Row k="segments">
-          <Text color="green">supported</Text>
-        </Row>
+      {data.bg && (
+        <Channel
+          label="Background channel:"
+          s={data.bg}
+          hasSegments={data.hasSegments}
+        />
       )}
       {data.support.length > 0 && (
         <Box flexDirection="column">
-          <Text bold>Supported commands</Text>
-          <Box marginLeft={2} flexWrap="wrap" gap={1}>
-            {data.support.map((cmd) => (
-              <Text key={cmd} color="cyan">
-                {cmd}
-              </Text>
-            ))}
+          <Text bold>Supported commands:</Text>
+          <Box marginLeft={2}>
+            <Text dimColor>{data.support.join(', ')}</Text>
           </Box>
         </Box>
       )}

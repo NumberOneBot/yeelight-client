@@ -30,23 +30,23 @@ packages/
 
 ### Core Library (`src/`)
 
-- **No React, no CLI, no side effects** — it is a pure library. Never import from `packages/` here.
-- **Throws, never exits** — all errors propagate as `Error` instances; `process.exit()` is forbidden.
-- **No console output** — callers decide what to print. The library is silent.
-- Key types live in `types.ts`; `errors.ts` exports named error classes (`UnsupportedError`, etc.).
+- **No React, no CLI, no side effects** — pure library. Never import from `packages/` here.
+- **Throws, never exits** — errors propagate as `Error` instances; `process.exit()` is forbidden.
+- **No console output** — callers decide what to print.
+- Key types in `types.ts`; named error classes in `errors.ts`.
 - `device.ts` is the public API surface. Internal modules (`transport.ts`, `client.ts`) are not re-exported.
 
 ### CLI (`packages/cli/`)
 
-- **Every command is an Ink React component** in `commands/*.tsx`. It runs a side effect in `useEffect`, calls `exit()` when done, and renders an error `<Text>` if something throws.
-- **`resolve.ts` is the boundary** between CLI and library: it calls `YeelightDevice.discover/connect` and throws on failure — the command component catches and displays it.
-- No `process.exit()` inside command components — use `process.exitCode = 1` + `exit()` instead.
-- Color output uses Ink `<Text color="…">` — never raw ANSI strings except in `fmt.ts` (`swatch` only).
+- **Every command is an Ink React component** in `commands/*.tsx` — `useEffect` for logic, `exit()` when done, render error `<Text>` on throw.
+- **`resolve.ts`** calls `YeelightDevice.discover/connect` and throws on failure — command components only catch and display.
+- Never `process.exit()` in command components — use `process.exitCode = 1` + `exit()`.
+- Color output via Ink `<Text color="…">` — no raw ANSI strings except `fmt.ts` (`swatch` only).
 
 ### Docs (`packages/docs/`)
 
 - Content is MDX in `content/`. Do not generate MDX programmatically.
-- Logo component (`components/Logo.tsx`) is an inline SVG — edit the SVG directly, do not replace with `<img>`.
+- `components/Logo.tsx` is an inline SVG — edit directly, do not replace with `<img>`.
 
 ## Development Commands
 
@@ -62,28 +62,25 @@ pnpm --filter yeelight-cli build:win        # compile CLI binary for Windows
 
 ### General
 
-- **Named exports only** — no default exports anywhere (docs Next.js layouts/pages are an exception; this is a framework requirement).
+- **Modern, compact TypeScript** — destructuring, `?.`, `??`, concise ternaries, array methods. Conditional rendering: `data?.support?.length > 0 && ...` — never `data && data.support && data.support.length > 0 && (...)`.
+- **Named exports only** — no default exports (Next.js layouts/pages excepted — framework requirement).
 - **camelCase everywhere** — constants included; no `SCREAMING_CASE`.
-- **Lint warnings must not be left in committed code** — fix immediately, never suppress with a comment.
-- **Dead code is deleted** — unused imports, variables, props, and files must be removed immediately as part of every task. Never leave anything "just in case".
-- **Boy Scout Rule** — leave every file you touch cleaner than you found it. Fix naming, remove dead code — scoped to the file being changed, not the whole codebase.
-- **No confabulation** — never state something as fact without verifying it (reading a file, running a search). If unsure, say so and ask.
+- **No lint warnings** — fix immediately, never suppress with a comment.
+- **Boy Scout Rule** — delete dead code (unused imports, variables, props, files) in every file you touch. Scoped to the file being changed.
+- **No confabulation** — never state something as fact without verifying it (read a file, run a search). If unsure, say so.
 
 ### Naming
 
-Follow **Intention-Revealing Names** (Clean Code): names should answer _"what is this for?"_, not _"what type/state is this?"_.
+Names answer _"what is this for?"_, not _"what type/state is this?"_ (Intention-Revealing Names).
 
-Avoid `is`/`has`/`can` prefixes when a more expressive name exists: prefer `loading` over `isLoading`, `connected` over `isConnected` — unless the prefix genuinely adds clarity.
+Avoid `is`/`has`/`can` prefixes when a shorter name still answers the question: `loading` over `isLoading`, `connected` over `isConnected`. Drop context-redundant modifiers — shorter is always preferred when meaning is preserved.
 
-**Keep names compact.** Drop modifiers that add no information given the context. Shorter names that still answer _"what is this for?"_ are always preferred.
-
-**Watch for name drift near external data.** Yeelight API field names (`bg_power`, `ct`, `rgb`) must not silently transform across layers. Align internal names to match the protocol field names, not the other way around.
+**Watch for name drift near external data.** Yeelight API field names (`bg_power`, `ct`, `rgb`) must not silently transform across layers. Align internal names to the protocol, not the other way around.
 
 ### Component Structure (CLI + Docs only)
 
-Start every new component as a **single file**. Keep it there as long as it satisfies single responsibility.
+Start every new component as a **single file**. Convert to a folder when it grows beyond ~100 lines or needs visual sub-parts:
 
-**Convert to folder** when the component grows beyond ~100 lines or needs visual sub-parts:
 ```
 CommandName/
 ├── index.ts          # barrel: re-exports the component
@@ -91,10 +88,8 @@ CommandName/
 └── components/       # sub-components
 ```
 
-Sub-components are always preferred over inline render functions.
-
-When a component grows further, extract `constants.ts` and/or `utils.ts` as sibling files.
+Sub-components are always preferred over inline render functions. Extract `constants.ts` / `utils.ts` as sibling files when the component grows further.
 
 ### Reuse Before Build
 
-**Before writing any new UI sub-component**, check for an existing one that does the same job. In the CLI this means looking at other command components first. In the docs, check `packages/docs/components/` before creating new ones.
+Before writing any new UI sub-component, check for an existing one. In the CLI — look at other command components. In the docs — check `packages/docs/components/`.

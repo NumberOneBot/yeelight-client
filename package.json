@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsx src/index.ts",
+    "dev": "tsup --watch",
     "docs:dev": "pnpm --filter yeelight-client-docs dev",
     "docs:build": "pnpm --filter yeelight-client-docs build",
     "release": "pnpm build ; pnpm changeset publish"

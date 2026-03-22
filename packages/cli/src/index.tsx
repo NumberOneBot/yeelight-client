@@ -11,7 +11,7 @@ import { ColorCommand } from './commands/color.tsx'
 import { SegmentCommand } from './commands/segment.tsx'
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ['bg', 'help', 'version'],
+  boolean: ['bg', 'help', 'version', 'raw'],
   string: ['ip'],
   default: { duration: 0, timeout: 3000 },
   alias: { h: 'help', V: 'version' }
@@ -123,7 +123,7 @@ function HelpScreen() {
 
 // ── Routing ────────────────────────────────────────────────────────────────────
 
-const { ip, bg, duration, timeout, help } = argv
+const { ip, bg, duration, timeout, help, raw } = argv
 
 async function main() {
   if (help || !subcmd) {
@@ -139,7 +139,7 @@ async function main() {
       break
 
     case 'status':
-      await render(<StatusCommand ip={ip} />).waitUntilExit()
+      await render(<StatusCommand ip={ip} showRaw={raw} />).waitUntilExit()
       break
 
     case 'power': {

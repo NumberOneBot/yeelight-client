@@ -21,6 +21,7 @@ export class YeelightDevice extends EventEmitter {
   readonly ip: string
   readonly model: string
   readonly name: string
+  readonly support: string[]
   readonly capabilities: DeviceCapabilities
   readonly main: LightChannel
   readonly background: LightChannel | null
@@ -31,6 +32,7 @@ export class YeelightDevice extends EventEmitter {
     port: number
     model: string
     name: string
+    support?: string[]
     capabilities: Capabilities
     transport: Transport
   }) {
@@ -39,10 +41,10 @@ export class YeelightDevice extends EventEmitter {
     this.port = opts.port
     this.id = opts.id
     this.ip = opts.ip
-    this.model = opts.model
-    this.name = opts.name
+    this.model = opts.model ?? 'unknown'
+    this.name = opts.name ?? ''
+    this.support = opts.support ?? []
     this.capabilities = opts.capabilities.device
-
     this.main = new LightChannel(
       'main',
       opts.capabilities.main,
@@ -59,9 +61,6 @@ export class YeelightDevice extends EventEmitter {
       : null
 
     this.transport.on('disconnect', () => this.emit('disconnect'))
-    this.transport.on('props', (data: Partial<ChannelState>) =>
-      this.emit('props', data)
-    )
   }
 
   // ── Static factory methods ────────────────────────────────────────────────
@@ -75,11 +74,15 @@ export class YeelightDevice extends EventEmitter {
     timeout?: number
   }): Promise<YeelightDevice[]> {
     const infos = await ssdpDiscover(opts?.timeout)
-
     return infos.map((info) => {
-      const transport = new Transport()
+      // capabilitiesFromSupport expects support: string[]
       const caps = capabilitiesFromSupport(info.support)
-      return new YeelightDevice({ ...info, capabilities: caps, transport })
+      const transport = new Transport()
+      return new YeelightDevice({
+        ...info,
+        capabilities: caps,
+        transport
+      })
     })
   }
 
@@ -93,10 +96,8 @@ export class YeelightDevice extends EventEmitter {
   ): Promise<YeelightDevice> {
     const transport = new Transport()
     await transport.connect(ip, port)
-
     const probeResult = await transport.send('get_prop', PROBE_PROPS)
     const caps = capabilitiesFromProbe(probeResult)
-
     return new YeelightDevice({
       id: '',
       ip,
@@ -145,6 +146,11 @@ export class YeelightDevice extends EventEmitter {
     const rightInt =
       ((right[0] & 0xff) << 16) | ((right[1] & 0xff) << 8) | (right[2] & 0xff)
     await this.transport.send('set_segment_rgb', [leftInt, rightInt])
+  }
+
+  async getRawProps(props: string[]): Promise<Record<string, string>> {
+    const values = await this.transport.send('get_prop', props)
+    return Object.fromEntries(props.map((p, i) => [p, values[i] ?? '']))
   }
 
   // ── EventEmitter overloads for type safety ────────────────────────────────

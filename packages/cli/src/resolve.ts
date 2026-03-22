@@ -1,7 +1,31 @@
 import { YeelightDevice } from 'yeelight-client'
 
 export async function resolveDevice(ip?: string): Promise<YeelightDevice> {
-  if (ip) return YeelightDevice.connect(ip)
+  if (ip) {
+    // Run TCP connect and SSDP discovery in parallel.
+    // TCP gives a live connection fast; SSDP gives the support list.
+    const [tcpResult, ssdpResult] = await Promise.allSettled([
+      YeelightDevice.connect(ip),
+      YeelightDevice.discover({ timeout: 1000 }).then(
+        (devs) => devs.find((d) => d.ip === ip) ?? null
+      )
+    ])
+
+    if (tcpResult.status === 'rejected') {
+      throw new Error(tcpResult.reason?.message ?? `Cannot connect to ${ip}`)
+    }
+
+    const tcpDevice = tcpResult.value
+    const ssdpDevice =
+      ssdpResult.status === 'fulfilled' ? ssdpResult.value : null
+
+    if (ssdpDevice) {
+      tcpDevice.disconnect()
+      await ssdpDevice.connect()
+      return ssdpDevice
+    }
+    return tcpDevice
+  }
 
   const devices = await YeelightDevice.discover({ timeout: 3000 })
 
@@ -10,7 +34,9 @@ export async function resolveDevice(ip?: string): Promise<YeelightDevice> {
   }
 
   if (devices.length > 1) {
-    const list = devices.map((d) => `  ${d.ip}  ${d.name} (${d.model})`).join('\n')
+    const list = devices
+      .map((d) => `  ${d.ip}  ${d.name} (${d.model})`)
+      .join('\n')
     throw new Error(`Multiple devices found. Specify one with --ip:\n${list}`)
   }
 
