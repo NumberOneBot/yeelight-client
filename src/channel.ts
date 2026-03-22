@@ -119,23 +119,16 @@ export class LightChannel {
   async getState(): Promise<ChannelState> {
     const props =
       this.prefix === ''
-        ? ['power', 'bright', 'ct', 'rgb', 'color_mode', 'flowing']
-        : [
-            'bg_power',
-            'bg_bright',
-            'bg_ct',
-            'bg_rgb',
-            'bg_color_mode',
-            'bg_flowing'
-          ]
+        ? ['power', 'bright', 'ct', 'rgb', 'flowing']
+        : ['bg_power', 'bg_bright', 'bg_ct', 'bg_rgb', 'bg_flowing']
 
-    const [power, bright, ct, rgb, colorMode, flowing] =
-      await this.transport.send('get_prop', props)
-
-    const mode = colorMode?.trim() ?? ''
+    const [power, bright, ct, rgb, flowing] = await this.transport.send(
+      'get_prop',
+      props
+    )
 
     let rgbTuple: [number, number, number] | null = null
-    if (this.capabilities.hasColor && mode === '1' && rgb) {
+    if (this.capabilities.hasColor && rgb) {
       const v = parseInt(rgb, 10)
       if (!isNaN(v) && v > 0) {
         rgbTuple = [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
@@ -146,9 +139,7 @@ export class LightChannel {
       power: power === 'on',
       brightness: parseInt(bright, 10) || 0,
       colorTemp:
-        this.capabilities.hasColorTemp && (mode === '2' || mode === '') && ct
-          ? parseInt(ct, 10) || null
-          : null,
+        this.capabilities.hasColorTemp && ct ? parseInt(ct, 10) || null : null,
       rgb: rgbTuple,
       flowing: flowing === '1'
     }

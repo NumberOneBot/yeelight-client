@@ -39,7 +39,7 @@ export function ChannelStatus({
         </PropRow>
         {s.colorTemp !== null && (
           <PropRow k="color temp">
-            <Text color="yellow">{s.colorTemp}K</Text>
+            <Text color="yellow">{s.colorTemp} K</Text>
             {!noColor && <Text color={ctToColor(s.colorTemp)}> ██</Text>}
           </PropRow>
         )}
