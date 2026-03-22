@@ -41,10 +41,14 @@ export function DeviceRow({
 }) {
   return (
     <Box gap={2}>
-      <Text bold={focused} color={focused ? 'cyan' : undefined}>
-        {device.ip}
-      </Text>
-      {device.model && <Text dimColor>({device.model})</Text>}
+      <Box minWidth={15}>
+        <Text bold={focused} color={focused ? 'cyan' : undefined}>
+          {device.ip}
+        </Text>
+      </Box>
+      <Box minWidth={12}>
+        {device.model && <Text dimColor>({device.model})</Text>}
+      </Box>
       <Box gap={1}>
         <Text dimColor>main:</Text>
         <CapsText value={device.main} />

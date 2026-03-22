@@ -216,6 +216,7 @@ export function PropertyMenu({
           const cur = isCurrent(item)
           let label: string
           let swatch: React.ReactNode = null
+          const labelWidth = prop === 'rgb' ? 10 : prop === 'ct' ? 6 : 4
 
           if (item.kind === 'brightness') {
             label = `${item.value}%`
@@ -234,12 +235,14 @@ export function PropertyMenu({
               <Text color={focused ? 'cyan' : undefined}>
                 {focused ? '›' : ' '}
               </Text>
-              <Text
-                bold={focused || cur}
-                color={cur ? 'green' : focused ? 'cyan' : undefined}
-              >
-                {label}
-              </Text>
+              <Box minWidth={labelWidth}>
+                <Text
+                  bold={focused || cur}
+                  color={cur ? 'green' : focused ? 'cyan' : undefined}
+                >
+                  {label}
+                </Text>
+              </Box>
               {swatch}
             </Box>
           )

@@ -112,6 +112,10 @@ export class LightChannel {
     await this.transport.send(`${this.prefix}stop_cf`, [])
   }
 
+  async setDefault(): Promise<void> {
+    await this.transport.send(`${this.prefix}set_default`, [])
+  }
+
   async getState(): Promise<ChannelState> {
     const props =
       this.prefix === ''
@@ -128,8 +132,10 @@ export class LightChannel {
     const [power, bright, ct, rgb, colorMode, flowing] =
       await this.transport.send('get_prop', props)
 
+    const mode = colorMode?.trim() ?? ''
+
     let rgbTuple: [number, number, number] | null = null
-    if (this.capabilities.hasColor && colorMode !== '2' && rgb) {
+    if (this.capabilities.hasColor && mode === '1' && rgb) {
       const v = parseInt(rgb, 10)
       if (!isNaN(v) && v > 0) {
         rgbTuple = [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
@@ -140,7 +146,7 @@ export class LightChannel {
       power: power === 'on',
       brightness: parseInt(bright, 10) || 0,
       colorTemp:
-        this.capabilities.hasColorTemp && colorMode === '2' && ct
+        this.capabilities.hasColorTemp && (mode === '2' || mode === '') && ct
           ? parseInt(ct, 10) || null
           : null,
       rgb: rgbTuple,
