@@ -3,16 +3,20 @@
   "version": "0.1.0",
   "type": "module",
   "bin": {
-    "ylc": "./src/index.tsx"
+    "ylc": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "bun run src/index.tsx",
+    "build:node": "tsup",
     "prebuild:win": "magick -background none assets/icon-dark.svg -define icon:auto-resize=256,48,32,16 assets/icon-dark.ico",
     "build:win": "bun build src/index.tsx --compile --target bun-windows-x64 --outfile dist/ylc.exe",
     "postbuild:win": "node scripts/set-icon.mjs",
     "build:mac-arm64": "bun build src/index.tsx --compile --target bun-darwin-arm64 --outfile dist/ylc",
     "build:mac-x64": "bun build src/index.tsx --compile --target bun-darwin-x64 --outfile dist/ylc-x64",
-    "build": "pnpm run build:win"
+    "build": "pnpm run build:node"
   },
   "devDependencies": {
     "rcedit": "^5.0.2",
