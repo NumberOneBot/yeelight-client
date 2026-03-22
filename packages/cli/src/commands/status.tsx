@@ -2,6 +2,7 @@ import React, { useEffect, useState, type ReactNode } from 'react'
 import { Box, Text, useApp } from 'ink'
 import type { ChannelCapabilities, ChannelState } from 'yeelight-client'
 import { resolveDevice } from '../resolve'
+import { Dots } from '../components/Dots'
 import { ErrorText } from '../components/ErrorText'
 
 type StatusData = {
@@ -188,7 +189,7 @@ export function StatusCommand({
   if (!data)
     return (
       <Box marginTop={1}>
-        <Text dimColor>Connecting...</Text>
+        <Text dimColor>Connecting<Dots /></Text>
       </Box>
     )
 

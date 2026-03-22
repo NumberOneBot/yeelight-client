@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
+import { Dots } from '../components/Dots'
 import { ErrorText } from '../components/ErrorText'
 
 type DeviceInfo = {
@@ -63,7 +64,7 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
   if (!devices)
     return (
       <Box marginTop={1}>
-        <Text dimColor>Scanning...</Text>
+        <Text dimColor>Scanning<Dots /></Text>
       </Box>
     )
   if (devices.length === 0) {
