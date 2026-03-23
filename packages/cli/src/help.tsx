@@ -17,7 +17,7 @@ function Cmd({
           {name}
         </Text>
       </Box>
-      <Box width={18}>
+      <Box width={22}>
         <Text color="yellow">{args ?? ''}</Text>
       </Box>
       <Text dimColor>{desc}</Text>

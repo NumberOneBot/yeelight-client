@@ -10,7 +10,7 @@
     "url": "https://github.com/NumberOneBot/yeelight-client.git",
     "directory": "packages/cli"
   },
-  "homepage": "https://github.com/NumberOneBot/yeelight-client/tree/main/packages/cli",
+  "homepage": "https://numberonebot.github.io/yeelight-client",
   "bugs": "https://github.com/NumberOneBot/yeelight-client/issues",
   "keywords": [
     "yeelight",

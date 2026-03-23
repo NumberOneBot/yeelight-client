@@ -39,12 +39,12 @@ class YeelightDevice {
   disconnect(): void
   isConnected(): boolean
 
-  setScene(scene: SceneConfig): Promise<void>   // delegates to main
+  setScene(scene: SceneConfig): Promise<void> // delegates to main
   setName(name: string): Promise<void>
-  devToggle(): Promise<void>                    // dual-zone devices only
+  devToggle(): Promise<void> // dual-zone devices only
   cronAdd(minutes: number): Promise<void>
   cronDel(): Promise<void>
-  cronGet(): Promise<CronTimer | null>     // active timer or null
+  cronGet(): Promise<CronTimer | null> // active timer or null
   getRawProps(props: string[]): Promise<Record<string, string>>
 
   on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
@@ -81,8 +81,17 @@ class LightChannel {
   setColorTemp(kelvin: number, opts?: TransitionOptions): Promise<void>
 
   // Require capabilities.hasColor — throw UnsupportedError otherwise
-  setRGB(r: number, g: number, b: number, opts?: TransitionOptions): Promise<void>
-  setHSV(hue: number, saturation: number, opts?: TransitionOptions): Promise<void>
+  setRGB(
+    r: number,
+    g: number,
+    b: number,
+    opts?: TransitionOptions
+  ): Promise<void>
+  setHSV(
+    hue: number,
+    saturation: number,
+    opts?: TransitionOptions
+  ): Promise<void>
 
   // Requires capabilities.hasFlow — throws UnsupportedError otherwise
   startFlow(flow: Flow): Promise<void>
@@ -94,7 +103,10 @@ class LightChannel {
   setDefault(): Promise<void>
 
   // Relative adjustments — no need to know the current value
-  setAdjust(action: 'increase' | 'decrease' | 'circle', prop: 'bright' | 'ct'): Promise<void>
+  setAdjust(
+    action: 'increase' | 'decrease' | 'circle',
+    prop: 'bright' | 'ct'
+  ): Promise<void>
   setAdjust(action: 'circle', prop: 'color'): Promise<void>
   adjustBrightness(percentage: number, duration?: number): Promise<void>
   adjustColorTemp(percentage: number, duration?: number): Promise<void>
@@ -169,7 +181,7 @@ class DeviceError extends Error {
 ```ts
 interface TransitionOptions {
   effect?: 'smooth' | 'sudden' // default: 'smooth'
-  duration?: number            // ms, default: 300
+  duration?: number // ms, default: 300
 }
 
 /** 0=normal, 1=CT, 2=RGB, 3=HSV, 4=color flow, 5=night (ceiling lights only) */
@@ -181,9 +193,9 @@ interface PowerOptions extends TransitionOptions {
 
 interface ChannelState {
   power: boolean
-  brightness: number              // 1–100
-  colorTemp: number | null        // Kelvin, null if channel has no CT
-  rgb: [number, number, number] | null  // null if channel has no color
+  brightness: number // 1–100
+  colorTemp: number | null // Kelvin, null if channel has no CT
+  rgb: [number, number, number] | null // null if channel has no color
   flowing: boolean
 }
 

@@ -148,9 +148,9 @@ await device.main.adjustColor(1000) // cycle over 1000ms
 Turn off the device automatically after a number of minutes:
 
 ```ts
-await device.cronAdd(30)   // turn off in 30 minutes
+await device.cronAdd(30) // turn off in 30 minutes
 const timer = await device.cronGet() // { delay: 28 } or null
-await device.cronDel()     // cancel the timer
+await device.cronDel() // cancel the timer
 ```
 
 ### Device Name
