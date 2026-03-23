@@ -23,9 +23,11 @@
 
 - **Auto-discovery** — find devices on your LAN via SSDP multicast
 - **Direct connection** — connect by IP when you know the address
-- **Dual-channel** — independent control of main and background lights
+- **Dual-channel** — independent control of main and background lights (`devToggle()` switches both at once)
 - **Segment control** — left/right colors on lamp15 (YLTD003)
 - **Color flows** — built-in presets (pulse, strobe, candle, sunrise, color cycle) and a chainable FlowBuilder
+- **Scenes** — `setScene()` atomically turns on the device and sets its state in one command
+- **Relative adjustments** — `setAdjust()`, `adjustBrightness()`, `adjustColorTemp()` without knowing the current value
 - **Full state** — read power, brightness, color temp, RGB, flow status
 - **Real-time events** — property change notifications pushed from the device
 - **ESM + CJS** — works everywhere, ships with TypeScript declarations
@@ -100,6 +102,48 @@ if (device.capabilities.hasSegments) {
 }
 ```
 
+### Scenes
+
+`setScene()` turns the device on and applies the target state atomically. Useful when the device may be off:
+
+```ts
+import type { SceneConfig } from 'yeelight-client'
+
+await device.setScene({ type: 'color', rgb: [255, 100, 0], brightness: 80 })
+await device.setScene({ type: 'ct', colorTemp: 4000, brightness: 60 })
+await device.setScene({ type: 'hsv', hue: 200, saturation: 80, brightness: 70 })
+await device.setScene({ type: 'cf', flow: Flow.colorCycle() })
+await device.setScene({ type: 'auto_delay_off', brightness: 50, minutes: 30 })
+```
+
+### Relative Adjustments
+
+Change brightness or color temperature relative to the current value — no need to know the current state:
+
+```ts
+await device.main.setAdjust('increase', 'bright')  // step up brightness
+await device.main.setAdjust('decrease', 'ct')       // step down color temp
+await device.main.setAdjust('circle', 'color')      // cycle through hues
+
+await device.main.adjustBrightness(+20)             // +20% brightness
+await device.main.adjustBrightness(-10, 500)        // -10% over 500ms
+await device.main.adjustColorTemp(-30)              // -30% color temp
+```
+
+### Device Name
+
+```ts
+await device.setName('Desk Light')
+```
+
+### Dual-Zone Toggle
+
+Devices with a background channel (Bedside Lamp 2, ceiling lights) can toggle both channels simultaneously:
+
+```ts
+await device.devToggle()  // toggles main + background in one command
+```
+
 ### Color Flows
 
 Built-in presets for common animations:
@@ -131,7 +175,7 @@ await device.main.stopFlow()
 
 ### Transition Options
 
-All setter methods accept an optional second argument:
+All setter methods accept an optional `TransitionOptions` argument:
 
 ```ts
 await device.main.setBrightness(50, { effect: 'smooth', duration: 1000 })
@@ -139,6 +183,24 @@ await device.main.setRGB(255, 0, 0, { effect: 'sudden' })
 ```
 
 Default: `{ effect: 'smooth', duration: 300 }`.
+
+`setPower()` accepts `PowerOptions` which extends `TransitionOptions` with an optional `mode`:
+
+```ts
+import type { PowerOptions } from 'yeelight-client'
+
+await device.main.setPower(true, { mode: 5 })              // night mode (ceiling lights)
+await device.main.setPower(true, { mode: 1, duration: 500 }) // turn on in CT mode
+```
+
+| Mode | Constant | Description |
+|---|---|---|
+| `0` | normal | Default mode |
+| `1` | CT | Color temperature mode |
+| `2` | RGB | RGB color mode |
+| `3` | HSV | HSV color mode |
+| `4` | CF | Color flow mode |
+| `5` | Night | Night light (ceiling lights only) |
 
 ### Events
 
@@ -199,30 +261,36 @@ device.capabilities
 
 |            | Signature                                                          | Description                                     |
 | ---------- | ------------------------------------------------------------------ | ----------------------------------------------- |
-| **Static** | `discover(opts?: { timeout?: number }): Promise<YeelightDevice[]>` | Find devices via SSDP (default timeout: 3000ms) |
-| **Static** | `connect(ip: string, port?: number): Promise<YeelightDevice>`      | Connect directly (default port: 55443)          |
-|            | `connect(): Promise<void>`                                         | Reconnect a disconnected device                 |
-|            | `disconnect(): void`                                               | Close the connection                            |
-|            | `isConnected(): boolean`                                           | Connection status                               |
-|            | `setSegments(left, right): Promise<void>`                          | Set left/right segment colors (lamp15)          |
-|            | `getRawProps(props: string[]): Promise<Record<string, string>>`    | Query raw Yeelight properties                   |
+| **Static** | `discover(opts?: { timeout?: number }): Promise<YeelightDevice[]>` | Find devices via SSDP (default timeout: 3000ms)     |
+| **Static** | `connect(ip: string, port?: number): Promise<YeelightDevice>`      | Connect directly (default port: 55443)              |
+|            | `connect(): Promise<void>`                                         | Reconnect a disconnected device                     |
+|            | `disconnect(): void`                                               | Close the connection                                |
+|            | `isConnected(): boolean`                                           | Connection status                                   |
+|            | `setSegments(left, right): Promise<void>`                          | Set left/right segment colors (lamp15)              |
+|            | `setScene(scene: SceneConfig): Promise<void>`                      | Turn on and apply state atomically                  |
+|            | `setName(name: string): Promise<void>`                             | Persist device name to device memory                |
+|            | `devToggle(): Promise<void>`                                       | Toggle main + background simultaneously             |
+|            | `getRawProps(props: string[]): Promise<Record<string, string>>`    | Query raw Yeelight properties                       |
 
 **Properties:** `id`, `ip`, `model`, `name`, `support`, `capabilities`, `main`, `background`
 
 ### `LightChannel`
 
-| Method                        | Description                            |
-| ----------------------------- | -------------------------------------- |
-| `setPower(on, opts?)`         | Turn on/off                            |
-| `toggle()`                    | Toggle power                           |
-| `setBrightness(1–100, opts?)` | Set brightness                         |
-| `setColorTemp(kelvin, opts?)` | Color temperature (1700–6500 K)        |
-| `setRGB(r, g, b, opts?)`      | RGB color (0–255 each)                 |
-| `setHSV(hue, sat, opts?)`     | HSV color (hue 0–359, sat 0–100)       |
-| `startFlow(flow)`             | Start a color flow animation           |
-| `stopFlow()`                  | Stop the current flow                  |
-| `setDefault()`                | Save current state as power-on default |
-| `getState()`                  | Read `ChannelState`                    |
+| Method                                           | Description                                             |
+| ------------------------------------------------ | ------------------------------------------------------- |
+| `setPower(on, opts?)`                            | Turn on/off; `opts` is `PowerOptions` (supports `mode`) |
+| `toggle()`                                       | Toggle power                                            |
+| `setBrightness(1–100, opts?)`                    | Set brightness                                          |
+| `setColorTemp(kelvin, opts?)`                    | Color temperature (1700–6500 K)                         |
+| `setRGB(r, g, b, opts?)`                         | RGB color (0–255 each)                                  |
+| `setHSV(hue, sat, opts?)`                        | HSV color (hue 0–359, sat 0–100)                        |
+| `startFlow(flow)`                                | Start a color flow animation                            |
+| `stopFlow()`                                     | Stop the current flow                                   |
+| `setDefault()`                                   | Save current state as power-on default                  |
+| `setAdjust(action, prop)`                        | Relative adjustment (no current value needed)           |
+| `adjustBrightness(percentage, duration?)`        | Change brightness by ±% (−100…+100)                     |
+| `adjustColorTemp(percentage, duration?)`         | Change color temp by ±% (−100…+100)                     |
+| `getState()`                                     | Read `ChannelState`                                     |
 
 Methods that require specific hardware throw `UnsupportedError` if the capability is missing.
 
@@ -264,6 +332,20 @@ interface TransitionOptions {
   effect?: 'smooth' | 'sudden'
   duration?: number // ms
 }
+
+type PowerMode = 0 | 1 | 2 | 3 | 4 | 5
+// 0 = normal, 1 = CT, 2 = RGB, 3 = HSV, 4 = CF, 5 = night
+
+interface PowerOptions extends TransitionOptions {
+  mode?: PowerMode
+}
+
+type SceneConfig =
+  | { type: 'color'; rgb: [number, number, number]; brightness: number }
+  | { type: 'hsv'; hue: number; saturation: number; brightness: number }
+  | { type: 'ct'; colorTemp: number; brightness: number }
+  | { type: 'cf'; flow: Flow }
+  | { type: 'auto_delay_off'; brightness: number; minutes: number }
 
 interface Capabilities {
   hasBackground: boolean
