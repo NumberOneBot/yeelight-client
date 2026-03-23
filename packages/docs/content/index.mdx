@@ -24,6 +24,11 @@ ylc brightness 50 --ip 192.168.0.27
 ylc ct 4000 --ip 192.168.0.27
 ylc color "#ff6400" --ip 192.168.0.27
 ylc segment "#ff0000" "#0000ff" --ip 192.168.0.27
+ylc toggle --ip 192.168.0.27         # toggle main + background at once
+ylc name "Desk Light" --ip 192.168.0.27
+ylc timer set 30 --ip 192.168.0.27   # sleep timer
+ylc timer status --ip 192.168.0.27
+ylc adjust brightness 20 --ip 192.168.0.27
 ylc discover
 ```
 

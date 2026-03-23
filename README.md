@@ -419,10 +419,18 @@ ylc status --ip 192.168.1.42         # show device state
 ylc power on                         # turn on
 ylc brightness 50 --duration 1000    # set brightness with transition
 ylc ct 3000                          # color temperature
-ylc color "#ff6400"                # hex color
-ylc color "#ff640080"              # hex with alpha → brightness
-ylc segment "#ff0000" "#0000ff"  # lamp15 left/right
+ylc color "#ff6400"                  # hex color
+ylc color "#ff640080"                # hex with alpha → brightness
+ylc segment "#ff0000" "#0000ff"      # lamp15 left/right
 ylc power on --bg                    # background channel
+ylc toggle                           # toggle main + background at once
+ylc name "Desk Light"                # set device name
+ylc timer set 30                     # sleep timer (auto power-off)
+ylc timer status                     # check remaining time
+ylc timer cancel                     # cancel timer
+ylc adjust brightness 20             # relative adjust (+/- 1..100)
+ylc adjust ct -10
+ylc adjust color
 ```
 
 ## Development
