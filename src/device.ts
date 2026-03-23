@@ -135,17 +135,11 @@ export class YeelightDevice extends EventEmitter {
 
   /**
    * Set left and right strip colors independently. lamp15 only.
-   * Throws UnsupportedError on devices without segment control.
    */
   async setSegments(
     left: [number, number, number],
     right: [number, number, number]
   ): Promise<void> {
-    if (!this.capabilities.hasSegments) {
-      throw new UnsupportedError(
-        `Device '${this.model}' does not support segment control`
-      )
-    }
     const leftInt =
       ((left[0] & 0xff) << 16) | ((left[1] & 0xff) << 8) | (left[2] & 0xff)
     const rightInt =
@@ -186,7 +180,10 @@ export class YeelightDevice extends EventEmitter {
 
   /** Returns the active sleep timer, or `null` if none is set. */
   async cronGet(): Promise<CronTimer | null> {
-    const result = (await this.transport.send('cron_get', [0])) as unknown as Array<{ delay: number }>
+    const result = (await this.transport.send(
+      'cron_get',
+      [0]
+    )) as unknown as Array<{ delay: number }>
     return result[0] ? { delay: result[0].delay } : null
   }
 

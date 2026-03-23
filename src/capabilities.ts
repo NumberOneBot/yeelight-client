@@ -47,29 +47,27 @@ export function capabilitiesFromSupport(support: string[]): Capabilities {
  *   get_prop(['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb'])
  */
 export function capabilitiesFromProbe(propResults: string[]): Capabilities {
-  const [ct, rgb, bgPower, bgCt, bgRgb] = propResults
+  const [, , bgPower] = propResults
 
-  const notEmpty = (v: string | undefined) => v !== '' && v !== undefined
-
-  const hasBackground = notEmpty(bgPower)
+  const hasBackground = bgPower !== '' && bgPower !== undefined
 
   const main: ChannelCapabilities = {
-    hasColor: notEmpty(rgb),
-    hasColorTemp: notEmpty(ct),
+    hasColor: true,
+    hasColorTemp: true,
     hasFlow: true
   }
 
   const background: ChannelCapabilities | null = hasBackground
     ? {
-        hasColor: notEmpty(bgRgb),
-        hasColorTemp: notEmpty(bgCt),
+        hasColor: true,
+        hasColorTemp: true,
         hasFlow: true
       }
     : null
 
   return {
     hasBackground,
-    hasSegments: false,
+    hasSegments: true,
     main,
     background
   }
