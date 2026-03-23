@@ -23,17 +23,19 @@ export function DeviceMenuItem({
   const hasSubmenu =
     row.kind === 'brightness' || row.kind === 'ct' || row.kind === 'rgb'
   const isBack = row.kind === 'back'
+  const disabled = hasSubmenu && state?.power !== true
+  const active = focused && !disabled
 
   return (
     <Box gap={1} marginTop={row.sep ? 1 : 0}>
-      <Text color={focused ? 'cyan' : undefined}>{focused ? '›' : ' '}</Text>
+      <Text color={active ? 'cyan' : undefined}>{active ? '›' : ' '}</Text>
       <Box minWidth={14}>
-        <Text bold={isBack && focused} color={focused ? 'cyan' : undefined}>
+        <Text bold={isBack && active} color={active ? 'cyan' : undefined} dimColor={disabled}>
           {row.label}
         </Text>
       </Box>
-      <Text dimColor={!hasSubmenu}>{hasSubmenu ? '›' : ' '} </Text>
-      {!isBack && <RowValue row={row} state={state} />}
+      <Text dimColor={disabled}>{hasSubmenu ? '›' : ' '} </Text>
+      {!isBack && <RowValue row={row} state={state} disabled={disabled} />}
     </Box>
   )
 }

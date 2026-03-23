@@ -13,7 +13,7 @@ type Screen =
   | { id: 'disconnected' }
   | { id: 'error'; message: string }
 
-export function InteractiveCommand({ timeout }: { timeout: number }) {
+export function InteractiveCommand({ timeout, debug }: { timeout: number; debug?: boolean }) {
   const { exit } = useApp()
   const [screen, setScreen] = useState<Screen>({ id: 'pick' })
   const [cachedDevices, setCachedDevices] = useState<YeelightDevice[] | null>(
@@ -104,5 +104,5 @@ export function InteractiveCommand({ timeout }: { timeout: number }) {
       </Box>
     )
 
-  return <DeviceMenu device={screen.device} onBack={onBack} onQuit={onQuit} />
+  return <DeviceMenu device={screen.device} onBack={onBack} onQuit={onQuit} debug={debug} />
 }

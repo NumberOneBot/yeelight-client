@@ -16,7 +16,7 @@ import { HelpScreen, CommandHelpScreen } from './help'
 import pkg from '../package.json'
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ['bg', 'help', 'version', 'raw', 'commands'],
+  boolean: ['bg', 'help', 'version', 'raw', 'commands', 'debug'],
   string: ['ip'],
   default: { duration: 0, timeout: 3000 },
   alias: { h: 'help', V: 'version' }
@@ -31,7 +31,7 @@ if (argv.version) {
 
 // ── Routing ────────────────────────────────────────────────────────────────────
 
-const { ip, bg, duration, timeout, help, raw, commands } = argv
+const { ip, bg, duration, timeout, help, raw, commands, debug } = argv
 
 async function main() {
   if (help && subcmd) {
@@ -129,7 +129,7 @@ async function main() {
     case 'interactive':
     case 'i':
       await render(
-        <InteractiveCommand timeout={Number(timeout)} />
+        <InteractiveCommand timeout={Number(timeout)} debug={debug} />
       ).waitUntilExit()
       break
 

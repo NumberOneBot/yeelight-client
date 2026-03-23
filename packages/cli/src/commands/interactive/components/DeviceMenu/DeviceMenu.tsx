@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { appendFileSync } from 'node:fs'
 import { Box, Text } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { YeelightDevice } from 'yeelight-client'
@@ -9,14 +10,21 @@ import { buildRows, type MenuRow, type SubScreen } from './rows'
 import { DeviceMenuItem } from './components/DeviceMenuItem'
 import { PropertyMenu } from './components/PropertyMenu'
 
+function dbg(event: string, data: unknown) {
+  const payload = typeof data === 'string' ? data : JSON.stringify(data)
+  appendFileSync('debug.log', `[${new Date().toISOString()}] ${event} ${payload}\n`)
+}
+
 export function DeviceMenu({
   device,
   onBack,
-  onQuit
+  onQuit,
+  debug
 }: {
   device: YeelightDevice
   onBack: () => void
   onQuit: () => void
+  debug?: boolean
 }) {
   const [mainState, setMainState] = useState<ChannelState | null>(null)
   const [bgState, setBgState] = useState<ChannelState | null>(null)
@@ -29,13 +37,30 @@ export function DeviceMenu({
   const rows = useMemo(() => buildRows(device), [device])
 
   useEffect(() => {
+    if (!debug) return
+    const handler = (params: unknown) => {
+      dbg('push props', params)
+    }
+    const onTx = (frame: string) => dbg('→ tx', frame)
+    const onRx = (frame: string) => dbg('← rx', frame)
+    device.on('props', handler)
+    device.on('tx', onTx)
+    device.on('rx', onRx)
+    return () => {
+      device.off('props', handler)
+      device.off('tx', onTx)
+      device.off('rx', onRx)
+    }
+  }, [device, debug])
+
+  useEffect(() => {
     device.main
       .getState()
-      .then(setMainState)
+      .then((s) => { if (debug) dbg('getState main', s); setMainState(s) })
       .catch(() => {})
     device.background
       ?.getState()
-      .then(setBgState)
+      .then((s) => { if (debug) dbg('getState bg', s); setBgState(s) })
       .catch(() => {})
   }, [device])
 
@@ -76,6 +101,7 @@ export function DeviceMenu({
         .toggle()
         .then(() => ch.getState())
         .then((state) => {
+          if (debug) dbg(`toggle ${row.channel}`, state)
           if (row.channel === 'bg') setBgState(state)
           else setMainState(state)
           setToggleDone(true)
@@ -120,7 +146,14 @@ export function DeviceMenu({
       <SelectList
         items={rows}
         initialCursor={savedCursor}
-        isSelectable={(row) => row.kind !== 'section'}
+        isSelectable={(row) => {
+          if (row.kind === 'section') return false
+          if (row.kind === 'brightness' || row.kind === 'ct' || row.kind === 'rgb') {
+            const chState = row.channel === 'bg' ? bgState : mainState
+            return chState?.power === true
+          }
+          return true
+        }}
         onSelect={handleSelect}
         onCancel={onBack}
         onQuit={onQuit}

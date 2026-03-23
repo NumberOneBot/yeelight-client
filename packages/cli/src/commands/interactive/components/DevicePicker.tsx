@@ -69,16 +69,18 @@ export function DevicePicker({
       <Box marginBottom={1}>
         <Text bold>Select device</Text>
       </Box>
+
       {error && (
-        <Box marginBottom={1}>
+        <Box>
           <Text color="red">✗ {error}</Text>
         </Box>
       )}
       {devices?.length === 0 && (
-        <Box marginBottom={1}>
+        <Box>
           <Text dimColor>No devices found.</Text>
         </Box>
       )}
+
       <SelectList<PickerItem>
         items={listItems}
         initialCursor={initialCursor}

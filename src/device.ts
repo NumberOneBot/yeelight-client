@@ -61,6 +61,9 @@ export class YeelightDevice extends EventEmitter {
       : null
 
     this.transport.on('disconnect', () => this.emit('disconnect'))
+    this.transport.on('props', (params: unknown) => this.emit('props', params))
+    this.transport.on('tx', (frame: string) => this.emit('tx', frame))
+    this.transport.on('rx', (frame: string) => this.emit('rx', frame))
   }
 
   // ── Static factory methods ────────────────────────────────────────────────
@@ -157,6 +160,7 @@ export class YeelightDevice extends EventEmitter {
 
   on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
   on(event: 'disconnect', listener: () => void): this
+  on(event: 'tx' | 'rx', listener: (frame: string) => void): this
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on(event: string, listener: (...args: any[]) => void): this {
     return super.on(event, listener)

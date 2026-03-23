@@ -5,10 +5,12 @@ import type { MenuRow } from '../rows'
 
 export function RowValue({
   row,
-  state
+  state,
+  disabled
 }: {
   row: MenuRow
   state: ChannelState | null
+  disabled?: boolean
 }) {
   const noColor = !!process.env.NO_COLOR
 
@@ -22,14 +24,16 @@ export function RowValue({
   }
   if (row.kind === 'brightness') {
     if (!state) return <Text dimColor>…</Text>
-    return <Text color="yellow">{state.brightness}%</Text>
+    return <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>{state.brightness}%</Text>
   }
   if (row.kind === 'ct') {
     if (!state || state.colorTemp === null) return <Text dimColor>—</Text>
     return (
       <Box>
-        <Text color="yellow">{state.colorTemp} K</Text>
-        {!noColor && <Text color={ctToColor(state.colorTemp)}> ██</Text>}
+        <Box minWidth={8}>
+          <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>{state.colorTemp} K</Text>
+        </Box>
+        {!noColor && !disabled && <Text color={ctToColor(state.colorTemp)}>██</Text>}
       </Box>
     )
   }
@@ -38,8 +42,8 @@ export function RowValue({
     const hex = rgbHex(...state.rgb)
     return (
       <Box>
-        <Text color="yellow">{hex}</Text>
-        {!noColor && <Text color={hex}> ██</Text>}
+        <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>{hex}</Text>
+        {!noColor && !disabled && <Text color={hex}> ██</Text>}
       </Box>
     )
   }

@@ -67,15 +67,14 @@ export class Transport extends EventEmitter {
       const id = this.cmdId++
       this.pending.set(id, { resolve, reject })
 
-      this.socket.write(
-        JSON.stringify({ id, method, params }) + '\r\n',
-        (err) => {
-          if (err) {
-            this.pending.delete(id)
-            reject(new ConnectionError(err.message))
-          }
+      const frame = JSON.stringify({ id, method, params }) + '\r\n'
+      this.emit('tx', frame.trimEnd())
+      this.socket.write(frame, (err) => {
+        if (err) {
+          this.pending.delete(id)
+          reject(new ConnectionError(err.message))
         }
-      )
+      })
     })
   }
 
@@ -86,6 +85,7 @@ export class Transport extends EventEmitter {
 
     for (const line of lines) {
       if (!line.trim()) continue
+      this.emit('rx', line)
       try {
         const msg = JSON.parse(line) as RpcResponse & {
           method?: string
