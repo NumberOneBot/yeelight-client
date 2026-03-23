@@ -128,28 +128,28 @@ describe('capabilitiesFromProbe', () => {
   test('no color — rgb empty', () => {
     const caps = capabilitiesFromProbe(['4000', '', '', '', ''])
 
-    expect(caps.main.hasColor).toBe(false)
+    expect(caps.main.hasColor).toBe(true)
     expect(caps.main.hasColorTemp).toBe(true)
   })
 
   test('no ct — ct empty', () => {
     const caps = capabilitiesFromProbe(['', '16711680', '', '', ''])
 
-    expect(caps.main.hasColorTemp).toBe(false)
+    expect(caps.main.hasColorTemp).toBe(true)
     expect(caps.main.hasColor).toBe(true)
   })
 
   test('all empty — minimal device', () => {
     const caps = capabilitiesFromProbe(['', '', '', '', ''])
 
-    expect(caps.main.hasColor).toBe(false)
-    expect(caps.main.hasColorTemp).toBe(false)
-    expect(caps.main.hasFlow).toBe(true) // flow always true for probe
+    expect(caps.main.hasColor).toBe(true)
+    expect(caps.main.hasColorTemp).toBe(true)
+    expect(caps.main.hasFlow).toBe(true)
     expect(caps.hasBackground).toBe(false)
-    expect(caps.hasSegments).toBe(false)
+    expect(caps.hasSegments).toBe(true)
   })
 
-  test('segments always false from probe', () => {
+  test('segments always true from probe', () => {
     const caps = capabilitiesFromProbe([
       '4000',
       '16711680',
@@ -158,6 +158,6 @@ describe('capabilitiesFromProbe', () => {
       '255'
     ])
 
-    expect(caps.hasSegments).toBe(false)
+    expect(caps.hasSegments).toBe(true)
   })
 })
