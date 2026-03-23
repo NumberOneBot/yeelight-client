@@ -98,6 +98,18 @@ export function HelpScreen() {
             args="<left> <right>"
             desc="Left/right segment colors (lamp15)"
           />
+          <Cmd name="toggle" desc="Toggle main + background simultaneously" />
+          <Cmd name="name" args="<name>" desc="Set device name" />
+          <Cmd
+            name="timer"
+            args="<set|cancel|status>"
+            desc="Sleep timer (auto power-off)"
+          />
+          <Cmd
+            name="adjust"
+            args="<brightness|ct|color>"
+            desc="Relative brightness / CT / color adjust"
+          />
         </Box>
       </Box>
 
@@ -225,6 +237,63 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
             desc="Device IP (auto-discover if omitted)"
           />
         </Box>
+      </>
+    ),
+    toggle: (
+      <>
+        <UsageLine cmd="toggle" />
+        <Box flexDirection="column" marginBottom={1}>
+          <Text dimColor>
+            Toggles both main and background channels simultaneously.
+          </Text>
+          <Text dimColor>
+            Only works on dual-channel devices (e.g. Bedside Lamp 2).
+          </Text>
+        </Box>
+        <Text bold>Options:</Text>
+        <Box marginLeft={2} marginTop={1} flexDirection="column">
+          <Opt
+            flag="--ip <address>"
+            desc="Device IP (auto-discover if omitted)"
+          />
+        </Box>
+      </>
+    ),
+    name: (
+      <>
+        <UsageLine cmd="name" args="<name>" />
+        <Text bold>Options:</Text>
+        <Box marginLeft={2} marginTop={1} flexDirection="column">
+          <Opt
+            flag="--ip <address>"
+            desc="Device IP (auto-discover if omitted)"
+          />
+        </Box>
+      </>
+    ),
+    timer: (
+      <>
+        <UsageLine cmd="timer" args="<set <minutes> | cancel | status>" />
+        <Text bold>Options:</Text>
+        <Box marginLeft={2} marginTop={1} flexDirection="column">
+          <Opt
+            flag="--ip <address>"
+            desc="Device IP (auto-discover if omitted)"
+          />
+        </Box>
+      </>
+    ),
+    adjust: (
+      <>
+        <UsageLine cmd="adjust" args="<brightness|ct|color> [<-100..100>]" />
+        <Box flexDirection="column" marginBottom={1}>
+          <Text dimColor>
+            Adjust by a relative percentage (-100 to 100). Color cycles without
+            a value.
+          </Text>
+        </Box>
+        <Text bold>Options:</Text>
+        <StdOpts />
       </>
     )
   }

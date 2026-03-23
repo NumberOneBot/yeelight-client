@@ -3,14 +3,18 @@ import React from 'react'
 import { render } from 'ink'
 import minimist from 'minimist'
 import {
+  AdjustCommand,
   BrightnessCommand,
   ColorCommand,
   CtCommand,
   DiscoverCommand,
   InteractiveCommand,
+  NameCommand,
   PowerCommand,
   SegmentCommand,
-  StatusCommand
+  StatusCommand,
+  TimerCommand,
+  ToggleCommand
 } from './commands'
 import { HelpScreen, CommandHelpScreen } from './help'
 import pkg from '../package.json'
@@ -132,6 +136,66 @@ async function main() {
         <InteractiveCommand timeout={Number(timeout)} debug={debug} />
       ).waitUntilExit()
       break
+
+    case 'toggle':
+      await render(<ToggleCommand ip={ip} />).waitUntilExit()
+      break
+
+    case 'name': {
+      const name = rest[0]
+      if (!name) {
+        console.error('Usage: ylc name <name>')
+        process.exit(1)
+      }
+      await render(<NameCommand name={name} ip={ip} />).waitUntilExit()
+      break
+    }
+
+    case 'timer': {
+      const action = rest[0]
+      if (action !== 'set' && action !== 'cancel' && action !== 'status') {
+        console.error('Usage: ylc timer <set <minutes> | cancel | status>')
+        process.exit(1)
+      }
+      let minutes: number | undefined
+      if (action === 'set') {
+        minutes = Number(rest[1])
+        if (!rest[1] || isNaN(minutes)) {
+          console.error('Usage: ylc timer set <minutes>')
+          process.exit(1)
+        }
+      }
+      await render(
+        <TimerCommand action={action} minutes={minutes} ip={ip} />
+      ).waitUntilExit()
+      break
+    }
+
+    case 'adjust': {
+      const prop = rest[0]
+      if (prop !== 'brightness' && prop !== 'ct' && prop !== 'color') {
+        console.error('Usage: ylc adjust <brightness|ct|color> [<-100..100>]')
+        process.exit(1)
+      }
+      let percentage: number | undefined
+      if (prop !== 'color') {
+        percentage = Number(rest[1])
+        if (!rest[1] || isNaN(percentage)) {
+          console.error(`Usage: ylc adjust ${prop} <-100..100>`)
+          process.exit(1)
+        }
+      }
+      await render(
+        <AdjustCommand
+          prop={prop}
+          percentage={percentage}
+          ip={ip}
+          bg={bg}
+          duration={Number(duration)}
+        />
+      ).waitUntilExit()
+      break
+    }
 
     default:
       await render(<HelpScreen />).waitUntilExit()
