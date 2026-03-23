@@ -148,7 +148,9 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
       <>
         <UsageLine cmd="interactive" />
         <Box flexDirection="column" marginBottom={1}>
-          <Text dimColor>Discover devices, pick one and control it interactively.</Text>
+          <Text dimColor>
+            Discover devices, pick one and control it interactively.
+          </Text>
         </Box>
         <Text bold>Options:</Text>
         <Box marginLeft={2} marginTop={1} flexDirection="column">
@@ -156,10 +158,7 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
             flag="--timeout <ms>"
             desc="Discovery timeout in ms (default: 3000)"
           />
-          <Opt
-            flag="--debug"
-            desc="Log all device tx/rx frames to debug.log"
-          />
+          <Opt flag="--debug" desc="Log all device tx/rx frames to debug.log" />
         </Box>
       </>
     ),

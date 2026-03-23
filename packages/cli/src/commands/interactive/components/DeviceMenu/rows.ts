@@ -1,6 +1,13 @@
 import type { YeelightDevice } from 'yeelight-client'
 
-export type RowKind = 'section' | 'power' | 'brightness' | 'ct' | 'rgb' | 'back'
+export type RowKind =
+  | 'section'
+  | 'power'
+  | 'brightness'
+  | 'ct'
+  | 'rgb'
+  | 'segments'
+  | 'back'
 
 export type MenuRow = {
   kind: RowKind
@@ -9,10 +16,13 @@ export type MenuRow = {
   sep?: boolean
 }
 
-export type SubScreen = {
-  channel: 'main' | 'bg'
-  prop: 'brightness' | 'ct' | 'rgb'
-}
+export type SubScreen =
+  | {
+      kind: 'property'
+      channel: 'main' | 'bg'
+      prop: 'brightness' | 'ct' | 'rgb'
+    }
+  | { kind: 'segments' }
 
 export function buildRows(device: YeelightDevice): MenuRow[] {
   const { main: ch, background: bg } = device
@@ -39,6 +49,8 @@ export function buildRows(device: YeelightDevice): MenuRow[] {
       rows.push({ kind: 'ct', label: 'Color temp', channel: 'bg' })
     if (bg.capabilities.hasColor)
       rows.push({ kind: 'rgb', label: 'Color', channel: 'bg' })
+    if (device.capabilities.hasSegments)
+      rows.push({ kind: 'segments', label: 'Segments', channel: 'bg' })
   }
 
   rows.push({

@@ -19,7 +19,12 @@ export function CurrentValue({
     return (
       <Box>
         <Text color="yellow">{current.colorTemp} K</Text>
-        {!noColor && <><Text> </Text><Text color={ctToColor(current.colorTemp)}>██</Text></>}
+        {!noColor && (
+          <>
+            <Text> </Text>
+            <Text color={ctToColor(current.colorTemp)}>██</Text>
+          </>
+        )}
       </Box>
     )
   }
@@ -28,7 +33,12 @@ export function CurrentValue({
   return (
     <Box>
       <Text color="yellow">{hex}</Text>
-      {!noColor && <><Text> </Text><Text color={hex}>██</Text></>}
+      {!noColor && (
+        <>
+          <Text> </Text>
+          <Text color={hex}>██</Text>
+        </>
+      )}
     </Box>
   )
 }

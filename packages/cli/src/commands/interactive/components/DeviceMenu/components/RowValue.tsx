@@ -24,16 +24,24 @@ export function RowValue({
   }
   if (row.kind === 'brightness') {
     if (!state) return <Text dimColor>…</Text>
-    return <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>{state.brightness}%</Text>
+    return (
+      <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>
+        {state.brightness}%
+      </Text>
+    )
   }
   if (row.kind === 'ct') {
     if (!state || state.colorTemp === null) return <Text dimColor>—</Text>
     return (
       <Box>
         <Box minWidth={8}>
-          <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>{state.colorTemp} K</Text>
+          <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>
+            {state.colorTemp} K
+          </Text>
         </Box>
-        {!noColor && !disabled && <Text color={ctToColor(state.colorTemp)}>██</Text>}
+        {!noColor && !disabled && (
+          <Text color={ctToColor(state.colorTemp)}>██</Text>
+        )}
       </Box>
     )
   }
@@ -42,7 +50,9 @@ export function RowValue({
     const hex = rgbHex(...state.rgb)
     return (
       <Box>
-        <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>{hex}</Text>
+        <Text color={disabled ? undefined : 'yellow'} dimColor={disabled}>
+          {hex}
+        </Text>
         {!noColor && !disabled && <Text color={hex}> ██</Text>}
       </Box>
     )

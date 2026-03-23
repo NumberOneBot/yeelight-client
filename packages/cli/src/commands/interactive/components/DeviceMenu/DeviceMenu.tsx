@@ -9,10 +9,14 @@ import { SelectList } from '../SelectList'
 import { buildRows, type MenuRow, type SubScreen } from './rows'
 import { DeviceMenuItem } from './components/DeviceMenuItem'
 import { PropertyMenu } from './components/PropertyMenu'
+import { SegmentMenu } from './components/SegmentMenu'
 
 function dbg(event: string, data: unknown) {
   const payload = typeof data === 'string' ? data : JSON.stringify(data)
-  appendFileSync('debug.log', `[${new Date().toISOString()}] ${event} ${payload}\n`)
+  appendFileSync(
+    'debug.log',
+    `[${new Date().toISOString()}] ${event} ${payload}\n`
+  )
 }
 
 export function DeviceMenu({
@@ -29,6 +33,10 @@ export function DeviceMenu({
   const [mainState, setMainState] = useState<ChannelState | null>(null)
   const [bgState, setBgState] = useState<ChannelState | null>(null)
   const [subscreen, setSubscreen] = useState<SubScreen | null>(null)
+  const [segLeft, setSegLeft] = useState<[number, number, number] | null>(null)
+  const [segRight, setSegRight] = useState<[number, number, number] | null>(
+    null
+  )
   const [savedCursor, setSavedCursor] = useState<number | undefined>(undefined)
   const [toggling, setToggling] = useState(false)
   const [toggleDone, setToggleDone] = useState(false)
@@ -56,11 +64,17 @@ export function DeviceMenu({
   useEffect(() => {
     device.main
       .getState()
-      .then((s) => { if (debug) dbg('getState main', s); setMainState(s) })
+      .then((s) => {
+        if (debug) dbg('getState main', s)
+        setMainState(s)
+      })
       .catch(() => {})
     device.background
       ?.getState()
-      .then((s) => { if (debug) dbg('getState bg', s); setBgState(s) })
+      .then((s) => {
+        if (debug) dbg('getState bg', s)
+        setBgState(s)
+      })
       .catch(() => {})
   }, [device])
 
@@ -78,7 +92,7 @@ export function DeviceMenu({
   }, [device])
 
   function handlePropertyDone(state: ChannelState | null) {
-    if (subscreen && state) {
+    if (subscreen?.kind === 'property' && state) {
       if (subscreen.channel === 'bg') setBgState(state)
       else setMainState(state)
     }
@@ -111,16 +125,38 @@ export function DeviceMenu({
       return
     }
 
+    if (row.kind === 'segments') {
+      setSavedCursor(rows.indexOf(row))
+      setSubscreen({ kind: 'segments' })
+      return
+    }
+
     if (
       row.channel &&
       (row.kind === 'brightness' || row.kind === 'ct' || row.kind === 'rgb')
     ) {
       setSavedCursor(rows.indexOf(row))
-      setSubscreen({ channel: row.channel, prop: row.kind })
+      setSubscreen({ kind: 'property', channel: row.channel, prop: row.kind })
     }
   }
 
-  if (subscreen) {
+  if (subscreen?.kind === 'segments') {
+    return (
+      <SegmentMenu
+        device={device}
+        initialLeft={segLeft}
+        initialRight={segRight}
+        onBack={(l, r) => {
+          setSegLeft(l)
+          setSegRight(r)
+          setSubscreen(null)
+        }}
+        onQuit={onQuit}
+      />
+    )
+  }
+
+  if (subscreen?.kind === 'property') {
     return (
       <PropertyMenu
         device={device}
@@ -148,7 +184,11 @@ export function DeviceMenu({
         initialCursor={savedCursor}
         isSelectable={(row) => {
           if (row.kind === 'section') return false
-          if (row.kind === 'brightness' || row.kind === 'ct' || row.kind === 'rgb') {
+          if (
+            row.kind === 'brightness' ||
+            row.kind === 'ct' ||
+            row.kind === 'rgb'
+          ) {
             const chState = row.channel === 'bg' ? bgState : mainState
             return chState?.power === true
           }
