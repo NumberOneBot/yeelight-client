@@ -10,7 +10,6 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/yeelight-cli"><img src="https://img.shields.io/npm/v/yeelight-cli" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/yeelight-cli"><img src="https://img.shields.io/npm/dm/yeelight-cli" alt="npm downloads" /></a>
   <a href="https://github.com/NumberOneBot/yeelight-client/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NumberOneBot/yeelight-client" alt="license" /></a>
 </p>
 
@@ -46,17 +45,17 @@ ylc segment <left> <right>          Left/right segment colors (lamp15)
 
 ## Options
 
-| Flag              | Description                              |
-| ----------------- | ---------------------------------------- |
-| `--bg`            | Target background channel                |
-| `--ip <address>`  | Device IP (auto-discover if omitted)     |
-| `--duration <ms>` | Transition duration in ms (default: 0)   |
-| `--timeout <ms>`  | Discovery timeout in ms (default: 3000)  |
-| `--raw`           | Dump all raw property values (status)    |
-| `--commands`      | Show supported commands (status, via SSDP)|
-| `--debug`         | Log tx/rx frames to debug.log (interactive)|
-| `-h, --help`      | Show help                                |
-| `-V, --version`   | Show version                             |
+| Flag              | Description                                 |
+| ----------------- | ------------------------------------------- |
+| `--bg`            | Target background channel                   |
+| `--ip <address>`  | Device IP (auto-discover if omitted)        |
+| `--duration <ms>` | Transition duration in ms (default: 0)      |
+| `--timeout <ms>`  | Discovery timeout in ms (default: 3000)     |
+| `--raw`           | Dump all raw property values (status)       |
+| `--commands`      | Show supported commands (status, via SSDP)  |
+| `--debug`         | Log tx/rx frames to debug.log (interactive) |
+| `-h, --help`      | Show help                                   |
+| `-V, --version`   | Show version                                |
 
 ## Examples
 

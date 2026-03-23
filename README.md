@@ -11,7 +11,6 @@
 <p align="center">
   <a href="https://github.com/NumberOneBot/yeelight-client/actions/workflows/ci.yml"><img src="https://github.com/NumberOneBot/yeelight-client/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://www.npmjs.com/package/yeelight-client"><img src="https://img.shields.io/npm/v/yeelight-client" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/yeelight-client"><img src="https://img.shields.io/npm/dm/yeelight-client" alt="npm downloads" /></a>
   <a href="https://github.com/NumberOneBot/yeelight-client/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NumberOneBot/yeelight-client" alt="license" /></a>
   <a href="https://github.com/NumberOneBot/yeelight-client"><img src="https://img.shields.io/badge/TypeScript-5.7-blue" alt="TypeScript" /></a>
 </p>
