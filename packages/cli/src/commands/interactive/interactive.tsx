@@ -54,6 +54,12 @@ export function InteractiveCommand({
     return () => clearTimeout(t)
   }, [screen])
 
+  useEffect(() => {
+    if (screen.id !== 'error') return
+    process.exitCode = 1
+    exit()
+  }, [screen])
+
   function onPick(device: YeelightDevice) {
     setScreen({ id: 'connecting', device })
     void device
