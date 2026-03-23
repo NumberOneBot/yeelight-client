@@ -116,6 +116,43 @@ export class LightChannel {
     await this.transport.send(`${this.prefix}set_default`, [])
   }
 
+  async setAdjust(action: 'increase' | 'decrease' | 'circle', prop: 'bright' | 'ct'): Promise<void>
+  async setAdjust(action: 'circle', prop: 'color'): Promise<void>
+  async setAdjust(
+    action: 'increase' | 'decrease' | 'circle',
+    prop: 'bright' | 'ct' | 'color'
+  ): Promise<void> {
+    if (prop === 'color' && !this.capabilities.hasColor) {
+      throw new UnsupportedError(
+        `Channel '${this.type}' does not support color`
+      )
+    }
+    if (prop === 'ct' && !this.capabilities.hasColorTemp) {
+      throw new UnsupportedError(
+        `Channel '${this.type}' does not support color temperature`
+      )
+    }
+    await this.transport.send(`${this.prefix}set_adjust`, [action, prop])
+  }
+
+  async adjustBrightness(percentage: number, duration?: number): Promise<void> {
+    const pct = Math.max(-100, Math.min(100, Math.round(percentage)))
+    await this.transport.send(`${this.prefix}adjust_bright`, [
+      pct,
+      duration ?? 500
+    ])
+  }
+
+  async adjustColorTemp(percentage: number, duration?: number): Promise<void> {
+    if (!this.capabilities.hasColorTemp) {
+      throw new UnsupportedError(
+        `Channel '${this.type}' does not support color temperature`
+      )
+    }
+    const pct = Math.max(-100, Math.min(100, Math.round(percentage)))
+    await this.transport.send(`${this.prefix}adjust_ct`, [pct, duration ?? 500])
+  }
+
   async getState(): Promise<ChannelState> {
     const props =
       this.prefix === ''
