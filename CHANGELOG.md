@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.1.0 (2026-03-24)
+
+### Added
+
+- `setScene(SceneConfig)` — atomically turn on and apply state (color, CT, HSV, flow, or auto_delay_off); works on both main and background channels
+- `setName(name)` — persist device name to device memory
+- `devToggle()` — toggle main + background channels simultaneously (dual-zone devices)
+- `cronAdd(minutes)` / `cronDel()` / `cronGet()` — sleep timer with read-back
+- `setAdjust(action, prop)` / `adjustBrightness(pct)` / `adjustColorTemp(pct)` / `adjustColor()` — relative adjustments without knowing the current value
+- `setPower()` now accepts `PowerOptions` with optional `mode: PowerMode` (0–5)
+- New types exported: `SceneConfig`, `PowerMode`, `PowerOptions`, `CronTimer`
+
+### CLI
+
+- New commands: `toggle`, `name`, `timer set/cancel/status`, `adjust brightness/ct/color`
+- Interactive mode: exit immediately on connection error instead of hanging
+- Help column width increased to prevent argument wrapping
+
+### Fixed
+
+- Direct `--ip` connections now assume full capabilities — all commands sent directly to device without pre-flight capability check
+- `setSegments()` guard removed — device error is returned directly if not supported
+
 ## 1.0.1 (2026-03-23)
 
 ### Fixed
