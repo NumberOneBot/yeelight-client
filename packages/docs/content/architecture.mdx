@@ -44,6 +44,7 @@ class YeelightDevice {
   devToggle(): Promise<void>                    // dual-zone devices only
   cronAdd(minutes: number): Promise<void>
   cronDel(): Promise<void>
+  cronGet(): Promise<CronTimer | null>     // active timer or null
   getRawProps(props: string[]): Promise<Record<string, string>>
 
   on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
@@ -205,6 +206,10 @@ interface ChannelCapabilities {
   hasColorTemp: boolean
   hasFlow: boolean
 }
+
+interface CronTimer {
+  delay: number // remaining minutes until power-off
+}
 ```
 
 ---
@@ -221,7 +226,8 @@ export type {
   PowerMode,
   PowerOptions,
   SceneConfig,
-  ChannelCapabilities
+  ChannelCapabilities,
+  CronTimer
 } from 'yeelight-client'
 export type { Capabilities } from 'yeelight-client'
 ```

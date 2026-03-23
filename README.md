@@ -28,7 +28,7 @@
 - **Color flows** — built-in presets (pulse, strobe, candle, sunrise, color cycle) and a chainable FlowBuilder
 - **Scenes** — `setScene()` atomically turns on the device and sets its state in one command (works on main and background channels)
 - **Relative adjustments** — `setAdjust()`, `adjustBrightness()`, `adjustColorTemp()`, `adjustColor()` without knowing the current value
-- **Sleep timer** — `cronAdd(minutes)` / `cronDel()` — built-in device timer
+- **Sleep timer** — `cronAdd(minutes)` / `cronGet()` / `cronDel()` — built-in device timer
 - **Full state** — read power, brightness, color temp, RGB, flow status
 - **Real-time events** — property change notifications pushed from the device
 - **ESM + CJS** — works everywhere, ships with TypeScript declarations
@@ -119,7 +119,11 @@ await device.setScene({ type: 'auto_delay_off', brightness: 50, minutes: 30 })
 
 // background channel too
 if (device.background) {
-  await device.background.setScene({ type: 'color', rgb: [0, 0, 255], brightness: 50 })
+  await device.background.setScene({
+    type: 'color',
+    rgb: [0, 0, 255],
+    brightness: 50
+  })
 }
 ```
 
@@ -128,15 +132,15 @@ if (device.background) {
 Change brightness or color temperature relative to the current value — no need to know the current state:
 
 ```ts
-await device.main.setAdjust('increase', 'bright')  // step up brightness
-await device.main.setAdjust('decrease', 'ct')       // step down color temp
-await device.main.setAdjust('circle', 'color')      // cycle through hues
+await device.main.setAdjust('increase', 'bright') // step up brightness
+await device.main.setAdjust('decrease', 'ct') // step down color temp
+await device.main.setAdjust('circle', 'color') // cycle through hues
 
-await device.main.adjustBrightness(+20)             // +20% brightness
-await device.main.adjustBrightness(-10, 500)        // -10% over 500ms
-await device.main.adjustColorTemp(-30)              // -30% color temp
-await device.main.adjustColor()                     // cycle through basic colors
-await device.main.adjustColor(1000)                 // cycle over 1000ms
+await device.main.adjustBrightness(+20) // +20% brightness
+await device.main.adjustBrightness(-10, 500) // -10% over 500ms
+await device.main.adjustColorTemp(-30) // -30% color temp
+await device.main.adjustColor() // cycle through basic colors
+await device.main.adjustColor(1000) // cycle over 1000ms
 ```
 
 ### Sleep Timer
@@ -144,8 +148,9 @@ await device.main.adjustColor(1000)                 // cycle over 1000ms
 Turn off the device automatically after a number of minutes:
 
 ```ts
-await device.cronAdd(30)  // turn off in 30 minutes
-await device.cronDel()    // cancel the timer
+await device.cronAdd(30)   // turn off in 30 minutes
+const timer = await device.cronGet() // { delay: 28 } or null
+await device.cronDel()     // cancel the timer
 ```
 
 ### Device Name
@@ -159,7 +164,7 @@ await device.setName('Desk Light')
 Devices with a background channel (Bedside Lamp 2, ceiling lights) can toggle both channels simultaneously:
 
 ```ts
-await device.devToggle()  // toggles main + background in one command
+await device.devToggle() // toggles main + background in one command
 ```
 
 ### Color Flows
@@ -207,18 +212,18 @@ Default: `{ effect: 'smooth', duration: 300 }`.
 ```ts
 import type { PowerOptions } from 'yeelight-client'
 
-await device.main.setPower(true, { mode: 5 })              // night mode (ceiling lights)
+await device.main.setPower(true, { mode: 5 }) // night mode (ceiling lights)
 await device.main.setPower(true, { mode: 1, duration: 500 }) // turn on in CT mode
 ```
 
-| Mode | Constant | Description |
-|---|---|---|
-| `0` | normal | Default mode |
-| `1` | CT | Color temperature mode |
-| `2` | RGB | RGB color mode |
-| `3` | HSV | HSV color mode |
-| `4` | CF | Color flow mode |
-| `5` | Night | Night light (ceiling lights only) |
+| Mode | Constant | Description                       |
+| ---- | -------- | --------------------------------- |
+| `0`  | normal   | Default mode                      |
+| `1`  | CT       | Color temperature mode            |
+| `2`  | RGB      | RGB color mode                    |
+| `3`  | HSV      | HSV color mode                    |
+| `4`  | CF       | Color flow mode                   |
+| `5`  | Night    | Night light (ceiling lights only) |
 
 ### Events
 
@@ -277,42 +282,43 @@ device.capabilities
 
 ### `YeelightDevice`
 
-|            | Signature                                                          | Description                                     |
-| ---------- | ------------------------------------------------------------------ | ----------------------------------------------- |
-| **Static** | `discover(opts?: { timeout?: number }): Promise<YeelightDevice[]>` | Find devices via SSDP (default timeout: 3000ms)     |
-| **Static** | `connect(ip: string, port?: number): Promise<YeelightDevice>`      | Connect directly (default port: 55443)              |
-|            | `connect(): Promise<void>`                                         | Reconnect a disconnected device                     |
-|            | `disconnect(): void`                                               | Close the connection                                |
-|            | `isConnected(): boolean`                                           | Connection status                                   |
-|            | `setSegments(left, right): Promise<void>`                          | Set left/right segment colors (lamp15)              |
-|            | `setScene(scene: SceneConfig): Promise<void>`                      | Turn on and apply state atomically (delegates to `main`)    |
-|            | `setName(name: string): Promise<void>`                             | Persist device name to device memory                        |
-|            | `devToggle(): Promise<void>`                                       | Toggle main + background simultaneously                     |
-|            | `cronAdd(minutes: number): Promise<void>`                          | Set sleep timer (auto power-off)                            |
-|            | `cronDel(): Promise<void>`                                         | Cancel sleep timer                                          |
-|            | `getRawProps(props: string[]): Promise<Record<string, string>>`    | Query raw Yeelight properties                               |
+|            | Signature                                                          | Description                                              |
+| ---------- | ------------------------------------------------------------------ | -------------------------------------------------------- |
+| **Static** | `discover(opts?: { timeout?: number }): Promise<YeelightDevice[]>` | Find devices via SSDP (default timeout: 3000ms)          |
+| **Static** | `connect(ip: string, port?: number): Promise<YeelightDevice>`      | Connect directly (default port: 55443)                   |
+|            | `connect(): Promise<void>`                                         | Reconnect a disconnected device                          |
+|            | `disconnect(): void`                                               | Close the connection                                     |
+|            | `isConnected(): boolean`                                           | Connection status                                        |
+|            | `setSegments(left, right): Promise<void>`                          | Set left/right segment colors (lamp15)                   |
+|            | `setScene(scene: SceneConfig): Promise<void>`                      | Turn on and apply state atomically (delegates to `main`) |
+|            | `setName(name: string): Promise<void>`                             | Persist device name to device memory                     |
+|            | `devToggle(): Promise<void>`                                       | Toggle main + background simultaneously                  |
+|            | `cronAdd(minutes: number): Promise<void>`                          | Set sleep timer (auto power-off)                         |
+|            | `cronDel(): Promise<void>`                                         | Cancel sleep timer                                       |
+|            | `cronGet(): Promise<CronTimer \| null>`                            | Read active timer (remaining minutes), or `null`         |
+|            | `getRawProps(props: string[]): Promise<Record<string, string>>`    | Query raw Yeelight properties                            |
 
 **Properties:** `id`, `ip`, `model`, `name`, `support`, `capabilities`, `main`, `background`
 
 ### `LightChannel`
 
-| Method                                           | Description                                             |
-| ------------------------------------------------ | ------------------------------------------------------- |
-| `setPower(on, opts?)`                            | Turn on/off; `opts` is `PowerOptions` (supports `mode`) |
-| `toggle()`                                       | Toggle power                                            |
-| `setBrightness(1–100, opts?)`                    | Set brightness                                          |
-| `setColorTemp(kelvin, opts?)`                    | Color temperature (1700–6500 K)                         |
-| `setRGB(r, g, b, opts?)`                         | RGB color (0–255 each)                                  |
-| `setHSV(hue, sat, opts?)`                        | HSV color (hue 0–359, sat 0–100)                        |
-| `startFlow(flow)`                                | Start a color flow animation                            |
-| `stopFlow()`                                     | Stop the current flow                                   |
-| `setDefault()`                                   | Save current state as power-on default                  |
-| `setScene(scene)`                                | Turn on and apply state atomically                      |
-| `setAdjust(action, prop)`                        | Relative adjustment (no current value needed)           |
-| `adjustBrightness(percentage, duration?)`        | Change brightness by ±% (−100…+100)                     |
-| `adjustColorTemp(percentage, duration?)`         | Change color temp by ±% (−100…+100)                     |
-| `adjustColor(duration?)`                         | Cycle through basic colors                              |
-| `getState()`                                     | Read `ChannelState`                                     |
+| Method                                    | Description                                             |
+| ----------------------------------------- | ------------------------------------------------------- |
+| `setPower(on, opts?)`                     | Turn on/off; `opts` is `PowerOptions` (supports `mode`) |
+| `toggle()`                                | Toggle power                                            |
+| `setBrightness(1–100, opts?)`             | Set brightness                                          |
+| `setColorTemp(kelvin, opts?)`             | Color temperature (1700–6500 K)                         |
+| `setRGB(r, g, b, opts?)`                  | RGB color (0–255 each)                                  |
+| `setHSV(hue, sat, opts?)`                 | HSV color (hue 0–359, sat 0–100)                        |
+| `startFlow(flow)`                         | Start a color flow animation                            |
+| `stopFlow()`                              | Stop the current flow                                   |
+| `setDefault()`                            | Save current state as power-on default                  |
+| `setScene(scene)`                         | Turn on and apply state atomically                      |
+| `setAdjust(action, prop)`                 | Relative adjustment (no current value needed)           |
+| `adjustBrightness(percentage, duration?)` | Change brightness by ±% (−100…+100)                     |
+| `adjustColorTemp(percentage, duration?)`  | Change color temp by ±% (−100…+100)                     |
+| `adjustColor(duration?)`                  | Cycle through basic colors                              |
+| `getState()`                              | Read `ChannelState`                                     |
 
 Methods that require specific hardware throw `UnsupportedError` if the capability is missing.
 
@@ -380,6 +386,10 @@ interface ChannelCapabilities {
   hasColor: boolean
   hasColorTemp: boolean
   hasFlow: boolean
+}
+
+interface CronTimer {
+  delay: number // remaining minutes
 }
 ```
 
