@@ -42,10 +42,28 @@ The library is designed to work with the full Yeelight lineup. See [API Referenc
 ## Quick start
 
 ```ts
-import { YeelightDevice } from 'yeelight-client'
+import { YeelightDevice, Flow } from 'yeelight-client'
 
 const [device] = await YeelightDevice.discover()
+await device.connect()
 
+// Basic control
 await device.main.setColorTemp(4000)
+await device.main.setBrightness(80)
 await device.background?.setRGB(255, 0, 128)
+
+// Turn on and apply state atomically (even if device is off)
+await device.setScene({ type: 'ct', colorTemp: 3000, brightness: 60 })
+
+// Relative adjustments — no need to know the current value
+await device.main.adjustBrightness(+20)
+await device.main.setAdjust('increase', 'ct')
+
+// Color flow presets
+await device.main.startFlow(Flow.candle())
+
+// Sleep timer
+await device.cronAdd(30) // turn off in 30 minutes
+
+device.disconnect()
 ```

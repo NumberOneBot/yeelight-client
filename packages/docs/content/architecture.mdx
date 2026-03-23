@@ -29,7 +29,8 @@ class YeelightDevice {
   readonly ip: string
   readonly model: string
   readonly name: string
-  readonly capabilities: DeviceCapabilities
+  readonly support: string[]
+  readonly capabilities: Capabilities
 
   readonly main: LightChannel
   readonly background: LightChannel | null
@@ -37,6 +38,13 @@ class YeelightDevice {
   connect(): Promise<void>
   disconnect(): void
   isConnected(): boolean
+
+  setScene(scene: SceneConfig): Promise<void>   // delegates to main
+  setName(name: string): Promise<void>
+  devToggle(): Promise<void>                    // dual-zone devices only
+  cronAdd(minutes: number): Promise<void>
+  cronDel(): Promise<void>
+  getRawProps(props: string[]): Promise<Record<string, string>>
 
   on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
   on(event: 'disconnect', listener: () => void): this
@@ -64,29 +72,32 @@ class LightChannel {
   readonly type: 'main' | 'background'
   readonly capabilities: ChannelCapabilities
 
-  setPower(on: boolean, opts?: TransitionOptions): Promise<void>
-  toggle(opts?: TransitionOptions): Promise<void>
+  setPower(on: boolean, opts?: PowerOptions): Promise<void>
+  toggle(): Promise<void>
   setBrightness(value: number, opts?: TransitionOptions): Promise<void>
 
   // Requires capabilities.hasColorTemp — throws UnsupportedError otherwise
   setColorTemp(kelvin: number, opts?: TransitionOptions): Promise<void>
 
-  // Requires capabilities.hasColor — throws UnsupportedError otherwise
-  setRGB(
-    r: number,
-    g: number,
-    b: number,
-    opts?: TransitionOptions
-  ): Promise<void>
-  setHSV(
-    hue: number,
-    saturation: number,
-    opts?: TransitionOptions
-  ): Promise<void>
+  // Require capabilities.hasColor — throw UnsupportedError otherwise
+  setRGB(r: number, g: number, b: number, opts?: TransitionOptions): Promise<void>
+  setHSV(hue: number, saturation: number, opts?: TransitionOptions): Promise<void>
 
   // Requires capabilities.hasFlow — throws UnsupportedError otherwise
   startFlow(flow: Flow): Promise<void>
   stopFlow(): Promise<void>
+
+  // Turn on and apply state atomically (works on both main and background)
+  setScene(scene: SceneConfig): Promise<void>
+
+  setDefault(): Promise<void>
+
+  // Relative adjustments — no need to know the current value
+  setAdjust(action: 'increase' | 'decrease' | 'circle', prop: 'bright' | 'ct'): Promise<void>
+  setAdjust(action: 'circle', prop: 'color'): Promise<void>
+  adjustBrightness(percentage: number, duration?: number): Promise<void>
+  adjustColorTemp(percentage: number, duration?: number): Promise<void>
+  adjustColor(duration?: number): Promise<void>
 
   getState(): Promise<ChannelState>
 }
@@ -157,15 +168,42 @@ class DeviceError extends Error {
 ```ts
 interface TransitionOptions {
   effect?: 'smooth' | 'sudden' // default: 'smooth'
-  duration?: number // ms, default: 300
+  duration?: number            // ms, default: 300
+}
+
+/** 0=normal, 1=CT, 2=RGB, 3=HSV, 4=color flow, 5=night (ceiling lights only) */
+type PowerMode = 0 | 1 | 2 | 3 | 4 | 5
+
+interface PowerOptions extends TransitionOptions {
+  mode?: PowerMode
 }
 
 interface ChannelState {
   power: boolean
-  brightness: number // 1–100
-  colorTemp: number | null // Kelvin, null if channel has no CT
-  rgb: [number, number, number] | null // null if channel has no color
+  brightness: number              // 1–100
+  colorTemp: number | null        // Kelvin, null if channel has no CT
+  rgb: [number, number, number] | null  // null if channel has no color
   flowing: boolean
+}
+
+type SceneConfig =
+  | { type: 'color'; rgb: [number, number, number]; brightness: number }
+  | { type: 'hsv'; hue: number; saturation: number; brightness: number }
+  | { type: 'ct'; colorTemp: number; brightness: number }
+  | { type: 'cf'; flow: Flow }
+  | { type: 'auto_delay_off'; brightness: number; minutes: number }
+
+interface Capabilities {
+  hasBackground: boolean
+  hasSegments: boolean
+  main: ChannelCapabilities
+  background: ChannelCapabilities | null
+}
+
+interface ChannelCapabilities {
+  hasColor: boolean
+  hasColorTemp: boolean
+  hasFlow: boolean
 }
 ```
 
@@ -177,7 +215,15 @@ interface ChannelState {
 export { YeelightDevice } from 'yeelight-client'
 export { Flow, FlowBuilder } from 'yeelight-client'
 export { UnsupportedError, ConnectionError, DeviceError } from 'yeelight-client'
-export type { ChannelState, TransitionOptions } from 'yeelight-client'
+export type {
+  ChannelState,
+  TransitionOptions,
+  PowerMode,
+  PowerOptions,
+  SceneConfig,
+  ChannelCapabilities
+} from 'yeelight-client'
+export type { Capabilities } from 'yeelight-client'
 ```
 
 `LightChannel` is not constructable directly — instances come from `device.main` / `device.background` only.
