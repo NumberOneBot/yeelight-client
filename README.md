@@ -333,4 +333,4 @@ pnpm --filter yeelight-client-docs dev      # docs dev server
 
 ## License
 
-[MIT](LICENSE) © NumberOneBot
+[MIT](LICENSE) © Alex Strelets
