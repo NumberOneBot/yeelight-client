@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1 (2026-03-23)
+
+### Fixed
+
+- Add npm link to CLI section in core README
+- Remove downloads badges from both READMEs
+- Fix lockfile for CI (`--frozen-lockfile`)
+- Remove internal docs (ARCHITECTURE.md, CLI-TEST.md, COMMANDS.md)
+
 ## 1.0.0 (2026-03-23)
 
 First stable release. Both `yeelight-client` and `yeelight-cli` published to npm.

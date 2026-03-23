@@ -1,6 +1,6 @@
 {
   "name": "yeelight-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript library for controlling Yeelight smart lights over LAN",
   "license": "MIT",
   "type": "module",
