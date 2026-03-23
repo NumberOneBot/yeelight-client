@@ -3,7 +3,6 @@ import { appendFileSync } from 'node:fs'
 import { Box } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { YeelightDevice } from 'yeelight-client'
-import { useAsyncAction } from '../../useAsyncAction'
 import { ActionFeedback } from '../ActionFeedback'
 import { DeviceHeader } from '../DeviceHeader'
 import { HintBar } from '../HintBar'
@@ -12,6 +11,7 @@ import { buildRows, type MenuRow, type SubScreen } from './rows'
 import { DeviceMenuItem } from './components/DeviceMenuItem'
 import { PropertyMenu } from './components/PropertyMenu'
 import { SegmentMenu } from './components/SegmentMenu'
+import { useDeviceState } from './useDeviceState'
 
 function dbg(event: string, data: unknown) {
   const payload = typeof data === 'string' ? data : JSON.stringify(data)
@@ -32,15 +32,17 @@ export function DeviceMenu({
   onQuit: () => void
   debug?: boolean
 }) {
-  const [mainState, setMainState] = useState<ChannelState | null>(null)
-  const [bgState, setBgState] = useState<ChannelState | null>(null)
+  const { mainState, bgState, updateState, togglePower, toggle } =
+    useDeviceState(
+      device,
+      debug ? (ch, s) => dbg(`getState ${ch}`, s) : undefined
+    )
   const [subscreen, setSubscreen] = useState<SubScreen | null>(null)
   const [segLeft, setSegLeft] = useState<[number, number, number] | null>(null)
   const [segRight, setSegRight] = useState<[number, number, number] | null>(
     null
   )
   const [savedCursor, setSavedCursor] = useState<number | undefined>(undefined)
-  const toggle = useAsyncAction()
 
   const rows = useMemo(() => buildRows(device), [device])
 
@@ -61,34 +63,9 @@ export function DeviceMenu({
     }
   }, [device, debug])
 
-  useEffect(() => {
-    device.main
-      .getState()
-      .then((s) => {
-        if (debug) dbg('getState main', s)
-        setMainState(s)
-      })
-      .catch(() => {})
-    device.background
-      ?.getState()
-      .then((s) => {
-        if (debug) dbg('getState bg', s)
-        setBgState(s)
-      })
-      .catch(() => {})
-  }, [device])
-
-  useEffect(() => {
-    const t = setInterval(() => {
-      device.getRawProps(['power']).catch(() => {})
-    }, 30_000)
-    return () => clearInterval(t)
-  }, [device])
-
   function handlePropertyDone(state: ChannelState | null) {
     if (subscreen?.kind === 'property' && state) {
-      if (subscreen.channel === 'bg') setBgState(state)
-      else setMainState(state)
+      updateState(subscreen.channel, state)
     }
     setSubscreen(null)
   }
@@ -101,14 +78,10 @@ export function DeviceMenu({
     if (row.kind === 'section') return
 
     if (row.kind === 'power') {
-      const ch = row.channel === 'bg' ? device.background! : device.main
-      toggle.run(async () => {
-        await ch.toggle()
-        const state = await ch.getState()
-        if (debug) dbg(`toggle ${row.channel}`, state)
-        if (row.channel === 'bg') setBgState(state)
-        else setMainState(state)
-      })
+      togglePower(
+        row.channel as 'main' | 'bg',
+        debug ? (s) => dbg(`toggle ${row.channel}`, s) : undefined
+      )
       return
     }
 
@@ -138,7 +111,9 @@ export function DeviceMenu({
           setSegRight(r)
           setSubscreen(null)
         }}
-        onApplied={() => setBgState((s) => (s ? { ...s, power: true } : s))}
+        onApplied={() =>
+          updateState('bg', bgState ? { ...bgState, power: true } : null)
+        }
         onQuit={onQuit}
       />
     )

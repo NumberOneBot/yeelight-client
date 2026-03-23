@@ -1,5 +1,5 @@
 import React from 'react'
-import { useOneShot } from '../useOneShot'
+import { useCommand } from '../useCommand'
 import { resolveDevice } from '../resolve'
 import { ErrorText } from '../components/ErrorText'
 
@@ -14,7 +14,7 @@ export function PowerCommand({
   bg?: boolean
   duration: number
 }) {
-  const error = useOneShot(async () => {
+  const error = useCommand(async () => {
     const device = await resolveDevice(ip)
     const ch = bg ? device.background : device.main
     if (!ch) throw new Error('This device has no background channel')

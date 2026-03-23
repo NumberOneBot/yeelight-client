@@ -381,9 +381,9 @@ ylc segment "red" "#0000ff"
 
 ## 8. Error handling
 
-- [ ] `ylc unknowncommand` — shows help screen (no crash)
-- [ ] `ylc` (no args) — shows help screen
-- [ ] `ylc -h` — shows help screen
-- [ ] `ylc --help` — shows help screen
-- [ ] `ylc -V` — prints version
-- [ ] `ylc --version` — prints version
+- [x] `ylc unknowncommand` — shows help screen (no crash)
+- [x] `ylc` (no args) — shows help screen
+- [x] `ylc -h` — shows help screen
+- [x] `ylc --help` — shows help screen
+- [x] `ylc -V` — prints version
+- [x] `ylc --version` — prints version

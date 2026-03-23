@@ -1,5 +1,5 @@
 import React from 'react'
-import { useOneShot } from '../useOneShot'
+import { useCommand } from '../useCommand'
 import { resolveDevice } from '../resolve'
 import { ErrorText } from '../components/ErrorText'
 import { parseHex } from '../utils/color'
@@ -13,7 +13,7 @@ export function SegmentCommand({
   right: string
   ip?: string
 }) {
-  const error = useOneShot(async () => {
+  const error = useCommand(async () => {
     if (!left || !right) {
       throw new Error('Usage: ylc segment <#left> <#right>')
     }

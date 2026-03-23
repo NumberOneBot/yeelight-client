@@ -1,5 +1,5 @@
 import React from 'react'
-import { useOneShot } from '../useOneShot'
+import { useCommand } from '../useCommand'
 import { resolveDevice } from '../resolve'
 import { ErrorText } from '../components/ErrorText'
 import { parseHex } from '../utils/color'
@@ -15,7 +15,7 @@ export function ColorCommand({
   bg?: boolean
   duration: number
 }) {
-  const error = useOneShot(async () => {
+  const error = useCommand(async () => {
     let rv: number, gv: number, bv: number
     let brightness: number | null = null
 
