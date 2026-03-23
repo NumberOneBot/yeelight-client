@@ -108,12 +108,7 @@ export function StatusCommand({
         {data.model !== 'unknown' && <Text dimColor>({data.model})</Text>}
       </Box>
       <ChannelStatus label="Main channel" s={data.main} />
-      {data.bg && (
-        <ChannelStatus
-          label="Background channel"
-          s={data.bg}
-        />
-      )}
+      {data.bg && <ChannelStatus label="Background channel" s={data.bg} />}
       {showCommands && data.support.length > 0 && (
         <Box flexDirection="column">
           <Text bold>Supported commands</Text>

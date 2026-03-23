@@ -46,11 +46,11 @@ describe('parseHex', () => {
 
   test('returns null for invalid input', () => {
     expect(parseHex('')).toBeNull()
-    expect(parseHex('ff6400')).toBeNull()      // no #
-    expect(parseHex('#gg0000')).toBeNull()      // invalid hex chars
-    expect(parseHex('#ff')).toBeNull()           // too short
-    expect(parseHex('#ff00000')).toBeNull()      // 7 chars — invalid length
-    expect(parseHex('#ff000000f')).toBeNull()    // 9 chars — too long
+    expect(parseHex('ff6400')).toBeNull() // no #
+    expect(parseHex('#gg0000')).toBeNull() // invalid hex chars
+    expect(parseHex('#ff')).toBeNull() // too short
+    expect(parseHex('#ff00000')).toBeNull() // 7 chars — invalid length
+    expect(parseHex('#ff000000f')).toBeNull() // 9 chars — too long
   })
 
   test('case insensitive', () => {

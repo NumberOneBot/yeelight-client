@@ -27,7 +27,11 @@ describe('Flow.toParams', () => {
 
   test('action codes: recover=0, stay=1, off=2', () => {
     const make = (action: 'recover' | 'stay' | 'off') =>
-      Flow.builder().rgb(255, 0, 0, { duration: 100 }).onEnd(action).build().toParams().action
+      Flow.builder()
+        .rgb(255, 0, 0, { duration: 100 })
+        .onEnd(action)
+        .build()
+        .toParams().action
 
     expect(make('recover')).toBe(0)
     expect(make('stay')).toBe(1)
@@ -54,9 +58,7 @@ describe('Flow.toParams', () => {
   })
 
   test('default brightness is 100', () => {
-    const flow = Flow.builder()
-      .rgb(255, 0, 0, { duration: 100 })
-      .build()
+    const flow = Flow.builder().rgb(255, 0, 0, { duration: 100 }).build()
     const { expression } = flow.toParams()
 
     expect(expression).toBe('100,1,16711680,100')

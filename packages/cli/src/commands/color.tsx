@@ -45,8 +45,7 @@ export function ColorCommand({
     const ch = bg ? device.background : device.main
     if (!ch) throw new Error('This device has no background channel')
     await ch.setRGB(rv!, gv!, bv!, { duration })
-    if (brightness !== null)
-      await ch.setBrightness(brightness, { duration })
+    if (brightness !== null) await ch.setBrightness(brightness, { duration })
     device.disconnect()
   })
 

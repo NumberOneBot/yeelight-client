@@ -69,8 +69,7 @@ export function usePropertyExec(
       }
       setLiveState((s) => {
         if (!s) return s
-        if (item.kind === 'brightness')
-          return { ...s, brightness: item.value }
+        if (item.kind === 'brightness') return { ...s, brightness: item.value }
         if (item.kind === 'ct') return { ...s, colorTemp: item.value }
         if (item.kind === 'rgb')
           return {

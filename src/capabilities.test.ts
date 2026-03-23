@@ -4,17 +4,35 @@ import { capabilitiesFromSupport, capabilitiesFromProbe } from './capabilities'
 describe('capabilitiesFromSupport', () => {
   test('full-featured device', () => {
     const support = [
-      'set_power', 'set_bright', 'set_ct_abx', 'set_rgb', 'set_hsv',
-      'start_cf', 'stop_cf', 'set_default',
-      'bg_set_power', 'bg_set_rgb', 'bg_set_hsv', 'bg_set_ct_abx', 'bg_start_cf',
+      'set_power',
+      'set_bright',
+      'set_ct_abx',
+      'set_rgb',
+      'set_hsv',
+      'start_cf',
+      'stop_cf',
+      'set_default',
+      'bg_set_power',
+      'bg_set_rgb',
+      'bg_set_hsv',
+      'bg_set_ct_abx',
+      'bg_start_cf',
       'set_segment_rgb'
     ]
     const caps = capabilitiesFromSupport(support)
 
     expect(caps.hasBackground).toBe(true)
     expect(caps.hasSegments).toBe(true)
-    expect(caps.main).toEqual({ hasColor: true, hasColorTemp: true, hasFlow: true })
-    expect(caps.background).toEqual({ hasColor: true, hasColorTemp: true, hasFlow: true })
+    expect(caps.main).toEqual({
+      hasColor: true,
+      hasColorTemp: true,
+      hasFlow: true
+    })
+    expect(caps.background).toEqual({
+      hasColor: true,
+      hasColorTemp: true,
+      hasFlow: true
+    })
   })
 
   test('color-temp-only device (no rgb/hsv)', () => {
@@ -66,7 +84,11 @@ describe('capabilitiesFromSupport', () => {
 
     expect(caps.hasBackground).toBe(false)
     expect(caps.hasSegments).toBe(false)
-    expect(caps.main).toEqual({ hasColor: false, hasColorTemp: false, hasFlow: false })
+    expect(caps.main).toEqual({
+      hasColor: false,
+      hasColorTemp: false,
+      hasFlow: false
+    })
     expect(caps.background).toBeNull()
   })
 
@@ -80,7 +102,13 @@ describe('capabilitiesFromSupport', () => {
 
 describe('capabilitiesFromProbe', () => {
   test('full probe — all properties present', () => {
-    const caps = capabilitiesFromProbe(['4000', '16711680', 'on', '3500', '255'])
+    const caps = capabilitiesFromProbe([
+      '4000',
+      '16711680',
+      'on',
+      '3500',
+      '255'
+    ])
 
     expect(caps.main.hasColor).toBe(true)
     expect(caps.main.hasColorTemp).toBe(true)
@@ -122,7 +150,13 @@ describe('capabilitiesFromProbe', () => {
   })
 
   test('segments always false from probe', () => {
-    const caps = capabilitiesFromProbe(['4000', '16711680', 'on', '3500', '255'])
+    const caps = capabilitiesFromProbe([
+      '4000',
+      '16711680',
+      'on',
+      '3500',
+      '255'
+    ])
 
     expect(caps.hasSegments).toBe(false)
   })
