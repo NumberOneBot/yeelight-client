@@ -8,7 +8,7 @@ import { LightChannel } from './channel.js'
 import { UnsupportedError } from './errors.js'
 import { discover as ssdpDiscover } from './discovery.js'
 import { Transport } from './transport.js'
-import type { ChannelState, SceneConfig } from './types.js'
+import type { ChannelState, CronTimer, SceneConfig } from './types.js'
 
 export type { SceneConfig } from './types.js'
 
@@ -182,6 +182,12 @@ export class YeelightDevice extends EventEmitter {
   /** Clears the currently active sleep timer. */
   async cronDel(): Promise<void> {
     await this.transport.send('cron_del', [0])
+  }
+
+  /** Returns the active sleep timer, or `null` if none is set. */
+  async cronGet(): Promise<CronTimer | null> {
+    const result = (await this.transport.send('cron_get', [0])) as unknown as Array<{ delay: number }>
+    return result[0] ? { delay: result[0].delay } : null
   }
 
   /**

@@ -42,6 +42,11 @@ export interface ChannelCapabilities {
   hasFlow: boolean
 }
 
+/** Active sleep timer returned by `cronGet()`. `delay` is remaining minutes. */
+export interface CronTimer {
+  delay: number
+}
+
 import type { Flow } from './flow.js'
 
 export type SceneConfig =

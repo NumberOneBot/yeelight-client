@@ -8,5 +8,6 @@ export type {
   TransitionOptions,
   ChannelCapabilities,
   PowerMode,
-  PowerOptions
+  PowerOptions,
+  CronTimer
 } from './types.js'
