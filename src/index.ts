@@ -6,5 +6,7 @@ export type { Capabilities } from './capabilities.js'
 export type {
   ChannelState,
   TransitionOptions,
-  ChannelCapabilities
+  ChannelCapabilities,
+  PowerMode,
+  PowerOptions
 } from './types.js'

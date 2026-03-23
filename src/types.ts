@@ -21,6 +21,13 @@ export interface TransitionOptions {
   duration?: number
 }
 
+/** Power-on mode. 0 = normal, 1 = CT, 2 = RGB, 3 = HSV, 4 = color flow, 5 = night (ceiling lights only) */
+export type PowerMode = 0 | 1 | 2 | 3 | 4 | 5
+
+export interface PowerOptions extends TransitionOptions {
+  mode?: PowerMode
+}
+
 export interface ChannelState {
   power: boolean
   brightness: number

@@ -4,6 +4,7 @@ import type { Transport } from './transport.js'
 import type {
   ChannelCapabilities,
   ChannelState,
+  PowerOptions,
   TransitionOptions
 } from './types.js'
 
@@ -22,13 +23,11 @@ export class LightChannel {
     return [opts?.effect ?? DEFAULT_EFFECT, opts?.duration ?? DEFAULT_DURATION]
   }
 
-  async setPower(on: boolean, opts?: TransitionOptions): Promise<void> {
+  async setPower(on: boolean, opts?: PowerOptions): Promise<void> {
     const [effect, duration] = this.transition(opts)
-    await this.transport.send(`${this.prefix}set_power`, [
-      on ? 'on' : 'off',
-      effect,
-      duration
-    ])
+    const params: (string | number)[] = [on ? 'on' : 'off', effect, duration]
+    if (opts?.mode !== undefined) params.push(opts.mode)
+    await this.transport.send(`${this.prefix}set_power`, params)
   }
 
   async toggle(): Promise<void> {
