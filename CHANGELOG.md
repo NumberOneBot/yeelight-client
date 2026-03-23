@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.0 (2026-03-23)
+
+First stable release. Both `yeelight-client` and `yeelight-cli` published to npm.
+
+### Added
+
+- CLI README with full command reference, options, and examples
+- Cross-links between `yeelight-client` and `yeelight-cli` npm pages
+- CLI npm metadata: description, author, repository, homepage, bugs, keywords
+
+### Changed
+
+- Move `@types/minimist` and `@types/react` to devDependencies in CLI
+
 ## 0.9.8 (2026-03-23)
 
 ### Added

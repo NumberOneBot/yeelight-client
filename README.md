@@ -287,7 +287,7 @@ interface ChannelCapabilities {
 | Package                                                            | Description                                                 |
 | ------------------------------------------------------------------ | ----------------------------------------------------------- |
 | [`yeelight-client`](https://www.npmjs.com/package/yeelight-client) | Core library — this package                                 |
-| [`yeelight-cli`](packages/cli/)                                    | Terminal tool (`ylc`) — interactive TUI + one-shot commands |
+| [`yeelight-cli`](https://www.npmjs.com/package/yeelight-cli)       | Terminal tool (`ylc`) — interactive TUI + one-shot commands |
 
 ## CLI
 
