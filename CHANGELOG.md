@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2 (2026-03-24)
+
+### Fixed
+
+- CLI (`yeelight-cli`): remove duplicate `#!/usr/bin/env bun` shebang from source entry — tsup banner already adds `#!/usr/bin/env node`, causing a syntax error on install
+
 ## 1.1.0 (2026-03-24)
 
 ### Added
