@@ -22,12 +22,14 @@ export function SegmentMenu({
   initialLeft,
   initialRight,
   onBack,
+  onApplied,
   onQuit
 }: {
   device: YeelightDevice
   initialLeft: RGB | null
   initialRight: RGB | null
   onBack: (left: RGB | null, right: RGB | null) => void
+  onApplied?: () => void
   onQuit: () => void
 }) {
   const [stage, setStage] = useState<Stage>('menu')
@@ -51,7 +53,7 @@ export function SegmentMenu({
     setApplyError(null)
     void device
       .setSegments(left, right)
-      .then(() => setDone(true))
+      .then(() => { setDone(true); onApplied?.() })
       .catch((e: Error) => setApplyError(e.message))
       .finally(() => setApplying(false))
   }

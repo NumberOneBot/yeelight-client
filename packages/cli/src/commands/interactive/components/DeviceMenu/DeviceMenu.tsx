@@ -151,6 +151,7 @@ export function DeviceMenu({
           setSegRight(r)
           setSubscreen(null)
         }}
+        onApplied={() => setBgState((s) => s ? { ...s, power: true } : s)}
         onQuit={onQuit}
       />
     )
