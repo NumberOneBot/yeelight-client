@@ -300,16 +300,16 @@ npm install -g yeelight-cli
 Or download a precompiled binary from [Releases](https://github.com/NumberOneBot/yeelight-client/releases).
 
 ```bash
-ylc discover                       # find devices on the network
-ylc interactive                    # TUI with device picker + controls
-ylc status --ip 192.168.1.42      # show device state
-ylc power on                       # turn on
-ylc brightness 50 --duration 1000 # set brightness with transition
-ylc ct 3000                        # color temperature
+ylc discover                         # find devices on the network
+ylc interactive                      # TUI with device picker + controls
+ylc status --ip 192.168.1.42         # show device state
+ylc power on                         # turn on
+ylc brightness 50 --duration 1000    # set brightness with transition
+ylc ct 3000                          # color temperature
 ylc color "#ff6400"                # hex color
 ylc color "#ff640080"              # hex with alpha → brightness
-ylc segment "#ff0000" "#0000ff"   # lamp15 left/right
-ylc power on --bg                  # background channel
+ylc segment "#ff0000" "#0000ff"  # lamp15 left/right
+ylc power on --bg                    # background channel
 ```
 
 ## Development
