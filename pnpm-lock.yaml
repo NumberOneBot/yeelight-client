@@ -42,8 +42,8 @@ importers:
         specifier: ^18.0.0
         version: 18.3.1
       yeelight-client:
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: workspace:*
+        version: link:../..
     devDependencies:
       '@types/minimist':
         specifier: ^1.2.5
@@ -2917,10 +2917,6 @@ packages:
     resolution: {integrity: sha512-AvbaCLOO2Otw/lW5bmh9d/WEdcDFdQp2Z2ZUH3pX9U2ihyUY0nvLv7J6TrWowklRGPYbB/IuIMfYgxaCPg5Bpg==}
     engines: {node: '>= 14.6'}
     hasBin: true
-
-  yeelight-client@1.1.0:
-    resolution: {integrity: sha512-3kD6Xd2+dFWvtJ0GpZ7RV9kPixmAt/GF7dql60irY0B/Gi8v+ouAwCPvjHVc5Wa2liNjp5FeDWTUesgETM3MUQ==}
-    engines: {node: '>=18'}
 
   yoga-layout@3.2.1:
     resolution: {integrity: sha512-0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ==}
@@ -6278,8 +6274,6 @@ snapshots:
   ws@8.19.0: {}
 
   yaml@2.8.3: {}
-
-  yeelight-client@1.1.0: {}
 
   yoga-layout@3.2.1: {}
 
