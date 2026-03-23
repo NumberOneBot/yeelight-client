@@ -1,8 +1,27 @@
 {
   "name": "yeelight-client",
-  "version": "0.9.0",
+  "version": "0.9.8",
+  "description": "TypeScript library for controlling Yeelight smart lights over LAN",
   "license": "MIT",
   "type": "module",
+  "author": "NumberOneBot",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NumberOneBot/yeelight-client.git"
+  },
+  "homepage": "https://github.com/NumberOneBot/yeelight-client",
+  "bugs": "https://github.com/NumberOneBot/yeelight-client/issues",
+  "keywords": [
+    "yeelight",
+    "smart-home",
+    "iot",
+    "lan",
+    "ssdp",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
