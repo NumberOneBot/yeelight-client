@@ -181,7 +181,7 @@ async function main() {
       if (prop !== 'color') {
         percentage = Number(rest[1])
         if (!rest[1] || isNaN(percentage)) {
-          console.error(`Usage: ylc adjust ${prop} <-100..100>`)
+          console.error(`Usage: ylc adjust ${prop} [-100..100]`)
           process.exit(1)
         }
       }
