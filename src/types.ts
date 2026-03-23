@@ -41,3 +41,12 @@ export interface ChannelCapabilities {
   hasColorTemp: boolean
   hasFlow: boolean
 }
+
+import type { Flow } from './flow.js'
+
+export type SceneConfig =
+  | { type: 'color'; rgb: [number, number, number]; brightness: number }
+  | { type: 'hsv'; hue: number; saturation: number; brightness: number }
+  | { type: 'ct'; colorTemp: number; brightness: number }
+  | { type: 'cf'; flow: Flow }
+  | { type: 'auto_delay_off'; brightness: number; minutes: number }

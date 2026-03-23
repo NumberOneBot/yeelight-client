@@ -5,6 +5,7 @@ import type {
   ChannelCapabilities,
   ChannelState,
   PowerOptions,
+  SceneConfig,
   TransitionOptions
 } from './types.js'
 
@@ -150,6 +151,77 @@ export class LightChannel {
     }
     const pct = Math.max(-100, Math.min(100, Math.round(percentage)))
     await this.transport.send(`${this.prefix}adjust_ct`, [pct, duration ?? 500])
+  }
+
+  async adjustColor(duration?: number): Promise<void> {
+    if (!this.capabilities.hasColor) {
+      throw new UnsupportedError(
+        `Channel '${this.type}' does not support color`
+      )
+    }
+    await this.transport.send(`${this.prefix}adjust_color`, [duration ?? 500])
+  }
+
+  async setScene(scene: SceneConfig): Promise<void> {
+    let params: (string | number)[]
+    switch (scene.type) {
+      case 'color': {
+        if (!this.capabilities.hasColor) {
+          throw new UnsupportedError(
+            `Channel '${this.type}' does not support RGB color`
+          )
+        }
+        const [r, g, b] = scene.rgb
+        const v = ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff)
+        params = ['color', v, Math.max(1, Math.min(100, scene.brightness))]
+        break
+      }
+      case 'hsv': {
+        if (!this.capabilities.hasColor) {
+          throw new UnsupportedError(
+            `Channel '${this.type}' does not support color`
+          )
+        }
+        params = [
+          'hsv',
+          Math.max(0, Math.min(359, Math.round(scene.hue))),
+          Math.max(0, Math.min(100, Math.round(scene.saturation))),
+          Math.max(1, Math.min(100, Math.round(scene.brightness)))
+        ]
+        break
+      }
+      case 'ct': {
+        if (!this.capabilities.hasColorTemp) {
+          throw new UnsupportedError(
+            `Channel '${this.type}' does not support color temperature`
+          )
+        }
+        params = [
+          'ct',
+          Math.round(scene.colorTemp),
+          Math.max(1, Math.min(100, Math.round(scene.brightness)))
+        ]
+        break
+      }
+      case 'cf': {
+        if (!this.capabilities.hasFlow) {
+          throw new UnsupportedError(
+            `Channel '${this.type}' does not support color flow`
+          )
+        }
+        const { count, action, expression } = scene.flow.toParams()
+        params = ['cf', count, action, expression]
+        break
+      }
+      case 'auto_delay_off':
+        params = [
+          'auto_delay_off',
+          Math.max(1, Math.min(100, Math.round(scene.brightness))),
+          Math.round(scene.minutes)
+        ]
+        break
+    }
+    await this.transport.send(`${this.prefix}set_scene`, params)
   }
 
   async getState(): Promise<ChannelState> {
