@@ -156,6 +156,24 @@ export class YeelightDevice extends EventEmitter {
     return Object.fromEntries(props.map((p, i) => [p, values[i] ?? '']))
   }
 
+  /** Saves the device name to persistent memory on the device. */
+  async setName(name: string): Promise<void> {
+    await this.transport.send('set_name', [name])
+  }
+
+  /**
+   * Toggles main and background channels simultaneously with a single command.
+   * Throws UnsupportedError on devices without a background channel.
+   */
+  async devToggle(): Promise<void> {
+    if (!this.background) {
+      throw new UnsupportedError(
+        `Device '${this.model}' does not have a background channel`
+      )
+    }
+    await this.transport.send('dev_toggle', [])
+  }
+
   // ── EventEmitter overloads for type safety ────────────────────────────────
 
   on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
