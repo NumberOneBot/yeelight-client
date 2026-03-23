@@ -290,7 +290,7 @@ interface ChannelCapabilities {
 
 ## CLI
 
-The companion `yeelight-cli` package provides a terminal tool:
+The companion [`yeelight-cli`](https://www.npmjs.com/package/yeelight-cli) package provides a terminal tool:
 
 ```bash
 npm install -g yeelight-cli
