@@ -43,6 +43,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "test": "bun test",
     "docs:dev": "pnpm --filter yeelight-client-docs dev",
     "docs:build": "pnpm --filter yeelight-client-docs build",
     "release": "pnpm build ; pnpm changeset publish"
