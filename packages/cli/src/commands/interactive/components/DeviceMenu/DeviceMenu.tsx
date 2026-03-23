@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { appendFileSync } from 'node:fs'
-import { Box, Text } from 'ink'
+import { Box } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { YeelightDevice } from 'yeelight-client'
-import { Dots } from '../../../../components/Dots'
+import { useAsyncAction } from '../../useAsyncAction'
+import { ActionFeedback } from '../ActionFeedback'
+import { DeviceHeader } from '../DeviceHeader'
 import { HintBar } from '../HintBar'
 import { SelectList } from '../SelectList'
 import { buildRows, type MenuRow, type SubScreen } from './rows'
@@ -38,9 +40,7 @@ export function DeviceMenu({
     null
   )
   const [savedCursor, setSavedCursor] = useState<number | undefined>(undefined)
-  const [toggling, setToggling] = useState(false)
-  const [toggleDone, setToggleDone] = useState(false)
-  const [toggleError, setToggleError] = useState<string | null>(null)
+  const toggle = useAsyncAction()
 
   const rows = useMemo(() => buildRows(device), [device])
 
@@ -79,12 +79,6 @@ export function DeviceMenu({
   }, [device])
 
   useEffect(() => {
-    if (!toggleDone) return
-    const t = setTimeout(() => setToggleDone(false), 800)
-    return () => clearTimeout(t)
-  }, [toggleDone])
-
-  useEffect(() => {
     const t = setInterval(() => {
       device.getRawProps(['power']).catch(() => {})
     }, 30_000)
@@ -108,20 +102,13 @@ export function DeviceMenu({
 
     if (row.kind === 'power') {
       const ch = row.channel === 'bg' ? device.background! : device.main
-      setToggling(true)
-      setToggleDone(false)
-      setToggleError(null)
-      void ch
-        .toggle()
-        .then(() => ch.getState())
-        .then((state) => {
-          if (debug) dbg(`toggle ${row.channel}`, state)
-          if (row.channel === 'bg') setBgState(state)
-          else setMainState(state)
-          setToggleDone(true)
-        })
-        .catch((e: Error) => setToggleError(e.message))
-        .finally(() => setToggling(false))
+      toggle.run(async () => {
+        await ch.toggle()
+        const state = await ch.getState()
+        if (debug) dbg(`toggle ${row.channel}`, state)
+        if (row.channel === 'bg') setBgState(state)
+        else setMainState(state)
+      })
       return
     }
 
@@ -151,7 +138,7 @@ export function DeviceMenu({
           setSegRight(r)
           setSubscreen(null)
         }}
-        onApplied={() => setBgState((s) => s ? { ...s, power: true } : s)}
+        onApplied={() => setBgState((s) => (s ? { ...s, power: true } : s))}
         onQuit={onQuit}
       />
     )
@@ -172,13 +159,7 @@ export function DeviceMenu({
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Box gap={2} marginBottom={1}>
-        <Text bold color="cyan">
-          {device.ip}
-        </Text>
-        {device.name && <Text bold>{device.name}</Text>}
-        {device.model !== 'unknown' && <Text dimColor>({device.model})</Text>}
-      </Box>
+      <DeviceHeader device={device} />
 
       <SelectList
         items={rows}
@@ -207,20 +188,11 @@ export function DeviceMenu({
         )}
       />
 
-      <Box marginTop={1} minHeight={1}>
-        {toggling ? (
-          <Box marginLeft={2}>
-            <Text dimColor>
-              <Dots />
-            </Text>
-          </Box>
-        ) : (
-          <>
-            {toggleDone && <Text color="green">✓ Done</Text>}
-            {toggleError && <Text color="red">✗ {toggleError}</Text>}
-          </>
-        )}
-      </Box>
+      <ActionFeedback
+        executing={toggle.executing}
+        done={toggle.done}
+        error={toggle.error}
+      />
 
       <HintBar back />
     </Box>

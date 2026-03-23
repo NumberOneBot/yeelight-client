@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Box, Text } from 'ink'
 import type { YeelightDevice } from 'yeelight-client'
-import { Dots } from '../../../../../../components/Dots'
+import { useAsyncAction } from '../../../../useAsyncAction'
+import { ActionFeedback } from '../../../ActionFeedback'
+import { DeviceHeader } from '../../../DeviceHeader'
 import { HintBar } from '../../../HintBar'
 import { SelectList } from '../../../SelectList'
 import { RgbPicker } from '../RgbPicker'
@@ -35,45 +37,23 @@ export function SegmentMenu({
   const [stage, setStage] = useState<Stage>('menu')
   const [left, setLeft] = useState<RGB | null>(initialLeft)
   const [right, setRight] = useState<RGB | null>(initialRight)
-  const [applying, setApplying] = useState(false)
-  const [done, setDone] = useState(false)
-  const [applyError, setApplyError] = useState<string | null>(null)
+  const action = useAsyncAction()
   const noColor = !!process.env.NO_COLOR
 
-  useEffect(() => {
-    if (!done) return
-    const t = setTimeout(() => setDone(false), 800)
-    return () => clearTimeout(t)
-  }, [done])
-
   function apply() {
-    if (!left || !right || applying) return
-    setApplying(true)
-    setDone(false)
-    setApplyError(null)
-    void device
-      .setSegments(left, right)
-      .then(() => { setDone(true); onApplied?.() })
-      .catch((e: Error) => setApplyError(e.message))
-      .finally(() => setApplying(false))
+    if (!left || !right) return
+    action.run(async () => {
+      await device.setSegments(left, right)
+      onApplied?.()
+    })
   }
-
-  const header = (
-    <Box gap={2} marginBottom={1}>
-      <Text bold color="cyan">
-        {device.ip}
-      </Text>
-      {device.name && <Text bold>{device.name}</Text>}
-      {device.model !== 'unknown' && <Text dimColor>({device.model})</Text>}
-    </Box>
-  )
 
   if (stage === 'left' || stage === 'right') {
     const color = stage === 'left' ? left : right
     const title = stage === 'left' ? 'Left segment' : 'Right segment'
     return (
       <Box flexDirection="column" marginTop={1}>
-        {header}
+        <DeviceHeader device={device} />
         <Box marginBottom={1}>
           <Text bold>{title}</Text>
         </Box>
@@ -96,7 +76,7 @@ export function SegmentMenu({
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      {header}
+      <DeviceHeader device={device} />
       <Box marginBottom={1}>
         <Text bold>Segments</Text>
       </Box>
@@ -134,20 +114,11 @@ export function SegmentMenu({
           />
         )}
       />
-      <Box marginTop={1} minHeight={1}>
-        {applying ? (
-          <Box marginLeft={2}>
-            <Text dimColor>
-              <Dots />
-            </Text>
-          </Box>
-        ) : (
-          <>
-            {done && <Text color="green">✓ Done</Text>}
-            {applyError && <Text color="red">✗ {applyError}</Text>}
-          </>
-        )}
-      </Box>
+      <ActionFeedback
+        executing={action.executing}
+        done={action.done}
+        error={action.error}
+      />
       <HintBar back />
     </Box>
   )

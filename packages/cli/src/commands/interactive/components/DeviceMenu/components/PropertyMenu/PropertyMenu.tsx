@@ -1,7 +1,8 @@
 import { Box, Text } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { YeelightDevice } from 'yeelight-client'
-import { Dots } from '../../../../../../components/Dots'
+import { ActionFeedback } from '../../../ActionFeedback'
+import { DeviceHeader } from '../../../DeviceHeader'
 import { HintBar } from '../../../HintBar'
 import { SelectList } from '../../../SelectList'
 import { propItems, propLabel, type Prop } from './items'
@@ -30,7 +31,7 @@ export function PropertyMenu({
     liveState,
     executing,
     done,
-    execError,
+    error,
     hexMode,
     setHexMode,
     isCurrent,
@@ -46,13 +47,7 @@ export function PropertyMenu({
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Box gap={2} marginBottom={1}>
-        <Text bold color="cyan">
-          {device.ip}
-        </Text>
-        {device.name && <Text bold>{device.name}</Text>}
-        {device.model !== 'unknown' && <Text dimColor>({device.model})</Text>}
-      </Box>
+      <DeviceHeader device={device} />
 
       <Box gap={1} marginBottom={1}>
         <Text bold>{propLabel(prop)}</Text>
@@ -86,20 +81,7 @@ export function PropertyMenu({
         />
       )}
 
-      <Box marginTop={1} minHeight={1}>
-        {executing ? (
-          <Box marginLeft={2}>
-            <Text dimColor>
-              <Dots />
-            </Text>
-          </Box>
-        ) : (
-          <>
-            {done && <Text color="green">✓ Done</Text>}
-            {execError && <Text color="red">✗ {execError}</Text>}
-          </>
-        )}
-      </Box>
+      <ActionFeedback executing={executing} done={done} error={error} />
 
       {!hexMode && <HintBar back />}
     </Box>

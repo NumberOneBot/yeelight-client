@@ -2,35 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useApp } from 'ink'
 import { resolveDevice } from '../resolve'
 import { ErrorText } from '../components/ErrorText'
-
-function parseHex(
-  input: string
-): { r: number; g: number; b: number; a: number | null } | null {
-  if (!input.startsWith('#')) return null
-  const raw = input.slice(1)
-  if (!/^[0-9a-fA-F]+$/.test(raw)) return null
-
-  let r: number,
-    g: number,
-    b: number,
-    a: number | null = null
-
-  if (raw.length === 3 || raw.length === 4) {
-    r = parseInt(raw[0] + raw[0], 16)
-    g = parseInt(raw[1] + raw[1], 16)
-    b = parseInt(raw[2] + raw[2], 16)
-    if (raw.length === 4) a = parseInt(raw[3] + raw[3], 16)
-  } else if (raw.length === 6 || raw.length === 8) {
-    r = parseInt(raw.slice(0, 2), 16)
-    g = parseInt(raw.slice(2, 4), 16)
-    b = parseInt(raw.slice(4, 6), 16)
-    if (raw.length === 8) a = parseInt(raw.slice(6, 8), 16)
-  } else {
-    return null
-  }
-
-  return { r, g, b, a }
-}
+import { parseHex } from '../utils/color'
 
 export function ColorCommand({
   raw,

@@ -2,24 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useApp } from 'ink'
 import { resolveDevice } from '../resolve'
 import { ErrorText } from '../components/ErrorText'
-
-function parseHex(input: string): { r: number; g: number; b: number } | null {
-  if (!input.startsWith('#')) return null
-  const raw = input.slice(1)
-  if (!/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(raw)) return null
-  if (raw.length === 3) {
-    return {
-      r: parseInt(raw[0] + raw[0], 16),
-      g: parseInt(raw[1] + raw[1], 16),
-      b: parseInt(raw[2] + raw[2], 16)
-    }
-  }
-  return {
-    r: parseInt(raw.slice(0, 2), 16),
-    g: parseInt(raw.slice(2, 4), 16),
-    b: parseInt(raw.slice(4, 6), 16)
-  }
-}
+import { parseHex } from '../utils/color'
 
 export function SegmentCommand({
   left,
