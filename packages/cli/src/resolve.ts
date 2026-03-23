@@ -23,6 +23,8 @@ export async function resolveDevice(
       const ssdpDevice =
         ssdpResult.status === 'fulfilled' ? ssdpResult.value : null
 
+      // Prefer SSDP device — only SSDP discovery populates the
+      // support list (supported commands). TCP alone doesn't have it.
       if (ssdpDevice) {
         tcpDevice.disconnect()
         await ssdpDevice.connect()

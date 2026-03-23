@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { resolveDevice } from '../resolve'
-import { ChannelStatus, PropRow } from '../components/ChannelStatus'
+import { ChannelStatus, StatRow } from '../components/ChannelStatus'
 import { Dots } from '../components/Dots'
 import { ErrorText } from '../components/ErrorText'
 
@@ -127,9 +127,9 @@ export function StatusCommand({
           <Text bold>Raw properties</Text>
           <Box marginLeft={2} flexDirection="column" marginTop={1}>
             {Object.entries(data.raw).map(([k, v]) => (
-              <PropRow key={k} k={k} dim>
+              <StatRow key={k} k={k} dim>
                 <Text dimColor>{v || '—'}</Text>
-              </PropRow>
+              </StatRow>
             ))}
           </Box>
         </Box>

@@ -3,7 +3,7 @@ import { Box, Text } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { ctToColor, rgbHex } from '../utils/color'
 
-export function PropRow({
+export function StatRow({
   k,
   dim,
   children
@@ -35,30 +35,30 @@ export function ChannelStatus({
     <Box flexDirection="column">
       <Text bold>{label}</Text>
       <Box marginLeft={2} flexDirection="column" marginTop={1}>
-        <PropRow k="Power">
+        <StatRow k="Power">
           <Text bold color={s.power ? 'green' : 'red'}>
             {s.power ? 'on' : 'off'}
           </Text>
-        </PropRow>
-        <PropRow k="Brightness">
+        </StatRow>
+        <StatRow k="Brightness">
           <Text color="yellow">{s.brightness}%</Text>
-        </PropRow>
+        </StatRow>
         {s.colorTemp !== null && (
-          <PropRow k="Color temp">
+          <StatRow k="Color temp">
             <Text color="yellow">{s.colorTemp} K</Text>
             {!noColor && <Text color={ctToColor(s.colorTemp)}> ██</Text>}
-          </PropRow>
+          </StatRow>
         )}
         {s.rgb !== null && (
-          <PropRow k="Color">
+          <StatRow k="Color">
             <Text color="yellow">{hex}</Text>
             {!noColor && <Text color={hex}> ██</Text>}
-          </PropRow>
+          </StatRow>
         )}
         {s.flowing && (
-          <PropRow k="Flowing">
+          <StatRow k="Flowing">
             <Text color="magenta">active</Text>
-          </PropRow>
+          </StatRow>
         )}
       </Box>
     </Box>
