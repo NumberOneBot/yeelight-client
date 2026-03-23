@@ -285,7 +285,7 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
     ),
     adjust: (
       <>
-        <UsageLine cmd="adjust" args="<brightness|ct|color> [<-100..100>]" />
+        <UsageLine cmd="adjust" args="<brightness|ct|color> [-100..100]" />
         <Box flexDirection="column" marginBottom={1}>
           <Text dimColor>
             Adjust by a relative percentage (-100 to 100). Color cycles without

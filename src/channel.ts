@@ -116,7 +116,10 @@ export class LightChannel {
     await this.transport.send(`${this.prefix}set_default`, [])
   }
 
-  async setAdjust(action: 'increase' | 'decrease' | 'circle', prop: 'bright' | 'ct'): Promise<void>
+  async setAdjust(
+    action: 'increase' | 'decrease' | 'circle',
+    prop: 'bright' | 'ct'
+  ): Promise<void>
   async setAdjust(action: 'circle', prop: 'color'): Promise<void>
   async setAdjust(
     action: 'increase' | 'decrease' | 'circle',

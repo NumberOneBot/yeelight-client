@@ -174,7 +174,7 @@ async function main() {
     case 'adjust': {
       const prop = rest[0]
       if (prop !== 'brightness' && prop !== 'ct' && prop !== 'color') {
-        console.error('Usage: ylc adjust <brightness|ct|color> [<-100..100>]')
+        console.error('Usage: ylc adjust <brightness|ct|color> [-100..100]')
         process.exit(1)
       }
       let percentage: number | undefined
