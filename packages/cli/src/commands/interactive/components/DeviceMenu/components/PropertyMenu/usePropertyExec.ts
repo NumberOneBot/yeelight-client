@@ -53,7 +53,7 @@ export function usePropertyExec(
     setDone(false)
     setExecError(null)
     void ch
-      .setRGB(r, g, b)
+      .setRGB(r, g, b, { duration: 500 })
       .then(() => {
         setDone(true)
         setLiveState((s) =>
@@ -77,11 +77,11 @@ export function usePropertyExec(
 
     let promise: Promise<void> | null = null
     if (item.kind === 'brightness') {
-      promise = ch.setBrightness(item.value)
+      promise = ch.setBrightness(item.value, { duration: 500 })
     } else if (item.kind === 'ct') {
-      promise = ch.setColorTemp(item.value)
+      promise = ch.setColorTemp(item.value, { duration: 500 })
     } else if (item.kind === 'rgb') {
-      promise = ch.setRGB(item.r, item.g, item.b)
+      promise = ch.setRGB(item.r, item.g, item.b, { duration: 500 })
     }
     if (!promise) return
 
