@@ -26,8 +26,9 @@
 - **Dual-channel** — independent control of main and background lights (`devToggle()` switches both at once)
 - **Segment control** — left/right colors on lamp15 (YLTD003)
 - **Color flows** — built-in presets (pulse, strobe, candle, sunrise, color cycle) and a chainable FlowBuilder
-- **Scenes** — `setScene()` atomically turns on the device and sets its state in one command
-- **Relative adjustments** — `setAdjust()`, `adjustBrightness()`, `adjustColorTemp()` without knowing the current value
+- **Scenes** — `setScene()` atomically turns on the device and sets its state in one command (works on main and background channels)
+- **Relative adjustments** — `setAdjust()`, `adjustBrightness()`, `adjustColorTemp()`, `adjustColor()` without knowing the current value
+- **Sleep timer** — `cronAdd(minutes)` / `cronDel()` — built-in device timer
 - **Full state** — read power, brightness, color temp, RGB, flow status
 - **Real-time events** — property change notifications pushed from the device
 - **ESM + CJS** — works everywhere, ships with TypeScript declarations
@@ -104,7 +105,8 @@ if (device.capabilities.hasSegments) {
 
 ### Scenes
 
-`setScene()` turns the device on and applies the target state atomically. Useful when the device may be off:
+`setScene()` turns the device on and applies the target state atomically. Useful when the device may be off.
+Works on both main and background channels:
 
 ```ts
 import type { SceneConfig } from 'yeelight-client'
@@ -114,6 +116,11 @@ await device.setScene({ type: 'ct', colorTemp: 4000, brightness: 60 })
 await device.setScene({ type: 'hsv', hue: 200, saturation: 80, brightness: 70 })
 await device.setScene({ type: 'cf', flow: Flow.colorCycle() })
 await device.setScene({ type: 'auto_delay_off', brightness: 50, minutes: 30 })
+
+// background channel too
+if (device.background) {
+  await device.background.setScene({ type: 'color', rgb: [0, 0, 255], brightness: 50 })
+}
 ```
 
 ### Relative Adjustments
@@ -128,6 +135,17 @@ await device.main.setAdjust('circle', 'color')      // cycle through hues
 await device.main.adjustBrightness(+20)             // +20% brightness
 await device.main.adjustBrightness(-10, 500)        // -10% over 500ms
 await device.main.adjustColorTemp(-30)              // -30% color temp
+await device.main.adjustColor()                     // cycle through basic colors
+await device.main.adjustColor(1000)                 // cycle over 1000ms
+```
+
+### Sleep Timer
+
+Turn off the device automatically after a number of minutes:
+
+```ts
+await device.cronAdd(30)  // turn off in 30 minutes
+await device.cronDel()    // cancel the timer
 ```
 
 ### Device Name
@@ -267,10 +285,12 @@ device.capabilities
 |            | `disconnect(): void`                                               | Close the connection                                |
 |            | `isConnected(): boolean`                                           | Connection status                                   |
 |            | `setSegments(left, right): Promise<void>`                          | Set left/right segment colors (lamp15)              |
-|            | `setScene(scene: SceneConfig): Promise<void>`                      | Turn on and apply state atomically                  |
-|            | `setName(name: string): Promise<void>`                             | Persist device name to device memory                |
-|            | `devToggle(): Promise<void>`                                       | Toggle main + background simultaneously             |
-|            | `getRawProps(props: string[]): Promise<Record<string, string>>`    | Query raw Yeelight properties                       |
+|            | `setScene(scene: SceneConfig): Promise<void>`                      | Turn on and apply state atomically (delegates to `main`)    |
+|            | `setName(name: string): Promise<void>`                             | Persist device name to device memory                        |
+|            | `devToggle(): Promise<void>`                                       | Toggle main + background simultaneously                     |
+|            | `cronAdd(minutes: number): Promise<void>`                          | Set sleep timer (auto power-off)                            |
+|            | `cronDel(): Promise<void>`                                         | Cancel sleep timer                                          |
+|            | `getRawProps(props: string[]): Promise<Record<string, string>>`    | Query raw Yeelight properties                               |
 
 **Properties:** `id`, `ip`, `model`, `name`, `support`, `capabilities`, `main`, `background`
 
@@ -287,9 +307,11 @@ device.capabilities
 | `startFlow(flow)`                                | Start a color flow animation                            |
 | `stopFlow()`                                     | Stop the current flow                                   |
 | `setDefault()`                                   | Save current state as power-on default                  |
+| `setScene(scene)`                                | Turn on and apply state atomically                      |
 | `setAdjust(action, prop)`                        | Relative adjustment (no current value needed)           |
 | `adjustBrightness(percentage, duration?)`        | Change brightness by ±% (−100…+100)                     |
 | `adjustColorTemp(percentage, duration?)`         | Change color temp by ±% (−100…+100)                     |
+| `adjustColor(duration?)`                         | Cycle through basic colors                              |
 | `getState()`                                     | Read `ChannelState`                                     |
 
 Methods that require specific hardware throw `UnsupportedError` if the capability is missing.
