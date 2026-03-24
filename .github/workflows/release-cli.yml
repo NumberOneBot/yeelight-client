@@ -44,8 +44,14 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - name: Install dependencies
+      - name: Install dependencies (pnpm)
         run: pnpm install --frozen-lockfile
+
+      - name: Install dependencies (bun)
+        run: bun install
+
+      - name: Build library
+        run: pnpm build
 
       - name: Build binary
         run: pnpm --filter yeelight-cli ${{ matrix.script }}
