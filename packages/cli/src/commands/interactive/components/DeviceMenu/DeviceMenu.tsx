@@ -25,12 +25,14 @@ export function DeviceMenu({
   device,
   onBack,
   onQuit,
-  debug
+  debug,
+  canGoBack = true
 }: {
   device: YeelightDevice
   onBack: () => void
   onQuit: () => void
   debug?: boolean
+  canGoBack?: boolean
 }) {
   const { mainState, bgState, updateState, togglePower, toggle } =
     useDeviceState(
@@ -44,7 +46,7 @@ export function DeviceMenu({
   )
   const [savedCursor, setSavedCursor] = useState<number | undefined>(undefined)
 
-  const rows = useMemo(() => buildRows(device), [device])
+  const rows = useMemo(() => buildRows(device, canGoBack), [device, canGoBack])
 
   useEffect(() => {
     if (!debug) return

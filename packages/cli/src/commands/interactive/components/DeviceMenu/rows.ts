@@ -24,7 +24,7 @@ export type SubScreen =
     }
   | { kind: 'segments' }
 
-export function buildRows(device: YeelightDevice): MenuRow[] {
+export function buildRows(device: YeelightDevice, canGoBack = true): MenuRow[] {
   const { main: ch, background: bg } = device
   const rows: MenuRow[] = [
     { kind: 'section', label: 'Main channel', channel: null },
@@ -53,11 +53,12 @@ export function buildRows(device: YeelightDevice): MenuRow[] {
       rows.push({ kind: 'segments', label: 'Segments', channel: 'bg' })
   }
 
-  rows.push({
-    kind: 'back',
-    label: '↩ Back to devices',
-    channel: null,
-    sep: true
-  })
+  if (canGoBack)
+    rows.push({
+      kind: 'back',
+      label: '↩ Back to devices',
+      channel: null,
+      sep: true
+    })
   return rows
 }

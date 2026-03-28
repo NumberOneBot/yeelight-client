@@ -156,6 +156,7 @@ export function InteractiveCommand({
       onBack={onBack}
       onQuit={onQuit}
       debug={debug}
+      canGoBack={!ip}
     />
   )
 }
