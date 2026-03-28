@@ -42,10 +42,12 @@ export function PropertyMenu({
 
   const items = propItems(prop)
   const cursorOverride = useRef<number | undefined>(undefined)
-  const initialCursor = cursorOverride.current ?? (() => {
-    const idx = items.findIndex((item) => isCurrent(item))
-    return idx >= 0 ? idx : undefined
-  })()
+  const initialCursor =
+    cursorOverride.current ??
+    (() => {
+      const idx = items.findIndex((item) => isCurrent(item))
+      return idx >= 0 ? idx : undefined
+    })()
 
   return (
     <Box flexDirection="column" marginTop={1}>
