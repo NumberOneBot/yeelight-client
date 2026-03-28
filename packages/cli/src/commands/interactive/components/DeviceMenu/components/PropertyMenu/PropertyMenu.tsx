@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Box, Text } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { YeelightDevice } from 'yeelight-client'
@@ -5,7 +6,7 @@ import { ActionFeedback } from '../../../ActionFeedback'
 import { DeviceHeader } from '../../../DeviceHeader'
 import { HintBar } from '../../../HintBar'
 import { SelectList } from '../../../SelectList'
-import { propItems, propLabel, type Prop } from './items'
+import { propItems, propLabel, type Prop, type RgbItem } from './items'
 import { usePropertyExec } from './usePropertyExec'
 import { CurrentValue } from './CurrentValue'
 import { HexInput } from './HexInput'
@@ -40,7 +41,8 @@ export function PropertyMenu({
   } = usePropertyExec(ch, current, onBack)
 
   const items = propItems(prop)
-  const initialCursor = (() => {
+  const cursorOverride = useRef<number | undefined>(undefined)
+  const initialCursor = cursorOverride.current ?? (() => {
     const idx = items.findIndex((item) => isCurrent(item))
     return idx >= 0 ? idx : undefined
   })()
@@ -60,7 +62,12 @@ export function PropertyMenu({
             setHexMode(false)
             applyRGB(r, g, b)
           }}
-          onCancel={() => setHexMode(false)}
+          onCancel={() => {
+            cursorOverride.current = items.findIndex(
+              (item) => item.kind === 'rgb' && (item as RgbItem).r < 0
+            )
+            setHexMode(false)
+          }}
         />
       ) : (
         <SelectList

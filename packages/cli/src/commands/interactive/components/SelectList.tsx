@@ -52,9 +52,9 @@ export function SelectList<T>({
   useInput((input, key) => {
     if (key.upArrow) move(-1)
     if (key.downArrow) move(1)
-    if (key.return && sel(cursor)) onSelect(items[cursor])
-    if (key.escape || key.leftArrow) onCancel?.()
-    if (input === 'q') (onQuit ?? onCancel)?.()
+    if (key.return && sel(cursor)) { setCursor((c) => c); onSelect(items[cursor]) }
+    if (key.escape || key.leftArrow) { setCursor((c) => c); onCancel?.() }
+    if (input === 'q') { setCursor((c) => c); (onQuit ?? onCancel)?.() }
   })
 
   return (
