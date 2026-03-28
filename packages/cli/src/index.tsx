@@ -10,6 +10,7 @@ import {
   InteractiveCommand,
   NameCommand,
   PowerCommand,
+  ScanCommand,
   SegmentCommand,
   StatusCommand,
   TimerCommand,
@@ -52,6 +53,10 @@ async function main() {
       await render(
         <DiscoverCommand timeout={Number(timeout)} />
       ).waitUntilExit()
+      break
+
+    case 'scan':
+      await render(<ScanCommand />).waitUntilExit()
       break
 
     case 'status':
@@ -132,7 +137,7 @@ async function main() {
     case 'interactive':
     case 'i':
       await render(
-        <InteractiveCommand timeout={Number(timeout)} debug={debug} />
+        <InteractiveCommand timeout={Number(timeout)} debug={debug} ip={ip} />
       ).waitUntilExit()
       break
 

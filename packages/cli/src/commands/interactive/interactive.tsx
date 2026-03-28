@@ -8,6 +8,7 @@ import { DevicePicker } from './components/DevicePicker'
 
 type Screen =
   | { id: 'pick' }
+  | { id: 'connecting-ip'; ip: string }
   | { id: 'connecting'; device: YeelightDevice }
   | { id: 'menu'; device: YeelightDevice }
   | { id: 'disconnected' }
@@ -15,13 +16,17 @@ type Screen =
 
 export function InteractiveCommand({
   timeout,
-  debug
+  debug,
+  ip
 }: {
   timeout: number
   debug?: boolean
+  ip?: string
 }) {
   const { exit } = useApp()
-  const [screen, setScreen] = useState<Screen>({ id: 'pick' })
+  const [screen, setScreen] = useState<Screen>(
+    ip ? { id: 'connecting-ip', ip } : { id: 'pick' }
+  )
   const [cachedDevices, setCachedDevices] = useState<YeelightDevice[] | null>(
     null
   )
@@ -49,7 +54,15 @@ export function InteractiveCommand({
   }, [screen])
 
   useEffect(() => {
+    if (screen.id !== 'connecting-ip') return
+    YeelightDevice.connect(screen.ip)
+      .then((device) => setScreen({ id: 'menu', device }))
+      .catch((e: Error) => setScreen({ id: 'error', message: e.message }))
+  }, [screen])
+
+  useEffect(() => {
     if (screen.id !== 'disconnected') return
+    if (ip) { exit(); return }
     const t = setTimeout(() => setScreen({ id: 'pick' }), 2000)
     return () => clearTimeout(t)
   }, [screen])
@@ -73,6 +86,7 @@ export function InteractiveCommand({
       leaving.current = true
       screen.device.disconnect()
     }
+    if (ip) { exit(); return }
     setScreen({ id: 'pick' })
   }
 
@@ -89,7 +103,9 @@ export function InteractiveCommand({
   if (screen.id === 'disconnected')
     return (
       <Box marginTop={1}>
-        <Text color="yellow">Connection lost. Returning to device list…</Text>
+        <Text color="yellow">
+          {ip ? 'Connection lost.' : 'Connection lost. Returning to device list…'}
+        </Text>
       </Box>
     )
 
@@ -104,6 +120,16 @@ export function InteractiveCommand({
         onSelect={onPick}
         onQuit={onQuit}
       />
+    )
+
+  if (screen.id === 'connecting-ip')
+    return (
+      <Box marginTop={1}>
+        <Text dimColor>
+          Connecting to {screen.ip}
+          <Dots />
+        </Text>
+      </Box>
     )
 
   if (screen.id === 'connecting')

@@ -82,7 +82,11 @@ export function HelpScreen() {
       <Box marginBottom={1} flexDirection="column">
         <Text bold>Commands:</Text>
         <Box marginLeft={2} marginTop={1} flexDirection="column">
-          <Cmd name="discover" desc="Discover devices on the network" />
+          <Cmd name="discover" desc="Discover devices on the network (UDP)" />
+          <Cmd
+            name="scan"
+            desc="Scan subnet via TCP (finds devices without LAN Control SSDP)"
+          />
           <Cmd name="status" desc="Show current device state" />
           <Cmd name="interactive" desc="Interactive device control (TUI)" />
           <Cmd name="power" args="<on|off>" desc="Turn on or off" />
@@ -153,6 +157,17 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
             flag="--timeout <ms>"
             desc="Discovery timeout in ms (default: 3000)"
           />
+        </Box>
+      </>
+    ),
+    scan: (
+      <>
+        <UsageLine cmd="scan" />
+        <Box flexDirection="column" marginBottom={1}>
+          <Text dimColor>
+            Scans all /24 subnet hosts via TCP port 55443. Finds devices that
+            don't respond to SSDP multicast.
+          </Text>
         </Box>
       </>
     ),
