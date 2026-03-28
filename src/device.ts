@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events'
 import {
-  capabilitiesFromProbe,
+  capabilitiesFromProps,
   capabilitiesFromSupport
 } from './capabilities.js'
 import type { Capabilities } from './capabilities.js'
@@ -102,7 +102,7 @@ export class YeelightDevice extends EventEmitter {
     const transport = new Transport()
     await transport.connect(ip, port)
     const probeResult = await transport.send('get_prop', PROBE_PROPS)
-    const caps = capabilitiesFromProbe(probeResult)
+    const caps = capabilitiesFromProps(probeResult)
     return new YeelightDevice({
       id: '',
       ip,

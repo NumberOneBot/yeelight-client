@@ -47,7 +47,7 @@ export function capabilitiesFromSupport(support: string[]): Capabilities {
  * propResults must be the result of:
  *   get_prop(['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb'])
  */
-export function capabilitiesFromProbe(propResults: string[]): Capabilities {
+export function capabilitiesFromProps(propResults: string[]): Capabilities {
   const [ct, rgb, bgPower, bgCt, bgRgb] = propResults
 
   const hasColor = !!(rgb && rgb !== '0')

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test'
-import { capabilitiesFromSupport, capabilitiesFromProbe } from './capabilities'
+import { capabilitiesFromSupport, capabilitiesFromProps } from './capabilities'
 
 describe('capabilitiesFromSupport', () => {
   test('full-featured device', () => {
@@ -100,9 +100,9 @@ describe('capabilitiesFromSupport', () => {
   })
 })
 
-describe('capabilitiesFromProbe', () => {
+describe('capabilitiesFromProps', () => {
   test('full probe — all properties present', () => {
-    const caps = capabilitiesFromProbe([
+    const caps = capabilitiesFromProps([
       '4000',
       '16711680',
       'on',
@@ -120,28 +120,28 @@ describe('capabilitiesFromProbe', () => {
   })
 
   test('no background — bg_power empty', () => {
-    const caps = capabilitiesFromProbe(['4000', '16711680', '', '', ''])
+    const caps = capabilitiesFromProps(['4000', '16711680', '', '', ''])
 
     expect(caps.hasBackground).toBe(false)
     expect(caps.background).toBeNull()
   })
 
   test('no color — rgb empty', () => {
-    const caps = capabilitiesFromProbe(['4000', '', '', '', ''])
+    const caps = capabilitiesFromProps(['4000', '', '', '', ''])
 
     expect(caps.main.hasColor).toBe(false)
     expect(caps.main.hasColorTemp).toBe(true)
   })
 
   test('no ct — ct empty', () => {
-    const caps = capabilitiesFromProbe(['', '16711680', '', '', ''])
+    const caps = capabilitiesFromProps(['', '16711680', '', '', ''])
 
     expect(caps.main.hasColorTemp).toBe(false)
     expect(caps.main.hasColor).toBe(true)
   })
 
   test('all empty — minimal device', () => {
-    const caps = capabilitiesFromProbe(['', '', '', '', ''])
+    const caps = capabilitiesFromProps(['', '', '', '', ''])
 
     expect(caps.main.hasColor).toBe(false)
     expect(caps.main.hasColorTemp).toBe(false)
@@ -152,7 +152,13 @@ describe('capabilitiesFromProbe', () => {
 
   test('bg_ct and bg_rgb inferred independently', () => {
     // bg_power present but bg_ct absent — background has color but not ct
-    const caps = capabilitiesFromProbe(['4000', '16711680', 'on', '', '16711680'])
+    const caps = capabilitiesFromProps([
+      '4000',
+      '16711680',
+      'on',
+      '',
+      '16711680'
+    ])
 
     expect(caps.hasBackground).toBe(true)
     expect(caps.background!.hasColor).toBe(true)
