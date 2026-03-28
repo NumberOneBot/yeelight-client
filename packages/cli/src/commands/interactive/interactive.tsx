@@ -62,7 +62,10 @@ export function InteractiveCommand({
 
   useEffect(() => {
     if (screen.id !== 'disconnected') return
-    if (ip) { exit(); return }
+    if (ip) {
+      exit()
+      return
+    }
     const t = setTimeout(() => setScreen({ id: 'pick' }), 2000)
     return () => clearTimeout(t)
   }, [screen])
@@ -86,7 +89,10 @@ export function InteractiveCommand({
       leaving.current = true
       screen.device.disconnect()
     }
-    if (ip) { exit(); return }
+    if (ip) {
+      exit()
+      return
+    }
     setScreen({ id: 'pick' })
   }
 
@@ -104,7 +110,9 @@ export function InteractiveCommand({
     return (
       <Box marginTop={1}>
         <Text color="yellow">
-          {ip ? 'Connection lost.' : 'Connection lost. Returning to device list…'}
+          {ip
+            ? 'Connection lost.'
+            : 'Connection lost. Returning to device list…'}
         </Text>
       </Box>
     )

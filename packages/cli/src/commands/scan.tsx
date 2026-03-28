@@ -26,7 +26,8 @@ export function ScanCommand() {
               }),
               bg: hasBg
                 ? channelCaps({
-                    hasColor: s.includes('bg_set_rgb') || s.includes('bg_set_hsv'),
+                    hasColor:
+                      s.includes('bg_set_rgb') || s.includes('bg_set_hsv'),
                     hasColorTemp: s.includes('bg_set_ct_abx')
                   })
                 : null,

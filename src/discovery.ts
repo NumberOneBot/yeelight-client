@@ -103,7 +103,11 @@ const RESPONSE_TIMEOUT_MS = 1500
 const SCAN_CONCURRENCY = 20
 
 const PROBE_MESSAGE =
-  JSON.stringify({ id: 1, method: 'get_prop', params: ['power', 'ct', 'rgb', 'name', 'bg_power'] }) + '\r\n'
+  JSON.stringify({
+    id: 1,
+    method: 'get_prop',
+    params: ['power', 'ct', 'rgb', 'name', 'bg_power']
+  }) + '\r\n'
 
 function subnetHosts(address: string): string[] {
   const parts = address.split('.')
@@ -155,7 +159,8 @@ function probeHost(ip: string): Promise<DeviceInfo | null> {
           const support: string[] = []
           if (ct) support.push('set_ct_abx')
           if (rgbStr && rgbStr !== '0') support.push('set_rgb', 'set_hsv')
-          if (bgPower) support.push('bg_set_power', 'bg_set_rgb', 'bg_set_ct_abx')
+          if (bgPower)
+            support.push('bg_set_power', 'bg_set_rgb', 'bg_set_ct_abx')
           done({
             id: '',
             ip,
