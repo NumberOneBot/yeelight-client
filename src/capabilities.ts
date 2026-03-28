@@ -1,4 +1,5 @@
 import type { ChannelCapabilities } from './types.js'
+// ChannelCapabilities imported but used only in capabilitiesFromSupport — no change needed
 
 export interface Capabilities {
   hasBackground: boolean
@@ -41,34 +42,22 @@ export function capabilitiesFromSupport(support: string[]): Capabilities {
 
 /**
  * Derives capabilities from a get_prop probe result.
- * Used by YeelightDevice.connect() when no support list is available.
+ * Used by YeelightDevice.connect() when no SSDP support list is available.
+ * Builds a synthetic support list from prop values, then delegates to
+ * capabilitiesFromSupport — same approach as the TCP scan path.
  *
  * propResults must be the result of:
  *   get_prop(['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb'])
  */
 export function capabilitiesFromProbe(propResults: string[]): Capabilities {
-  const [, , bgPower] = propResults
+  const [ct, rgb, bgPower, bgCt, bgRgb] = propResults
+  const support: string[] = []
 
-  const hasBackground = bgPower !== '' && bgPower !== undefined
+  if (ct) support.push('set_ct_abx', 'start_cf')
+  if (rgb && rgb !== '0') support.push('set_rgb', 'set_hsv')
+  if (bgPower) support.push('bg_set_power', 'bg_start_cf')
+  if (bgCt) support.push('bg_set_ct_abx')
+  if (bgRgb && bgRgb !== '0') support.push('bg_set_rgb', 'bg_set_hsv')
 
-  const main: ChannelCapabilities = {
-    hasColor: true,
-    hasColorTemp: true,
-    hasFlow: true
-  }
-
-  const background: ChannelCapabilities | null = hasBackground
-    ? {
-        hasColor: true,
-        hasColorTemp: true,
-        hasFlow: true
-      }
-    : null
-
-  return {
-    hasBackground,
-    hasSegments: true,
-    main,
-    background
-  }
+  return capabilitiesFromSupport(support)
 }

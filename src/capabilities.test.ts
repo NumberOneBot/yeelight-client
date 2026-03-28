@@ -116,6 +116,7 @@ describe('capabilitiesFromProbe', () => {
     expect(caps.hasBackground).toBe(true)
     expect(caps.background!.hasColor).toBe(true)
     expect(caps.background!.hasColorTemp).toBe(true)
+    expect(caps.background!.hasFlow).toBe(true)
   })
 
   test('no background — bg_power empty', () => {
@@ -128,36 +129,33 @@ describe('capabilitiesFromProbe', () => {
   test('no color — rgb empty', () => {
     const caps = capabilitiesFromProbe(['4000', '', '', '', ''])
 
-    expect(caps.main.hasColor).toBe(true)
+    expect(caps.main.hasColor).toBe(false)
     expect(caps.main.hasColorTemp).toBe(true)
   })
 
   test('no ct — ct empty', () => {
     const caps = capabilitiesFromProbe(['', '16711680', '', '', ''])
 
-    expect(caps.main.hasColorTemp).toBe(true)
+    expect(caps.main.hasColorTemp).toBe(false)
     expect(caps.main.hasColor).toBe(true)
   })
 
   test('all empty — minimal device', () => {
     const caps = capabilitiesFromProbe(['', '', '', '', ''])
 
-    expect(caps.main.hasColor).toBe(true)
-    expect(caps.main.hasColorTemp).toBe(true)
-    expect(caps.main.hasFlow).toBe(true)
+    expect(caps.main.hasColor).toBe(false)
+    expect(caps.main.hasColorTemp).toBe(false)
+    expect(caps.main.hasFlow).toBe(false)
     expect(caps.hasBackground).toBe(false)
-    expect(caps.hasSegments).toBe(true)
+    expect(caps.hasSegments).toBe(false)
   })
 
-  test('segments always true from probe', () => {
-    const caps = capabilitiesFromProbe([
-      '4000',
-      '16711680',
-      'on',
-      '3500',
-      '255'
-    ])
+  test('bg_ct and bg_rgb inferred independently', () => {
+    // bg_power present but bg_ct absent — background has color but not ct
+    const caps = capabilitiesFromProbe(['4000', '16711680', 'on', '', '16711680'])
 
-    expect(caps.hasSegments).toBe(true)
+    expect(caps.hasBackground).toBe(true)
+    expect(caps.background!.hasColor).toBe(true)
+    expect(caps.background!.hasColorTemp).toBe(false)
   })
 })
