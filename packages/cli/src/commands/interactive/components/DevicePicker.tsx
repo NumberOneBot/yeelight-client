@@ -10,6 +10,7 @@ type PickerItem = YeelightDevice | { type: 'rescan' }
 
 export function DevicePicker({
   timeout,
+  scanMethod = 'ssdp',
   initialDevices = null,
   initialCursor,
   onDevicesFound,
@@ -18,6 +19,7 @@ export function DevicePicker({
   onQuit
 }: {
   timeout: number
+  scanMethod?: 'ssdp' | 'tcp'
   initialDevices?: YeelightDevice[] | null
   initialCursor?: number
   onDevicesFound?: (devices: YeelightDevice[]) => void
@@ -35,8 +37,12 @@ export function DevicePicker({
     if (scanKey === 0 && initialDevices != null) return
     setDevices(null)
     setError(null)
-    YeelightDevice.discover({ timeout })
-      .then((found) => {
+    const discover =
+      scanMethod === 'tcp'
+        ? YeelightDevice.scan()
+        : YeelightDevice.discover({ timeout })
+    discover
+      .then((found: YeelightDevice[]) => {
         setDevices(found)
         onDevicesFound?.(found)
       })
@@ -47,7 +53,7 @@ export function DevicePicker({
     return (
       <Box marginTop={1}>
         <Text dimColor>
-          Scanning
+          {scanMethod === 'tcp' ? 'TCP scan' : 'Scanning'}
           <Dots />
         </Text>
       </Box>

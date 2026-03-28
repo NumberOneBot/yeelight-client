@@ -6,14 +6,18 @@ import {
 import type { Capabilities } from './capabilities.js'
 import { LightChannel } from './channel.js'
 import { UnsupportedError } from './errors.js'
-import { discover as ssdpDiscover } from './discovery.js'
+import {
+  discover as ssdpDiscover,
+  discoverOne,
+  scan as tcpScan
+} from './discovery.js'
 import { Transport } from './transport.js'
 import type { ChannelState, CronTimer, SceneConfig } from './types.js'
 
 export type { SceneConfig } from './types.js'
 
 const DEFAULT_PORT = 55443
-const PROBE_PROPS = ['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb']
+const GET_PROPS = ['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb']
 
 export class YeelightDevice extends EventEmitter {
   private readonly transport: Transport
@@ -92,8 +96,26 @@ export class YeelightDevice extends EventEmitter {
   }
 
   /**
-   * Connects directly to a device by IP without discovery. Probes capabilities
-   * via get_prop.
+   * Scans the local subnet via TCP and returns found devices (not yet connected).
+   * Use when SSDP multicast is blocked or unreliable on the network.
+   * Call device.connect() before sending any commands.
+   */
+  static async scan(): Promise<YeelightDevice[]> {
+    const infos = await tcpScan()
+    return infos.map((info) => {
+      const transport = new Transport()
+      return new YeelightDevice({
+        ...info,
+        capabilities: capabilitiesFromSupport(info.support),
+        transport
+      })
+    })
+  }
+
+  /**
+   * Connects directly to a device by IP without discovery.
+   * Tries unicast SSDP first (gives model + full support list for capabilities).
+   * Falls back to get_prop probe only if SSDP times out.
    */
   static async connect(
     ip: string,
@@ -101,15 +123,25 @@ export class YeelightDevice extends EventEmitter {
   ): Promise<YeelightDevice> {
     const transport = new Transport()
     await transport.connect(ip, port)
-    const probeResult = await transport.send('get_prop', PROBE_PROPS)
-    const caps = capabilitiesFromProps(probeResult)
+
+    const info = await discoverOne(ip)
+    if (info) {
+      return new YeelightDevice({
+        ...info,
+        port,
+        capabilities: capabilitiesFromSupport(info.support),
+        transport
+      })
+    }
+
+    const probeResult = await transport.send('get_prop', GET_PROPS)
     return new YeelightDevice({
       id: '',
       ip,
       port,
       model: 'unknown',
       name: '',
-      capabilities: caps,
+      capabilities: capabilitiesFromProps(probeResult),
       transport
     })
   }

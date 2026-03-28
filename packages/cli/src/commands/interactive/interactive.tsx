@@ -17,11 +17,13 @@ type Screen =
 export function InteractiveCommand({
   timeout,
   debug,
-  ip
+  ip,
+  scanMethod = 'ssdp'
 }: {
   timeout: number
   debug?: boolean
   ip?: string
+  scanMethod?: 'ssdp' | 'tcp'
 }) {
   const { exit } = useApp()
   const [screen, setScreen] = useState<Screen>(
@@ -124,6 +126,7 @@ export function InteractiveCommand({
     return (
       <DevicePicker
         timeout={timeout}
+        scanMethod={scanMethod}
         initialDevices={cachedDevices}
         initialCursor={pickerCursor}
         onDevicesFound={setCachedDevices}

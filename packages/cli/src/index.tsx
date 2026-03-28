@@ -21,8 +21,8 @@ import pkg from '../package.json'
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ['bg', 'help', 'version', 'raw', 'commands', 'debug'],
-  string: ['ip'],
-  default: { duration: 0, timeout: 3000 },
+  string: ['ip', 'scan'],
+  default: { duration: 0, timeout: 3000, scan: 'ssdp' },
   alias: { h: 'help', V: 'version' }
 })
 
@@ -36,6 +36,7 @@ if (argv.version) {
 // ── Routing ────────────────────────────────────────────────────────────────────
 
 const { ip, bg, duration, timeout, help, raw, commands, debug } = argv
+const scanMethod: 'ssdp' | 'tcp' = argv.scan === 'tcp' ? 'tcp' : 'ssdp'
 
 async function main() {
   if (help && subcmd) {
@@ -137,7 +138,12 @@ async function main() {
     case 'interactive':
     case 'i':
       await render(
-        <InteractiveCommand timeout={Number(timeout)} debug={debug} ip={ip} />
+        <InteractiveCommand
+          timeout={Number(timeout)}
+          debug={debug}
+          ip={ip}
+          scanMethod={scanMethod}
+        />
       ).waitUntilExit()
       break
 

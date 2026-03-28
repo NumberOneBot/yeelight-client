@@ -93,6 +93,47 @@ export function discover(timeoutMs = SSDP_TIMEOUT_MS): Promise<DeviceInfo[]> {
   })
 }
 
+/**
+ * Sends a unicast SSDP M-SEARCH to a specific device IP and returns its
+ * DeviceInfo (model, name, id, support, etc.) or null on timeout.
+ */
+export function discoverOne(
+  ip: string,
+  timeoutMs = 1500
+): Promise<DeviceInfo | null> {
+  return new Promise((resolve) => {
+    const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true })
+    let done = false
+
+    const finish = (result: DeviceInfo | null) => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      try {
+        socket.close()
+      } catch {
+        /* already closed */
+      }
+      resolve(result)
+    }
+
+    const timer = setTimeout(() => finish(null), timeoutMs)
+
+    socket.on('error', () => finish(null))
+    socket.on('message', (msg: Buffer) => {
+      const device = parseDeviceHeaders(msg.toString('utf8'))
+      if (device) finish(device)
+    })
+
+    socket.bind(() => {
+      const buf = Buffer.from(SEARCH_MESSAGE)
+      socket.send(buf, 0, buf.length, SSDP_PORT, ip, (err: Error | null) => {
+        if (err) finish(null)
+      })
+    })
+  })
+}
+
 // ---------------------------------------------------------------------------
 // TCP scan — finds Yeelight devices that don't respond to SSDP
 // ---------------------------------------------------------------------------
@@ -137,9 +178,18 @@ function probeHost(ip: string): Promise<DeviceInfo | null> {
     socket.once('error', () => done(null))
 
     socket.once('connect', () => {
-      // Connected — extend timeout for the response
-      socket.setTimeout(RESPONSE_TIMEOUT_MS)
-      socket.write(PROBE_MESSAGE)
+      // Device is a Yeelight — try SSDP first for full metadata (model, support[]).
+      // Fall back to get_prop probe only if SSDP times out.
+      discoverOne(ip, RESPONSE_TIMEOUT_MS).then((info) => {
+        if (info) {
+          done(info)
+          return
+        }
+
+        // SSDP timed out — fall back to get_prop on the open TCP connection
+        socket.setTimeout(RESPONSE_TIMEOUT_MS)
+        socket.write(PROBE_MESSAGE)
+      })
     })
 
     let buf = ''

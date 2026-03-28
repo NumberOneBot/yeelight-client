@@ -185,6 +185,10 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
             flag="--timeout <ms>"
             desc="Discovery timeout in ms (default: 3000)"
           />
+          <Opt
+            flag="--scan <ssdp|tcp>"
+            desc="Discovery method: ssdp (default) or tcp subnet scan"
+          />
           <Opt flag="--debug" desc="Log all device tx/rx frames to debug.log" />
         </Box>
       </>
