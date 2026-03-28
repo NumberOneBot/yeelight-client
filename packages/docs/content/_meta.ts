@@ -2,7 +2,7 @@ export default {
   index: 'Overview',
   api: 'API Reference',
   cli: 'CLI',
-  protocol: 'Protocol',
   devices: 'Devices',
-  commands: 'Protocol Reference'
+  protocol: 'Protocol Reference',
+  commands: 'Commands Reference'
 }
