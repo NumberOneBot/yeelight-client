@@ -38,7 +38,10 @@ export function InteractiveCommand({
 
   // Keep stdin in raw mode at all times so useInput in child screens
   // always works after screen transitions (Ink/Windows stdin pause issue).
-  useInput(() => {})
+  // Also handles q during connecting screens where no child useInput is active.
+  useInput((input) => {
+    if (input === 'q') onQuit()
+  })
 
   useEffect(() => {
     if (screen.id !== 'menu') return
