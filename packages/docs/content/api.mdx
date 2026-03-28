@@ -23,7 +23,8 @@ The main entry point. Handles discovery, connection, and exposes channels.
 ```ts
 class YeelightDevice {
   static discover(opts?: { timeout?: number }): Promise<YeelightDevice[]>
-  static connect(ip: string, port?: number): Promise<YeelightDevice>
+  static scan(): Promise<YeelightDevice[]>
+  static connect(ip: string, port?: number, opts?: { discover?: boolean }): Promise<YeelightDevice>
 
   readonly id: string
   readonly ip: string
@@ -52,6 +53,10 @@ class YeelightDevice {
   off(event: string, listener: Function): this
 }
 ```
+
+`discover()` uses SSDP multicast. `scan()` discovers via TCP port scan of the local /24 subnet — useful when SSDP multicast is blocked on the network. Both return devices that are not yet connected; call `device.connect()` before sending commands.
+
+`connect(ip)` by default resolves device metadata (model, name, support list) via unicast SSDP; falls back to `get_prop` probe if SSDP times out. Pass `{ discover: false }` to skip all discovery — pure TCP handshake, full capabilities assumed. Useful for single-shot CLI commands where the caller already knows what the device supports.
 
 **lamp15 extension** — only present when `capabilities.hasSegments`:
 

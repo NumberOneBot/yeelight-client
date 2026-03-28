@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.2.0 (2026-03-28)
+
+### Added
+
+- `YeelightDevice.scan()` — static method that wraps TCP subnet scan and returns `YeelightDevice[]` (not yet connected), mirroring the `discover()` API
+- `discoverOne(ip)` — unicast SSDP M-SEARCH to a specific device IP; returns full `DeviceInfo` (model, name, id, support[]) or `null` on timeout
+- `YeelightDevice.connect()` now resolves device metadata (model, name, id, support[]) via SSDP-first approach — unicast SSDP runs in parallel with TCP; `get_prop` probe used only as fallback if SSDP times out
+- TCP `scan()` / `probeHost()` now attempt `discoverOne` first after TCP connect, falling back to `get_prop` — enables real `model` and full `support[]` even for TCP-discovered devices
+- `YeelightDevice.connect()` accepts `opts?: { discover?: boolean }` — pass `{ discover: false }` for pure TCP fast path (no SSDP, no `get_prop`, full capabilities assumed)
+- `fullCapabilities()` — new internal helper that returns all-true capabilities; used by the `{ discover: false }` path
+
+### CLI
+
+- `ylc interactive --scan <ssdp|tcp>` — new flag to choose discovery method in interactive mode (default: `ssdp`)
+- `ylc interactive --help` shows `--scan` option
+- Direct `--ip` control commands (power, brightness, color, etc.) now skip discovery entirely — pure TCP for fastest possible response
+
+### Docs
+
+- Documentation restructured to 6 pages: Overview, API Reference, CLI, Protocol, Devices, Command Reference
+- New **CLI** page with all commands, flags, and keyboard shortcuts
+- New **Command Reference** page structured by capability group (Main Channel, Background Channel, Segment Control)
+- Protocol page now visible in navigation
+- `resolve.ts` internal refactor: removed dead `withSupport` logic; `status` command uses `withMeta: true` to retain SSDP fetch for display
+
 ## 1.1.2 (2026-03-24)
 
 ### Fixed

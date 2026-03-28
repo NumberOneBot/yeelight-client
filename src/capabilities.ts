@@ -40,6 +40,25 @@ export function capabilitiesFromSupport(support: string[]): Capabilities {
 }
 
 /**
+ * Full capabilities — assumed when the caller already knows what the device supports.
+ * Used by direct IP connections where discovery is intentionally skipped.
+ * Background channel is included; segment is left to the device to reject if unsupported.
+ */
+export function fullCapabilities(): Capabilities {
+  const all: ChannelCapabilities = {
+    hasColor: true,
+    hasColorTemp: true,
+    hasFlow: true
+  }
+  return {
+    hasBackground: true,
+    hasSegments: true,
+    main: all,
+    background: all
+  }
+}
+
+/**
  * Derives capabilities from a get_prop probe result.
  * Used by YeelightDevice.connect() when no SSDP support list is available.
  * Computes Capabilities directly from prop values — no intermediate support[].

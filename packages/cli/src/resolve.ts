@@ -2,38 +2,12 @@ import { YeelightDevice } from 'yeelight-client'
 
 export async function resolveDevice(
   ip?: string,
-  opts?: { withSupport?: boolean; timeout?: number }
+  opts?: { timeout?: number; withMeta?: boolean }
 ): Promise<YeelightDevice> {
   if (ip) {
-    if (opts?.withSupport) {
-      // Run TCP connect and SSDP discovery in parallel.
-      // TCP gives a live connection fast; SSDP gives the support list.
-      const [tcpResult, ssdpResult] = await Promise.allSettled([
-        YeelightDevice.connect(ip),
-        YeelightDevice.discover({ timeout: opts.timeout ?? 1000 }).then(
-          (devs) => devs.find((d) => d.ip === ip) ?? null
-        )
-      ])
-
-      if (tcpResult.status === 'rejected') {
-        throw new Error(tcpResult.reason?.message ?? `Cannot connect to ${ip}`)
-      }
-
-      const tcpDevice = tcpResult.value
-      const ssdpDevice =
-        ssdpResult.status === 'fulfilled' ? ssdpResult.value : null
-
-      // Prefer SSDP device — only SSDP discovery populates the
-      // support list (supported commands). TCP alone doesn't have it.
-      if (ssdpDevice) {
-        tcpDevice.disconnect()
-        await ssdpDevice.connect()
-        return ssdpDevice
-      }
-      return tcpDevice
-    }
-
-    return YeelightDevice.connect(ip)
+    // withMeta: true — run SSDP to resolve model/name/support (e.g. status command)
+    // default (fast path) — skip discovery, just TCP + command
+    return YeelightDevice.connect(ip, undefined, { discover: opts?.withMeta === true ? undefined : false })
   }
 
   const devices = await YeelightDevice.discover({

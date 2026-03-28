@@ -1,12 +1,57 @@
 ---
-title: Commands — lamp15
+title: Protocol Reference
 ---
 
-# Commands Reference (lamp15 / YLTD003)
+# Command Reference
 
-> Determined empirically. Not all commands are in the official spec.
+TCP command methods for Yeelight devices. See [Protocol](/protocol) for transport framing, discovery, and flow animation format.
 
-## Physical Zones
+---
+
+## Main Channel
+
+Available on all devices.
+
+| Method                 | Parameters                                      | Description       |
+| ---------------------- | ----------------------------------------------- | ----------------- |
+| `set_power`            | `"on"\|"off"`, `"smooth"\|"sudden"`, `ms`       | Power on/off      |
+| `set_bright`           | `1-100`, `"smooth"\|"sudden"`, `ms`             | Brightness        |
+| `set_ct_abx`           | `kelvin(2700-6500)`, `"smooth"\|"sudden"`, `ms` | Color temperature |
+| `set_rgb`              | `rgb_int`, `"smooth"\|"sudden"`, `ms`           | RGB color         |
+| `set_hsv`              | `hue(0-359)`, `sat(0-100)`, `"smooth"\|"sudden"`, `ms` | Color via HSV |
+| `start_cf` / `stop_cf` | see [Flow Animations](/protocol#flow-animations)   | Animations        |
+| `toggle`               | —                                               | Toggle power      |
+| `set_default`          | —                                               | Save as default   |
+
+> `set_rgb` and `set_hsv` are only available on devices that report them in the SSDP `support` field.
+
+---
+
+## Background Channel (`bg_*`)
+
+Only on devices with a background channel (report `bg_set_power` in `support`).
+
+| Method           | Parameters                                             | Description                                 |
+| ---------------- | ------------------------------------------------------ | ------------------------------------------- |
+| `bg_set_power`   | `"on"\|"off"`, `"smooth"\|"sudden"`, `ms`              | Power on/off                                |
+| `bg_toggle`      | —                                                      | Toggle                                      |
+| `bg_set_bright`  | `1-100`, `"smooth"\|"sudden"`, `ms`                    | Brightness                                  |
+| `bg_set_rgb`     | `rgb_int`, `"smooth"\|"sudden"`, `ms`                  | Both sides same color, resets segment state |
+| `bg_set_hsv`     | `hue(0-359)`, `sat(0-100)`, `"smooth"\|"sudden"`, `ms` | Color via HSV                               |
+| `bg_set_ct_abx`  | `kelvin(1700-6500)`, `"smooth"\|"sudden"`, `ms`        | Color temperature                           |
+| `bg_start_cf`    | `count`, `action`, `flow_expression`                   | Start animation                             |
+| `bg_stop_cf`     | —                                                      | Stop animation                              |
+| `bg_set_default` | —                                                      | Save as default                             |
+
+`dev_toggle` — toggles both main and background channels simultaneously.
+
+---
+
+## Segment Control <small>lamp15 / YLTD003 only</small>
+
+> These commands are unique to the **lamp15** model (YLTD003). No other Yeelight device reports `set_segment_rgb` in its `support` field.
+>
+> All data on this section was determined empirically — the official spec does not document segment control.
 
 The lamp has **three independent control surfaces**:
 
@@ -16,57 +61,18 @@ The lamp has **three independent control surfaces**:
 | 2   | Rear strip — both sides at once   | RGB + CT   | `bg_set_rgb`, `bg_set_power`, `bg_set_bright` |
 | 3   | Rear strip — left and right sides | RGB + CT   | `set_segment_rgb`                             |
 
----
-
-## set_segment_rgb — Independent Side Control
-
-**Not in official docs** — determined empirically.
+### set_segment_rgb
 
 ```
 set_segment_rgb(left_rgb, right_rgb)
 ```
 
 - `left_rgb`, `right_rgb` = `r * 65536 + g * 256 + b`
-- Brightness comes from `bg_set_bright`, not from RGB magnitude
+- Brightness is controlled by `bg_set_bright`, not by RGB magnitude
 - RGB magnitude is **ignored** — only hue/saturation matter
 - `rgb(1,0,0)` and `rgb(255,0,0)` produce identically bright red
 - `0x000000` produces **undefined behavior** — avoid it
 - Calling `bg_set_rgb` afterward overrides and resets per-side state
-
----
-
-## Front Light (CT only)
-
-| Method                 | Parameters                                      | Description       |
-| ---------------------- | ----------------------------------------------- | ----------------- |
-| `set_power`            | `"on"\|"off"`, `"smooth"\|"sudden"`, `ms`       | Power on/off      |
-| `set_bright`           | `1-100`, `"smooth"\|"sudden"`, `ms`             | Brightness        |
-| `set_ct_abx`           | `kelvin(2700-6500)`, `"smooth"\|"sudden"`, `ms` | Color temperature |
-| `start_cf` / `stop_cf` | see [Flow section](/protocol#flow-animations)   | Animations        |
-| `toggle`               | —                                               | Toggle power      |
-| `set_default`          | —                                               | Save as default   |
-
----
-
-## Rear Strip — Global (`bg_*`)
-
-| Method           | Parameters                                             | Description                                 |
-| ---------------- | ------------------------------------------------------ | ------------------------------------------- |
-| `bg_set_power`   | `"on"\|"off"`, `"smooth"\|"sudden"`, `ms`              | Power on/off                                |
-| `bg_toggle`      | —                                                      | Toggle                                      |
-| `bg_set_bright`  | `1-100`, `"smooth"\|"sudden"`, `ms`                    | Brightness (applies to both sides)          |
-| `bg_set_rgb`     | `rgb_int`, `"smooth"\|"sudden"`, `ms`                  | Both sides same color, resets segment state |
-| `bg_set_hsv`     | `hue(0-359)`, `sat(0-100)`, `"smooth"\|"sudden"`, `ms` | Color via HSV                               |
-| `bg_set_ct_abx`  | `kelvin(1700-6500)`, `"smooth"\|"sudden"`, `ms`        | Color temperature                           |
-| `bg_start_cf`    | `count`, `action`, `flow_expression`                   | Start animation                             |
-| `bg_stop_cf`     | —                                                      | Stop animation                              |
-| `bg_set_default` | —                                                      | Save as default                             |
-
----
-
-## Both Zones
-
-`dev_toggle` — toggles both front light and rear strip simultaneously.
 
 ---
 
@@ -116,7 +122,9 @@ The full list of 34 methods reported by `get_prop` is available in [python-miio 
 
 ---
 
-## Known Limitations
+## Known Limitations (lamp15)
+
+> These limitations apply only to lamp15 / YLTD003 segment control.
 
 **No per-side brightness.** `set_segment_rgb` has no brightness parameter, and RGB magnitude is normalized away. Both sides always share the brightness set by `bg_set_bright`.
 

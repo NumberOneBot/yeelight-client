@@ -61,10 +61,7 @@ export function StatusCommand({
   useEffect(() => {
     ;(async () => {
       try {
-        const device = await resolveDevice(ip, {
-          withSupport: showCommands,
-          timeout
-        })
+        const device = await resolveDevice(ip, { timeout, withMeta: true })
         const main = await device.main.getState()
         const bg = device.background ? await device.background.getState() : null
         const raw = showRaw ? await device.getRawProps(rawPropNames) : {}

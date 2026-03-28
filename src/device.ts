@@ -1,7 +1,8 @@
 import { EventEmitter } from 'node:events'
 import {
   capabilitiesFromProps,
-  capabilitiesFromSupport
+  capabilitiesFromSupport,
+  fullCapabilities
 } from './capabilities.js'
 import type { Capabilities } from './capabilities.js'
 import { LightChannel } from './channel.js'
@@ -114,15 +115,33 @@ export class YeelightDevice extends EventEmitter {
 
   /**
    * Connects directly to a device by IP without discovery.
-   * Tries unicast SSDP first (gives model + full support list for capabilities).
-   * Falls back to get_prop probe only if SSDP times out.
+   *
+   * By default, tries unicast SSDP first to resolve model + capabilities;
+   * falls back to get_prop probe if SSDP times out.
+   *
+   * Pass `{ discover: false }` to skip all discovery — just TCP handshake.
+   * Use this when the caller already knows what commands the device supports
+   * (e.g. single-shot CLI control commands). Assumes full capabilities.
    */
   static async connect(
     ip: string,
-    port = DEFAULT_PORT
+    port = DEFAULT_PORT,
+    opts?: { discover?: boolean }
   ): Promise<YeelightDevice> {
     const transport = new Transport()
     await transport.connect(ip, port)
+
+    if (opts?.discover === false) {
+      return new YeelightDevice({
+        id: '',
+        ip,
+        port,
+        model: 'unknown',
+        name: '',
+        capabilities: fullCapabilities(),
+        transport
+      })
+    }
 
     const info = await discoverOne(ip)
     if (info) {

@@ -82,84 +82,9 @@ Sent by the device whenever state changes from any source (physical button, anot
 
 ---
 
-## Device Model Registry
-
-The `model` field in SSDP identifies the logical device type — **not** the hardware SKU on the box.
-
-### Dual-zone devices (bg\_\* commands)
-
-Devices with a `background` channel — the most capable category:
-
-| Model       | Main channel   | Background channel |
-| ----------- | -------------- | ------------------ |
-| `lamp15`    | CT 2700–6500 K | RGB 1700–6500 K    |
-| `ceiling4`  | CT 2700–6500 K | RGB 1700–6500 K    |
-| `ceiling10` | CT 2700–6500 K | RGB 1700–6500 K    |
-| `ceiling19` | CT 2700–6500 K | RGB 1700–6500 K    |
-| `ceiling20` | CT 2700–6500 K | RGB 1700–6500 K    |
-
-### Color bulbs (RGB + CT)
-
-| Model                       | CT Range    | Notes         |
-| --------------------------- | ----------- | ------------- |
-| `color`                     | 1700–6500 K | YLDP02YL Gen1 |
-| `color1`–`color5`, `color7` | 1700–6500 K |               |
-| `colora`, `colorb`          | 1700–6500 K |               |
-| `colorc`                    | 2700–6500 K |               |
-
-### LED strips
-
-| Model    | CT Range    |
-| -------- | ----------- |
-| `strip1` | 1700–6500 K |
-| `strip2` | 1700–6500 K |
-| `strip4` | 2700–6500 K |
-| `strip6` | 2700–6500 K |
-
-### Bedside lamps
-
-| Model     | CT Range    | Night light |
-| --------- | ----------- | ----------- |
-| `bslamp1` | 1700–6500 K | ❌          |
-| `bslamp2` | 1700–6500 K | ✅ ⚠️       |
-| `bslamp3` | 1700–6500 K | ✅          |
-
-> ⚠️ `bslamp2` had LAN control forcibly removed in firmware 2.0.6_0041 by Xiaomi.
-
-### Ceiling lights (CT only)
-
-| Model                                              | CT Range    | Background |
-| -------------------------------------------------- | ----------- | ---------- |
-| `ceiling1`–`ceiling6`                              | 2700–6500 K | ❌         |
-| `ceiling10`                                        | 2700–6500 K | ✅         |
-| `ceiling13`, `ceiling15`, `ceiling18`, `ceiling24` | 2700–6500 K | ❌         |
-| `ceiling19`, `ceiling20`                           | 2700–6500 K | ✅         |
-| `ceiling22`                                        | 2600–6100 K | ❌         |
-| `ceila`, `ceil26`                                  | 2700–6500 K | ❌         |
-
-### Desk lamps
-
-| Model    | CT Range    | Color | Background |
-| -------- | ----------- | ----- | ---------- |
-| `lamp1`  | 2700–5000 K | ❌    | ❌         |
-| `lamp2`  | 2500–4800 K | ❌    | ❌         |
-| `lamp4`  | 2600–5000 K | ❌    | ❌         |
-| `lamp15` | 2700–6500 K | ❌    | ✅         |
-| `lamp22` | 2700–6500 K | ✅    | ❌         |
-
-### White-only bulbs
-
-| Model                              | CT Range    |
-| ---------------------------------- | ----------- |
-| `mono`                             | 2700 K only |
-| `mono1`, `mono5`, `mono6`, `monob` | 2700 K only |
-| `ct_bulb`, `ct2`                   | 2700–6500 K |
-
----
-
 ## Capability System
 
-Capability detection is based on which methods appear in the `support` SSDP field:
+Capability detection is based on which methods appear in the `support` SSDP field. The `model` field identifies the logical device type — see [Devices](/devices) for the full compatibility matrix.
 
 | Group      | Methods                               | Capability                         |
 | ---------- | ------------------------------------- | ---------------------------------- |

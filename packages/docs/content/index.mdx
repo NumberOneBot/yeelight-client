@@ -12,37 +12,13 @@ A zero-dependency Node.js library that communicates with Yeelight WiFi devices d
 
 The library targets the Yeelight inter-operation protocol (port 55443, JSON-RPC over plain-text socket) and is built around a **channel abstraction** that works uniformly across the entire device lineup — from simple white bulbs to dual-zone light bars.
 
-## CLI
-
-Single-command control from the terminal.
-
-```sh
-ylc status --ip 192.168.0.27          # show current state
-ylc status --ip 192.168.0.27 --raw    # + dump all raw get_prop values
-ylc power on --ip 192.168.0.27
-ylc brightness 50 --ip 192.168.0.27
-ylc ct 4000 --ip 192.168.0.27
-ylc color "#ff6400" --ip 192.168.0.27
-ylc segment "#ff0000" "#0000ff" --ip 192.168.0.27
-ylc toggle --ip 192.168.0.27         # toggle main + background at once
-ylc name "Desk Light" --ip 192.168.0.27
-ylc timer set 30 --ip 192.168.0.27   # sleep timer
-ylc timer status --ip 192.168.0.27
-ylc adjust brightness 20 --ip 192.168.0.27
-ylc discover
-```
-
-`--raw` prints all `get_prop` values directly from the device — useful for debugging firmware behavior.
-
-## Downstream projects
-
-This library is the foundation for the CLI tool above.
+A companion [CLI tool](/cli) (`yeelight-cli`) is also available for terminal control.
 
 ## Target hardware
 
 Primary test device: **Yeelight Light Bar Pro** (`lamp15` / YLTD003) — the most capable device in the lineup, with a CT main channel and a dual-zone RGB rear strip.
 
-The library is designed to work with the full Yeelight lineup. See [API Reference](/architecture#device-compatibility-matrix) for the compatibility matrix.
+The library is designed to work with the full Yeelight lineup. See [Devices](/devices) for the compatibility matrix.
 
 ## Quick start
 

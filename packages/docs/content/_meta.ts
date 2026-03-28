@@ -1,6 +1,8 @@
 export default {
   index: 'Overview',
-  architecture: 'API Reference',
+  api: 'API Reference',
+  cli: 'CLI',
+  protocol: 'Protocol',
   devices: 'Devices',
-  commands: 'Commands (lamp15)'
+  commands: 'Protocol Reference'
 }

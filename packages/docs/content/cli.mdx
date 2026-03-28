@@ -1,0 +1,129 @@
+---
+title: CLI
+---
+
+# CLI — yeelight-cli
+
+A terminal tool for controlling Yeelight devices. Install globally:
+
+```sh
+npm install -g yeelight-cli
+```
+
+---
+
+## Discovery
+
+```sh
+ylc discover                      # SSDP multicast — lists all devices on the LAN
+ylc scan                          # TCP subnet scan — finds devices without SSDP
+```
+
+`discover` uses UDP SSDP multicast and is instant (~3s timeout). `scan` probes all 254 hosts on your /24 subnet over TCP — use it when SSDP is blocked on the network.
+
+---
+
+## Status
+
+```sh
+ylc status                        # auto-discover + show state
+ylc status --ip 192.168.0.27
+ylc status --ip 192.168.0.27 --raw         # dump all raw get_prop values
+ylc status --ip 192.168.0.27 --commands    # show device support list (SSDP only)
+```
+
+---
+
+## Control commands
+
+All control commands accept `--ip <address>`. Without `--ip`, the device is auto-discovered via SSDP.
+
+```sh
+ylc power on
+ylc power off --ip 192.168.0.27
+
+ylc brightness 50
+ylc br 75                          # alias
+
+ylc ct 4000                        # color temperature in Kelvin (1700–6500)
+
+ylc color "#ff6400"                # hex
+ylc color 255 100 0                # r g b
+
+ylc toggle                         # toggle main + background at once
+
+ylc segment "#ff0000" "#0000ff"    # left / right strip colors (lamp15 only)
+
+ylc name "Desk Light"              # set device name
+
+ylc timer set 30                   # auto power-off in 30 minutes
+ylc timer status
+ylc timer cancel
+
+ylc adjust brightness 20           # relative adjust
+ylc adjust ct -10
+ylc adjust color
+```
+
+### Background channel
+
+Append `--bg` to target the background channel on dual-zone devices:
+
+```sh
+ylc brightness 40 --bg
+ylc ct 3000 --bg
+ylc color "#0088ff" --bg
+ylc power off --bg
+```
+
+### Transitions
+
+`--duration <ms>` sets a smooth transition time (default: 0, immediate):
+
+```sh
+ylc brightness 30 --duration 1000
+ylc ct 2700 --duration 2000 --bg
+```
+
+---
+
+## Interactive mode
+
+Full TUI for live device control — pick a device and adjust all properties interactively.
+
+```sh
+ylc interactive
+ylc i                              # alias
+
+ylc interactive --scan tcp         # use TCP scan instead of SSDP
+ylc interactive --ip 192.168.0.27  # skip discovery, connect directly
+ylc interactive --debug            # log tx/rx frames to debug.log
+```
+
+**Keyboard shortcuts** inside interactive mode:
+
+| Key | Action |
+|-----|--------|
+| `↑` / `↓` | Navigate |
+| `Enter` | Select / confirm |
+| `Esc` / `Backspace` | Back |
+| `q` | Quit |
+
+---
+
+## Global options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--ip <address>` | auto | Device IP — skip auto-discovery |
+| `--bg` | off | Target background channel |
+| `--duration <ms>` | `0` | Transition duration |
+| `--timeout <ms>` | `3000` | SSDP discovery timeout |
+| `--scan <ssdp\|tcp>` | `ssdp` | Discovery method (interactive only) |
+| `--debug` | off | Log tx/rx frames (interactive only) |
+| `--raw` | off | Dump raw props (status only) |
+| `--commands` | off | Show support list (status only) |
+| `-h`, `--help` | | Show help |
+| `-V`, `--version` | | Show version |
+
+Run `ylc <command> --help` for command-specific options.
