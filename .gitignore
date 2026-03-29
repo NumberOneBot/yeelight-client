@@ -5,4 +5,5 @@ dist/
 package-lock.json
 docs/.next/
 packages/docs/.next/
+packages/desktop/
 debug.log
