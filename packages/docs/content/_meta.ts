@@ -3,6 +3,6 @@ export default {
   api: 'API Reference',
   protocol: 'Protocol Reference',
   commands: 'Commands Reference',
-  cli: 'CLI',
-  devices: 'Devices'
+  devices: 'Devices',
+  cli: 'CLI'
 }

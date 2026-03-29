@@ -19,7 +19,8 @@ ylc discover                      # SSDP multicast — lists all devices on the 
 ylc scan                          # TCP subnet scan — finds devices without SSDP
 ```
 
-`discover` uses UDP SSDP multicast and is instant (~3s timeout). `scan` probes all 254 hosts on your /24 subnet over TCP — use it when SSDP is blocked on the network.
+`discover` uses UDP SSDP multicast and is instant (~3s timeout).<br/>
+`scan` probes all 254 hosts on your /24 subnet over TCP — use it when SSDP is blocked on the network.
 
 ---
 
@@ -102,28 +103,28 @@ ylc interactive --debug            # log tx/rx frames to debug.log
 
 **Keyboard shortcuts** inside interactive mode:
 
-| Key | Action |
-|-----|--------|
-| `↑` / `↓` | Navigate |
-| `Enter` | Select / confirm |
-| `Esc` / `Backspace` | Back |
-| `q` | Quit |
+| Key                 | Action           |
+| ------------------- | ---------------- |
+| `↑` / `↓`           | Navigate         |
+| `Enter`             | Select / confirm |
+| `Esc` / `Backspace` | Back             |
+| `q`                 | Quit             |
 
 ---
 
 ## Global options
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--ip <address>` | auto | Device IP — skip auto-discovery |
-| `--bg` | off | Target background channel |
-| `--duration <ms>` | `0` | Transition duration |
-| `--timeout <ms>` | `3000` | SSDP discovery timeout |
-| `--scan <ssdp\|tcp>` | `ssdp` | Discovery method (interactive only) |
-| `--debug` | off | Log tx/rx frames (interactive only) |
-| `--raw` | off | Dump raw props (status only) |
-| `--commands` | off | Show support list (status only) |
-| `-h`, `--help` | | Show help |
-| `-V`, `--version` | | Show version |
+| Flag                 | Default | Description                         |
+| -------------------- | ------- | ----------------------------------- |
+| `--ip <address>`     | auto    | Device IP — skip auto-discovery     |
+| `--bg`               | off     | Target background channel           |
+| `--duration <ms>`    | `0`     | Transition duration                 |
+| `--timeout <ms>`     | `3000`  | SSDP discovery timeout              |
+| `--scan <ssdp\|tcp>` | `ssdp`  | Discovery method (interactive only) |
+| `--debug`            | off     | Log tx/rx frames (interactive only) |
+| `--raw`              | off     | Dump raw props (status only)        |
+| `--commands`         | off     | Show support list (status only)     |
+| `-h`, `--help`       |         | Show help                           |
+| `-V`, `--version`    |         | Show version                        |
 
 Run `ylc <command> --help` for command-specific options.

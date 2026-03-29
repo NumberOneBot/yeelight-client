@@ -24,7 +24,11 @@ The main entry point. Handles discovery, connection, and exposes channels.
 class YeelightDevice {
   static discover(opts?: { timeout?: number }): Promise<YeelightDevice[]>
   static scan(): Promise<YeelightDevice[]>
-  static connect(ip: string, port?: number, opts?: { discover?: boolean }): Promise<YeelightDevice>
+  static connect(
+    ip: string,
+    port?: number,
+    opts?: { discover?: boolean }
+  ): Promise<YeelightDevice>
 
   readonly id: string
   readonly ip: string
