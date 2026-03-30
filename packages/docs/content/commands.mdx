@@ -86,22 +86,38 @@ set_segment_rgb(left_rgb, right_rgb)
 }
 ```
 
-| Property        | Description                                  |
-| --------------- | -------------------------------------------- |
-| `power`         | Front light: `"on"` / `"off"`                |
-| `bright`        | Front light brightness (1–100)               |
-| `ct`            | Front light color temp **(Kelvin, not RGB)** |
-| `flowing`       | `"1"` if animation active                    |
-| `bg_power`      | Rear strip: `"on"` / `"off"`                 |
-| `bg_bright`     | Rear strip brightness (1–100)                |
-| `bg_rgb`        | Rear strip color as rgb_int                  |
-| `bg_ct`         | Rear strip CT **(Kelvin, not RGB)**          |
-| `bg_color_mode` | `"1"`=RGB, `"2"`=CT, `"3"`=HSV               |
-| `bg_flowing`    | `"1"` if rear animation active               |
-| `active_mode`   | `"0"`=normal, `"1"`=night light              |
-| `name`          | Device name                                  |
+| Property        | Description                                                              |
+| --------------- | ------------------------------------------------------------------------ |
+| `name`          | Device name                                                              |
+| `active_mode`   | `"0"`=normal, `"1"`=night light                                          |
+| `power`         | Main channel power state: `"on"` / `"off"` — fallback if `main_power` is unavailable |
+| `bright`        | Front light brightness (1–100)                                           |
+| `ct`            | Front light color temp **(Kelvin, not RGB)**                             |
+| `rgb`           | Front light color as rgb_int; `""` when not in RGB mode                  |
+| `color_mode` **\***  | Front light color mode: `"1"`=RGB, `"2"`=CT, `"3"`=HSV                   |
+| `hue` **\***         | Front light hue (0–359); `""` when not in HSV mode                       |
+| `sat` **\***         | Front light saturation (0–100); `""` when not in HSV mode                |
+| `min_ct` **\***      | Minimum CT supported by main channel (Kelvin)                            |
+| `max_ct` **\***      | Maximum CT supported by main channel (Kelvin)                            |
+| `flowing`            | `"1"` if animation active                                                |
+| `main_power` **\***  | Device-level power state; `"on"` / `"off"` — distinct from front `power` |
+| `bg_power`           | Rear strip: `"on"` / `"off"`                                             |
+| `bg_bright`          | Rear strip brightness (1–100)                                            |
+| `bg_rgb`             | Rear strip color as rgb_int                                              |
+| `bg_ct`              | Rear strip CT **(Kelvin, not RGB)**                                      |
+| `bg_color_mode`      | `"1"`=RGB, `"2"`=CT, `"3"`=HSV                                           |
+| `bg_lmode` **\***    | Background channel lighting mode; values same as `bg_color_mode`         |
+| `bg_hue` **\***      | Background channel hue (0–359)                                           |
+| `bg_sat` **\***      | Background channel saturation (0–100)                                    |
+| `bg_min_ct` **\***   | Minimum CT supported by background channel (Kelvin)                      |
+| `bg_max_ct` **\***   | Maximum CT supported by background channel (Kelvin)                      |
+| `bg_flowing`         | `"1"` if rear animation active                                           |
+| `bg_proact` **\***   | Unknown flag; observed value `"0"` — purpose undocumented                |
+| `strip_lenth` **\*** | Strip segment count (typo in protocol for `strip_length`); e.g. `"2"`    |
 
 > `ct` and `bg_ct` are **Kelvin values** — do not treat as RGB integers.
+>
+> **\*** Not present in the official Yeelight Inter-Operation Spec PDF — observed empirically via TCP traffic capture.
 
 ---
 

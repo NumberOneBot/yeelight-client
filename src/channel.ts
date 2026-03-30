@@ -230,13 +230,14 @@ export class LightChannel {
   async getState(): Promise<ChannelState> {
     const props =
       this.prefix === ''
-        ? ['power', 'bright', 'ct', 'rgb', 'flowing']
+        ? ['main_power', 'power', 'bright', 'ct', 'rgb', 'flowing']
         : ['bg_power', 'bg_bright', 'bg_ct', 'bg_rgb', 'bg_flowing']
 
-    const [power, bright, ct, rgb, flowing] = await this.transport.send(
+    const [p0, p1, bright, ct, rgb, flowing] = await this.transport.send(
       'get_prop',
       props
     )
+    const power = this.prefix === '' ? (p0 || p1) : p0
 
     let rgbTuple: [number, number, number] | null = null
     if (this.capabilities.hasColor && rgb) {

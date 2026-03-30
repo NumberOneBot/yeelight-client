@@ -48,6 +48,9 @@
     "docs:build": "pnpm --filter yeelight-client-docs build",
     "release": "pnpm build ; pnpm changeset publish"
   },
+  "pnpm": {
+    "allowedBuildScripts": ["electron", "esbuild"]
+  },
   "devDependencies": {
     "@changesets/cli": "^2.30.0",
     "@types/bun": "^1.3.11",
