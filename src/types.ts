@@ -32,6 +32,7 @@ export interface ChannelState {
   power: boolean
   brightness: number
   colorTemp: number | null
+  ctRange: [number, number] | null
   rgb: [number, number, number] | null
   flowing: boolean
 }

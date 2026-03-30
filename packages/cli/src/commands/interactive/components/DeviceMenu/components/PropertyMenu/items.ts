@@ -20,8 +20,16 @@ export const brightnessItems: PropItem[] = [
   { kind: 'back' as const }
 ]
 
-export const ctItems: PropItem[] = [
+const ctItems2700: PropItem[] = [
   ...[2700, 3000, 3500, 4000, 4500, 5000, 6000, 6500].map((v) => ({
+    kind: 'ct' as const,
+    value: v
+  })),
+  { kind: 'back' as const }
+]
+
+const ctItems1700: PropItem[] = [
+  ...[1700, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 6000, 6500].map((v) => ({
     kind: 'ct' as const,
     value: v
   })),
@@ -47,9 +55,9 @@ export const rgbItems: PropItem[] = [
   { kind: 'back' as const }
 ]
 
-export function propItems(prop: Prop): PropItem[] {
+export function propItems(prop: Prop, ctRange?: [number, number] | null): PropItem[] {
   if (prop === 'brightness') return brightnessItems
-  if (prop === 'ct') return ctItems
+  if (prop === 'ct') return ctRange?.[0] <= 1700 ? ctItems1700 : ctItems2700
   return rgbItems
 }
 

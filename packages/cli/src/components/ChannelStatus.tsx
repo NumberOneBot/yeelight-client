@@ -46,6 +46,11 @@ export function ChannelStatus({
         {s.colorTemp !== null && (
           <StatRow k="Color temp">
             <Text color="yellow">{s.colorTemp} K</Text>
+            {s.ctRange && (
+              <Text dimColor>
+                [{s.ctRange[0]} .. {s.ctRange[1]} K]
+              </Text>
+            )}
             {!noColor && <Text color={ctToColor(s.colorTemp)}> ██</Text>}
           </StatRow>
         )}

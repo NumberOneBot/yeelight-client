@@ -40,7 +40,7 @@ export function PropertyMenu({
     execute
   } = usePropertyExec(ch, current, onBack)
 
-  const items = propItems(prop)
+  const items = propItems(prop, current?.ctRange)
   const cursorOverride = useRef<number | undefined>(undefined)
   const initialCursor =
     cursorOverride.current ??

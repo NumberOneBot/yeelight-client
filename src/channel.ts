@@ -230,14 +230,29 @@ export class LightChannel {
   async getState(): Promise<ChannelState> {
     const props =
       this.prefix === ''
-        ? ['main_power', 'power', 'bright', 'ct', 'rgb', 'flowing']
-        : ['bg_power', 'bg_bright', 'bg_ct', 'bg_rgb', 'bg_flowing']
+        ? [
+            'main_power',
+            'power',
+            'bright',
+            'ct',
+            'rgb',
+            'flowing',
+            'min_ct',
+            'max_ct'
+          ]
+        : [
+            'bg_power',
+            'bg_bright',
+            'bg_ct',
+            'bg_rgb',
+            'bg_flowing',
+            'bg_min_ct',
+            'bg_max_ct'
+          ]
 
-    const [p0, p1, bright, ct, rgb, flowing] = await this.transport.send(
-      'get_prop',
-      props
-    )
-    const power = this.prefix === '' ? (p0 || p1) : p0
+    const [p0, p1, bright, ct, rgb, flowing, minCt, maxCt] =
+      await this.transport.send('get_prop', props)
+    const power = this.prefix === '' ? p0 || p1 : p0
 
     let rgbTuple: [number, number, number] | null = null
     if (this.capabilities.hasColor && rgb) {
@@ -247,11 +262,23 @@ export class LightChannel {
       }
     }
 
+    const ctMin = parseInt(minCt, 10)
+    const ctMax = parseInt(maxCt, 10)
+    const ctRange: [number, number] | null =
+      this.capabilities.hasColorTemp &&
+      !isNaN(ctMin) &&
+      !isNaN(ctMax) &&
+      ctMin > 0 &&
+      ctMax > 0
+        ? [ctMin, ctMax]
+        : null
+
     return {
       power: power === 'on',
       brightness: parseInt(bright, 10) || 0,
       colorTemp:
         this.capabilities.hasColorTemp && ct ? parseInt(ct, 10) || null : null,
+      ctRange,
       rgb: rgbTuple,
       flowing: flowing === '1'
     }
