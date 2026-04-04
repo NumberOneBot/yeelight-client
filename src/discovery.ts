@@ -51,8 +51,15 @@ function physicalInterfaces(): string[] {
     .map((iface) => iface.address)
 }
 
-export function discover(timeoutMs = SSDP_TIMEOUT_MS): Promise<DeviceInfo[]> {
+export function discover(
+  timeoutMs = SSDP_TIMEOUT_MS,
+  signal?: AbortSignal
+): Promise<DeviceInfo[]> {
   return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      resolve([])
+      return
+    }
     const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true })
     const devices: DeviceInfo[] = []
     const seen = new Set<string>()
@@ -89,6 +96,15 @@ export function discover(timeoutMs = SSDP_TIMEOUT_MS): Promise<DeviceInfo[]> {
         socket.close()
         resolve(devices)
       }, timeoutMs)
+
+      signal?.addEventListener(
+        'abort',
+        () => {
+          socket.close()
+          resolve(devices)
+        },
+        { once: true }
+      )
     })
   })
 }
@@ -229,7 +245,7 @@ function probeHost(ip: string): Promise<DeviceInfo | null> {
   })
 }
 
-export async function scan(): Promise<DeviceInfo[]> {
+export async function scan(signal?: AbortSignal): Promise<DeviceInfo[]> {
   const allHosts = [
     ...new Set(
       Object.values(os.networkInterfaces())
@@ -247,6 +263,7 @@ export async function scan(): Promise<DeviceInfo[]> {
   await Promise.all(
     Array.from({ length: SCAN_CONCURRENCY }, async () => {
       while (i < allHosts.length) {
+        if (signal?.aborted) return
         const ip = allHosts[i++]
         const device = await probeHost(ip)
         if (device) devices.push(device)

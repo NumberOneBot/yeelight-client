@@ -82,8 +82,9 @@ export class YeelightDevice extends EventEmitter {
    */
   static async discover(opts?: {
     timeout?: number
+    signal?: AbortSignal
   }): Promise<YeelightDevice[]> {
-    const infos = await ssdpDiscover(opts?.timeout)
+    const infos = await ssdpDiscover(opts?.timeout, opts?.signal)
     return infos.map((info) => {
       // capabilitiesFromSupport expects support: string[]
       const caps = capabilitiesFromSupport(info.support)
@@ -101,8 +102,8 @@ export class YeelightDevice extends EventEmitter {
    * Use when SSDP multicast is blocked or unreliable on the network.
    * Call device.connect() before sending any commands.
    */
-  static async scan(): Promise<YeelightDevice[]> {
-    const infos = await tcpScan()
+  static async scan(signal?: AbortSignal): Promise<YeelightDevice[]> {
+    const infos = await tcpScan(signal)
     return infos.map((info) => {
       const transport = new Transport()
       return new YeelightDevice({
