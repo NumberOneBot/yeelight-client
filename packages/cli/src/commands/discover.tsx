@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
-import { type DeviceInfo, channelCaps, DeviceRow, Dots, ErrorText } from '../components'
+import {
+  type DeviceInfo,
+  channelCaps,
+  DeviceRow,
+  Dots,
+  ErrorText
+} from '../components'
 
 export function DiscoverCommand({ timeout }: { timeout: number }) {
   const { exit } = useApp()
