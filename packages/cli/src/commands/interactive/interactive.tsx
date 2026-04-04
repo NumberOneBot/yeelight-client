@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Box, Text, useApp, useInput } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
-import { Dots } from '../../components/Dots'
-import { ErrorText } from '../../components/ErrorText'
-import { DeviceMenu } from './components/DeviceMenu'
-import { DevicePicker } from './components/DevicePicker'
+import { Dots, ErrorText } from '../../components'
+import { DeviceMenu, DevicePicker } from './components'
 
 type Screen =
   | { id: 'pick' }

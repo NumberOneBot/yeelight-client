@@ -1,7 +1,7 @@
 import React from 'react'
 import { useCommand } from '../useCommand'
 import { resolveDevice } from '../resolve'
-import { ErrorText } from '../components/ErrorText'
+import { ErrorText } from '../components'
 
 export function BrightnessCommand({
   value,

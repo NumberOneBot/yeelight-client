@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { resolveDevice } from '../resolve'
-import { ChannelStatus, StatRow } from '../components/ChannelStatus'
-import { Dots } from '../components/Dots'
-import { ErrorText } from '../components/ErrorText'
+import { ChannelStatus, StatRow, Dots, ErrorText } from '../components'
 
 type StatusData = {
   ip: string

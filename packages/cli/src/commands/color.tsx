@@ -1,7 +1,7 @@
 import React from 'react'
 import { useCommand } from '../useCommand'
 import { resolveDevice } from '../resolve'
-import { ErrorText } from '../components/ErrorText'
+import { ErrorText } from '../components'
 import { parseHex } from '../utils/color'
 
 export function ColorCommand({

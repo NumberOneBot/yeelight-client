@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import { scan } from 'yeelight-client'
-import { Dots } from '../components/Dots'
-import { ErrorText } from '../components/ErrorText'
-import { channelCaps, DeviceInfo, DeviceRow } from '../components/DeviceRow'
+import { type DeviceInfo, channelCaps, DeviceRow, Dots, ErrorText } from '../components'
 
 export function ScanCommand() {
   const { exit } = useApp()

@@ -3,7 +3,7 @@ import { Box, Text, useApp } from 'ink'
 import type { CronTimer } from 'yeelight-client'
 import { useCommand } from '../useCommand'
 import { resolveDevice } from '../resolve'
-import { ErrorText } from '../components/ErrorText'
+import { ErrorText } from '../components'
 
 type TimerAction = 'set' | 'cancel' | 'status'
 
