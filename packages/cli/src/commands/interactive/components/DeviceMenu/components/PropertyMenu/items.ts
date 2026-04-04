@@ -55,9 +55,13 @@ export const rgbItems: PropItem[] = [
   { kind: 'back' as const }
 ]
 
-export function propItems(prop: Prop, ctRange?: [number, number] | null): PropItem[] {
+export function propItems(
+  prop: Prop,
+  ctRange?: [number, number] | null
+): PropItem[] {
   if (prop === 'brightness') return brightnessItems
-  if (prop === 'ct') return ctRange?.[0] <= 1700 ? ctItems1700 : ctItems2700
+  if (prop === 'ct')
+    return (ctRange?.[0] || Infinity) <= 1700 ? ctItems1700 : ctItems2700
   return rgbItems
 }
 

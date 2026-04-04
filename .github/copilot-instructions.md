@@ -58,12 +58,41 @@ pnpm build                                  # build library (tsup)
 pnpm --filter yeelight-cli build:win        # compile CLI binary for Windows
 ```
 
+## Implementation Philosophy
+
+**Build final, not iterative.** Every feature must be implemented as its final version the first time. No placeholders, no "we'll add this later", no MVP shortcuts that create rework. If a feature is worth doing, it's worth doing properly now.
+
+- Before writing code, think through the complete design: data flow, edge cases, extensibility points.
+- If the full scope isn't clear yet, ask — don't guess and build something that will be thrown away.
+- "Quick version first" is not a valid approach. Prototypes are only acceptable in throwaway branches.
+- Each PR/commit should leave the feature in a state that never needs to be revisited for the same reason.
+
+**No shortcuts that create debt:**
+
+- Never hard-code values that belong in config or constants.
+- Never skip error handling at system boundaries.
+- Never leave a `// TODO` comment — either do it now or file it as a tracked task.
+
+**No magic numbers in markup — ever:**
+
+- Every spacing, size, or color value in JSX/TSX **must** come from a design token (`--spacing-*`, `--color-*`, etc.) expressed as a Tailwind utility or `var(--token)`.
+- If no token exists for the required value, **stop and ask the user** what token to add — do not invent an inline pixel value.
+- This applies to `style={{}}` props, `className` arbitrary values (`p-[5px]`), and any hardcoded CSS string.
+- Violations: `paddingInline: '5px'`, `style={{ gap: '3px' }}`, `className="p-[7px]"` — all forbidden.
+
+## File Size Limit
+
+- **~300 lines max per file** — split by responsibility when approaching this limit.
+- One file = one concern. No god-files or mega-modules.
+- Entry points (e.g. `main.ts`, `index.ts`) should only wire up imports — no inline logic.
+
 ## Code Style
 
 ### General
 
 - **Modern, compact TypeScript** — destructuring, `?.`, `??`, concise ternaries, array methods. Conditional rendering: `data?.support?.length > 0 && ...` — never `data && data.support && data.support.length > 0 && (...)`.
 - **Named exports only** — no default exports (Next.js layouts/pages excepted — framework requirement).
+- **One source of truth for every constant** — if a value appears in more than one file (strings, colors, numbers), it must live in a single authoritative module and be imported everywhere else. Never duplicate it. In the desktop package: `appName` lives only in `src/lib/config.ts`; CSS `--color-bg` dark value derives from `windowBg` in `electron/config.ts` via the Vite plugin.
 - **camelCase everywhere** — constants included; no `SCREAMING_CASE`.
 - **No lint warnings** — fix immediately, never suppress with a comment.
 - **Boy Scout Rule** — delete dead code (unused imports, variables, props, files) in every file you touch. Scoped to the file being changed.
