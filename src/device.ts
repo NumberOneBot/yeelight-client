@@ -19,6 +19,8 @@ export type { SceneConfig } from './types.js'
 
 const DEFAULT_PORT = 55443
 const GET_PROPS = ['ct', 'rgb', 'bg_power', 'bg_ct', 'bg_rgb']
+// See channel.ts CT_MAX — same threshold for push-event parsing
+const CT_MAX = 10000
 
 export class YeelightDevice extends EventEmitter {
   private readonly transport: Transport
@@ -68,7 +70,13 @@ export class YeelightDevice extends EventEmitter {
       : null
 
     this.transport.on('disconnect', () => this.emit('disconnect'))
-    this.transport.on('props', (params: unknown) => this.emit('props', params))
+    this.transport.on('props', (params: unknown) => {
+      const raw = params as Record<string, string>
+      this.emit('props', {
+        main: this.parseMainProps(raw),
+        bg: this.background ? this.parseBgProps(raw) : null
+      })
+    })
     this.transport.on('tx', (frame: string) => this.emit('tx', frame))
     this.transport.on('rx', (frame: string) => this.emit('rx', frame))
   }
@@ -254,7 +262,68 @@ export class YeelightDevice extends EventEmitter {
 
   // ── EventEmitter overloads for type safety ────────────────────────────────
 
-  on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
+  private parseMainProps(raw: Record<string, string>): Partial<ChannelState> {
+    const result: Partial<ChannelState> = {}
+    const caps = this.main.capabilities
+
+    if ('power' in raw || 'main_power' in raw)
+      result.power = (raw.power ?? raw.main_power) === 'on'
+    if ('bright' in raw) result.brightness = parseInt(raw.bright, 10)
+    if ('ct' in raw) {
+      const v = parseInt(raw.ct, 10)
+      if (v > CT_MAX && caps.hasColor) {
+        result.rgb = [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
+        result.colorTemp = null
+      } else {
+        result.colorTemp = caps.hasColorTemp && v > 0 ? v : null
+      }
+    }
+    if ('rgb' in raw) {
+      const v = parseInt(raw.rgb, 10)
+      result.rgb =
+        caps.hasColor && !isNaN(v) && v > 0
+          ? [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
+          : null
+    }
+    if ('flowing' in raw) result.flowing = raw.flowing === '1'
+
+    return result
+  }
+
+  private parseBgProps(raw: Record<string, string>): Partial<ChannelState> {
+    const result: Partial<ChannelState> = {}
+    const caps = this.background!.capabilities
+
+    if ('bg_power' in raw) result.power = raw.bg_power === 'on'
+    if ('bg_bright' in raw) result.brightness = parseInt(raw.bg_bright, 10)
+    if ('bg_ct' in raw) {
+      const v = parseInt(raw.bg_ct, 10)
+      if (v > CT_MAX && caps.hasColor) {
+        result.rgb = [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
+        result.colorTemp = null
+      } else {
+        result.colorTemp = caps.hasColorTemp && v > 0 ? v : null
+      }
+    }
+    if ('bg_rgb' in raw) {
+      const v = parseInt(raw.bg_rgb, 10)
+      result.rgb =
+        caps.hasColor && !isNaN(v) && v > 0
+          ? [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
+          : null
+    }
+    if ('bg_flowing' in raw) result.flowing = raw.bg_flowing === '1'
+
+    return result
+  }
+
+  on(
+    event: 'props',
+    listener: (props: {
+      main: Partial<ChannelState>
+      bg: Partial<ChannelState> | null
+    }) => void
+  ): this
   on(event: 'disconnect', listener: () => void): this
   on(event: 'tx' | 'rx', listener: (frame: string) => void): this
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

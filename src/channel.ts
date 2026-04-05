@@ -11,6 +11,9 @@ import type {
 
 const DEFAULT_EFFECT = 'smooth'
 const DEFAULT_DURATION = 300
+// Yeelight CT range tops at ~6500K; values above this in protocol responses
+// indicate a firmware quirk where packed RGB is sent in the ct field.
+const CT_MAX = 10000
 
 export class LightChannel {
   constructor(
@@ -261,12 +264,13 @@ export class LightChannel {
           ? [ctMin, ctMax]
           : null
 
+      const ctVal = parseInt(ct, 10)
       return {
         power: pwrStr === 'on',
         brightness: parseInt(bright, 10) || 0,
         colorTemp:
-          this.capabilities.hasColorTemp && ct
-            ? parseInt(ct, 10) || null
+          this.capabilities.hasColorTemp && ctVal > 0 && ctVal < CT_MAX
+            ? ctVal
             : null,
         ctRange,
         rgb: rgbTuple,
@@ -302,12 +306,13 @@ export class LightChannel {
           ? [ctMin, ctMax]
           : null
 
+      const ctVal = parseInt(ct, 10)
       return {
         power: bgPower === 'on',
         brightness: parseInt(bright, 10) || 0,
         colorTemp:
-          this.capabilities.hasColorTemp && ct
-            ? parseInt(ct, 10) || null
+          this.capabilities.hasColorTemp && ctVal > 0 && ctVal < CT_MAX
+            ? ctVal
             : null,
         ctRange,
         rgb: rgbTuple,
