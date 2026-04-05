@@ -266,8 +266,13 @@ export class YeelightDevice extends EventEmitter {
     const result: Partial<ChannelState> = {}
     const caps = this.main.capabilities
 
-    if ('power' in raw || 'main_power' in raw)
-      result.power = (raw.power ?? raw.main_power) === 'on'
+    if ('main_power' in raw)
+      result.power = raw.main_power === 'on'
+    else if (!this.background && 'power' in raw)
+      // For single-channel devices `power` is the main channel state.
+      // For dual-channel devices `power` reflects overall device state, not
+      // the main LED — ignore it here; only `main_power` is authoritative.
+      result.power = raw.power === 'on'
     if ('bright' in raw) result.brightness = parseInt(raw.bright, 10)
     if ('ct' in raw) {
       const v = parseInt(raw.ct, 10)
