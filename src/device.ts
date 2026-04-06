@@ -333,10 +333,12 @@ export class YeelightDevice extends EventEmitter {
     const caps = this.main.capabilities
 
     if ('main_power' in raw) result.power = raw.main_power === 'on'
-    else if (!this.background && 'power' in raw)
-      // For single-channel devices `power` is the main channel state.
-      // For dual-channel devices `power` reflects overall device state, not
-      // the main LED — ignore it here; only `main_power` is authoritative.
+    else if ('power' in raw)
+      // `power` is used both by single-channel devices and in push notifications
+      // (props method) from dual-channel devices — the device sends `power`, not
+      // `main_power`, when the main LED state changes externally.
+      // In get_prop responses both keys are present, so the `if` above takes
+      // precedence and `main_power` is used (which is authoritative for dual-channel).
       result.power = raw.power === 'on'
     if ('bright' in raw) result.brightness = parseInt(raw.bright, 10) || 0
     if ('ct' in raw) {
