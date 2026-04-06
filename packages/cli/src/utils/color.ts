@@ -35,8 +35,13 @@ export function parseHex(input: string): ParsedHex | null {
   return { r, g, b, a }
 }
 
+const CT_MIN = 1700
+const CT_MAX = 6500
+const CT_ALGO_MAX = 7500
+
 export function ctToColor(kelvin: number): string {
-  const t = kelvin / 100
+  const mapped = CT_MIN + ((kelvin - CT_MIN) / (CT_MAX - CT_MIN)) * (CT_ALGO_MAX - CT_MIN)
+  const t = mapped / 100
   let r = t <= 66 ? 255 : 329.698727446 * (t - 60) ** -0.1332047592
   r = Math.round(Math.max(0, Math.min(255, r)))
   let g =
@@ -51,16 +56,5 @@ export function ctToColor(kelvin: number): string {
         ? 0
         : 138.5177312231 * Math.log(t - 10) - 305.0447927307
   b = Math.round(Math.max(0, Math.min(255, b)))
-  if (kelvin >= 4000 && kelvin <= 5000) {
-    const blend = ((kelvin - 4000) / 1000) * 0.9
-    r = Math.round(r + (255 - r) * blend)
-    g = Math.round(g + (255 - g) * blend)
-    b = Math.round(b + (255 - b) * blend)
-  }
-  if (kelvin > 5000) {
-    const cool = (kelvin - 5000) / 1500
-    r = Math.round(Math.max(0, r - cool * 30))
-    b = Math.round(Math.min(255, b + cool * 15))
-  }
   return rgbHex(r, g, b)
 }
