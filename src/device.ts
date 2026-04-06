@@ -338,7 +338,7 @@ export class YeelightDevice extends EventEmitter {
       // For dual-channel devices `power` reflects overall device state, not
       // the main LED — ignore it here; only `main_power` is authoritative.
       result.power = raw.power === 'on'
-    if ('bright' in raw) result.brightness = parseInt(raw.bright, 10)
+    if ('bright' in raw) result.brightness = parseInt(raw.bright, 10) || 0
     if ('ct' in raw) {
       const v = parseInt(raw.ct, 10)
       if (v > CT_MAX && caps.hasColor) {
@@ -365,7 +365,7 @@ export class YeelightDevice extends EventEmitter {
     const caps = this.background!.capabilities
 
     if ('bg_power' in raw) result.power = raw.bg_power === 'on'
-    if ('bg_bright' in raw) result.brightness = parseInt(raw.bg_bright, 10)
+    if ('bg_bright' in raw) result.brightness = parseInt(raw.bg_bright, 10) || 0
     if ('bg_ct' in raw) {
       const v = parseInt(raw.bg_ct, 10)
       if (v > CT_MAX && caps.hasColor) {
