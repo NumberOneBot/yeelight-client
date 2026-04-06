@@ -56,7 +56,13 @@ class YeelightDevice {
   cronGet(): Promise<CronTimer | null> // active timer or null
   getRawProps(props: string[]): Promise<Record<string, string>>
 
-  on(event: 'props', listener: (props: { main: Partial<ChannelState>; bg: Partial<ChannelState> | null }) => void): this
+  on(
+    event: 'props',
+    listener: (props: {
+      main: Partial<ChannelState>
+      bg: Partial<ChannelState> | null
+    }) => void
+  ): this
   on(event: 'disconnect', listener: () => void): this
   off(event: string, listener: Function): this
 }

@@ -237,12 +237,12 @@ device.on('disconnect', () => {
 })
 ```
 
-| Event        | Payload                 | Description                     |
-| ------------ | ----------------------- | ------------------------------- |
-| `props`      | `Partial<ChannelState>` | Device pushed a property change |
-| `disconnect` | —                       | Connection lost or closed       |
-| `tx`         | `string`                | Outgoing JSON-RPC frame (debug) |
-| `rx`         | `string`                | Incoming JSON-RPC frame (debug) |
+| Event        | Payload                                                          | Description                     |
+| ------------ | ---------------------------------------------------------------- | ------------------------------- |
+| `props`      | `main: Partial<ChannelState>, bg: Partial<ChannelState> \| null` | Device pushed a property change |
+| `disconnect` | —                                                                | Connection lost or closed       |
+| `tx`         | `string`                                                         | Outgoing JSON-RPC frame (debug) |
+| `rx`         | `string`                                                         | Incoming JSON-RPC frame (debug) |
 
 ### Reading State
 
