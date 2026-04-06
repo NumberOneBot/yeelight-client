@@ -44,6 +44,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "bun test",
+    "typecheck": "tsc --noEmit",
     "docs:dev": "pnpm --filter yeelight-client-docs dev",
     "docs:build": "pnpm --filter yeelight-client-docs build",
     "release": "pnpm build ; pnpm changeset publish"
