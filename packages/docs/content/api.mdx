@@ -44,6 +44,10 @@ class YeelightDevice {
   disconnect(): void
   isConnected(): boolean
 
+  getState(): Promise<{ main: ChannelState; bg: ChannelState | null }>
+  // Fetches current state of all channels in a single get_prop request.
+  // Preferred over per-channel polling — avoids an extra round-trip.
+
   setScene(scene: SceneConfig): Promise<void> // delegates to main
   setName(name: string): Promise<void>
   devToggle(): Promise<void> // dual-zone devices only
@@ -52,7 +56,7 @@ class YeelightDevice {
   cronGet(): Promise<CronTimer | null> // active timer or null
   getRawProps(props: string[]): Promise<Record<string, string>>
 
-  on(event: 'props', listener: (props: Partial<ChannelState>) => void): this
+  on(event: 'props', listener: (props: { main: Partial<ChannelState>; bg: Partial<ChannelState> | null }) => void): this
   on(event: 'disconnect', listener: () => void): this
   off(event: string, listener: Function): this
 }
@@ -120,8 +124,6 @@ class LightChannel {
   adjustBrightness(percentage: number, duration?: number): Promise<void>
   adjustColorTemp(percentage: number, duration?: number): Promise<void>
   adjustColor(duration?: number): Promise<void>
-
-  getState(): Promise<ChannelState>
 }
 ```
 

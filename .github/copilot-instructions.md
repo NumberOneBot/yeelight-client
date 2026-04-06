@@ -98,6 +98,14 @@ pnpm --filter yeelight-cli build:win        # compile CLI binary for Windows
 - **Boy Scout Rule** — delete dead code (unused imports, variables, props, files) in every file you touch. Scoped to the file being changed.
 - **No confabulation** — never state something as fact without verifying it (read a file, run a search). If unsure, say so.
 
+### Architectural Change Protocol
+
+Before proposing or implementing any change that replaces or moves functionality:
+
+1. **Find all call sites** — use `vscode_listCodeUsages` or `grep_search` on every symbol being replaced. Cover the entire monorepo, not just the file being changed.
+2. **Enumerate dead code** — explicitly list what becomes unreachable after the change. Include methods, IPC handlers, preload bindings, and types.
+3. **Plan deletions alongside additions** — the change list must contain both. A proposal that only lists new code is incomplete.
+
 ### Naming
 
 Names answer _"what is this for?"_, not _"what type/state is this?"_ (Intention-Revealing Names).

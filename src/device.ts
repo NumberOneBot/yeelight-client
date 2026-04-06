@@ -260,14 +260,79 @@ export class YeelightDevice extends EventEmitter {
     await this.transport.send('dev_toggle', [])
   }
 
+  /**
+   * Fetches the current state of all channels in a single `get_prop` request.
+   * Preferred over calling `device.main.getState()` + `device.background.getState()`
+   * separately — avoids the extra round-trip.
+   */
+  async getState(): Promise<{ main: ChannelState; bg: ChannelState | null }> {
+    const mainProps = [
+      'main_power',
+      'power',
+      'bright',
+      'ct',
+      'rgb',
+      'flowing',
+      'min_ct',
+      'max_ct'
+    ]
+    const bgProps = this.background
+      ? [
+          'bg_power',
+          'bg_bright',
+          'bg_ct',
+          'bg_rgb',
+          'bg_flowing',
+          'bg_min_ct',
+          'bg_max_ct'
+        ]
+      : []
+    const allProps = [...mainProps, ...bgProps]
+    const values = await this.transport.send('get_prop', allProps)
+    const raw = Object.fromEntries(allProps.map((p, i) => [p, values[i] ?? '']))
+
+    const mainPartial = this.parseMainProps(raw)
+    const ctMin = parseInt(raw.min_ct, 10)
+    const ctMax = parseInt(raw.max_ct, 10)
+    const main: ChannelState = {
+      power: mainPartial.power ?? false,
+      brightness: mainPartial.brightness ?? 0,
+      colorTemp: mainPartial.colorTemp ?? null,
+      ctRange:
+        this.main.capabilities.hasColorTemp && ctMin > 0 && ctMax > 0
+          ? [ctMin, ctMax]
+          : null,
+      rgb: mainPartial.rgb ?? null,
+      flowing: mainPartial.flowing ?? false
+    }
+
+    if (!this.background) return { main, bg: null }
+
+    const bgPartial = this.parseBgProps(raw)
+    const bgCtMin = parseInt(raw.bg_min_ct, 10)
+    const bgCtMax = parseInt(raw.bg_max_ct, 10)
+    const bg: ChannelState = {
+      power: bgPartial.power ?? false,
+      brightness: bgPartial.brightness ?? 0,
+      colorTemp: bgPartial.colorTemp ?? null,
+      ctRange:
+        this.background.capabilities.hasColorTemp && bgCtMin > 0 && bgCtMax > 0
+          ? [bgCtMin, bgCtMax]
+          : null,
+      rgb: bgPartial.rgb ?? null,
+      flowing: bgPartial.flowing ?? false
+    }
+
+    return { main, bg }
+  }
+
   // ── EventEmitter overloads for type safety ────────────────────────────────
 
   private parseMainProps(raw: Record<string, string>): Partial<ChannelState> {
     const result: Partial<ChannelState> = {}
     const caps = this.main.capabilities
 
-    if ('main_power' in raw)
-      result.power = raw.main_power === 'on'
+    if ('main_power' in raw) result.power = raw.main_power === 'on'
     else if (!this.background && 'power' in raw)
       // For single-channel devices `power` is the main channel state.
       // For dual-channel devices `power` reflects overall device state, not
