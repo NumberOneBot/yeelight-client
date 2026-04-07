@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.3.0 (2026-04-07)
+
+### Added
+
+- `AbortSignal` support in `discover()` and `scan()` — pass `{ signal }` to cancel in-flight discovery or subnet scan
+- `YeelightDevice.getState()` — retrieve combined `{ main, bg }` channel state directly from the device (replaces `LightChannel.getState()`)
+- `ChannelState.ctRange` — color temperature range `[min, max]` fetched from device; `null` if unsupported
+- Props push-event parsed by the library before emission — `device.on('props')` now receives structured `{ main, bg }` instead of a flat `Record<string, string>`
+- Main channel uses `main_power` prop with fallback to `power` for correct state tracking on dual-zone devices
+
+### Fixed
+
+- `power` prop no longer incorrectly mapped to main channel on dual-channel devices (was shadowing `main_power`)
+- Background channel `getState()` destructuring used wrong field names — corrected
+- Brightness `NaN` guard — `parseInt` fallback to `0` for empty prop values returned by firmware
+- Props push-notification handler now correctly maps `power` field for dual-channel devices
+
+### CLI
+
+- CT range displayed next to color temperature in `status` output
+- CT color algorithm range remapped to `[1700, 7500]` for wide-range devices (device reports `[1700, 6500]`)
+
+### Breaking Changes
+
+- `device.on('props')` callback signature changed: receives `{ main: Record<string, string>, bg: Record<string, string> }` instead of a flat `Record<string, string>`
+- `LightChannel.getState()` removed — use `YeelightDevice.getState()` instead
+
 ## 1.2.0 (2026-03-28)
 
 ### Added
