@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.4 (2026-04-09)
+
+### Fixed
+
+- Power state detection for single-channel devices — `main_power` truthiness check now correctly falls through to `power` when the device returns an empty string
+
 ## 1.3.0 (2026-04-07)
 
 ### Added

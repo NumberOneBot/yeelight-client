@@ -1,6 +1,6 @@
 {
   "name": "yeelight-cli",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "CLI tool for controlling Yeelight smart lights over LAN",
   "license": "MIT",
   "type": "module",

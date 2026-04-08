@@ -1,5 +1,15 @@
 # yeelight-cli
 
+## 1.3.4 (2026-04-09)
+
+### Patch Changes
+
+- Sort discovered devices by model name in `discover` output and device picker
+- Fix color label — display "Color temp" instead of "CT" in device capability list
+- Reorder `ct+rgb` labels: Color temp shown first, RGB second
+- Use `greenBright` for Segments indicator
+- Update `adjust` help text: "color temp" instead of "CT"
+
 ## 1.3.3
 
 ### Patch Changes
