@@ -54,7 +54,7 @@ export function DeviceRow({
         <CapsText value={device.main} />
         {device.bg && (
           <>
-            <Text dimColor> · </Text>
+            <Text dimColor>+</Text>
             <Text dimColor>bg:</Text>
             <CapsText value={device.bg} />
           </>

@@ -43,8 +43,9 @@ export function DevicePicker({
         : YeelightDevice.discover({ timeout })
     discover
       .then((found: YeelightDevice[]) => {
-        setDevices(found)
-        onDevicesFound?.(found)
+        const sorted = [...found].sort((a, b) => a.model.localeCompare(b.model))
+        setDevices(sorted)
+        onDevicesFound?.(sorted)
       })
       .catch((e: Error) => setError(e.message))
   }, [scanKey])

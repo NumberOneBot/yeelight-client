@@ -18,13 +18,15 @@ export function DiscoverCommand({ timeout }: { timeout: number }) {
     YeelightDevice.discover({ timeout })
       .then((found) => {
         setDevices(
-          found.map((d) => ({
-            ip: d.ip,
-            model: d.model,
-            main: channelCaps(d.main.capabilities),
-            bg: d.background ? channelCaps(d.background.capabilities) : null,
-            segments: d.capabilities.hasSegments
-          }))
+          [...found]
+            .sort((a, b) => a.model.localeCompare(b.model))
+            .map((d) => ({
+              ip: d.ip,
+              model: d.model,
+              main: channelCaps(d.main.capabilities),
+              bg: d.background ? channelCaps(d.background.capabilities) : null,
+              segments: d.capabilities.hasSegments
+            }))
         )
       })
       .catch((e: Error) => {
