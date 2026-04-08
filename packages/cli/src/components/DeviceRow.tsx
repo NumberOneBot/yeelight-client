@@ -22,12 +22,12 @@ export function CapsText({ value }: { value: string }) {
   if (value === 'ct+rgb')
     return (
       <>
-        <Text color="redBright">RGB</Text>
+        <Text color="white">Color temp</Text>
         <Text dimColor>+</Text>
-        <Text color="yellow">CT</Text>
+        <Text color="redBright">RGB</Text>
       </>
     )
-  if (value === 'ct') return <Text color="yellow">CT</Text>
+  if (value === 'ct') return <Text color="white">Color temp</Text>
   if (value === 'rgb') return <Text color="redBright">RGB</Text>
   return <Text color="yellow">Brightness</Text>
 }
@@ -54,15 +54,15 @@ export function DeviceRow({
         <CapsText value={device.main} />
         {device.bg && (
           <>
-            <Text dimColor>·</Text>
-            <Text dimColor>background:</Text>
+            <Text dimColor> · </Text>
+            <Text dimColor>bg:</Text>
             <CapsText value={device.bg} />
           </>
         )}
         {device.segments && (
           <>
             <Text dimColor>+</Text>
-            <Text color="green">Segments</Text>
+            <Text color="greenBright">Segments</Text>
           </>
         )}
       </Box>

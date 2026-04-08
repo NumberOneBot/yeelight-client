@@ -112,7 +112,7 @@ export function HelpScreen() {
           <Cmd
             name="adjust"
             args="<brightness|ct|color>"
-            desc="Relative brightness / CT / color adjust"
+            desc="Relative brightness / color temp / color adjust"
           />
         </Box>
       </Box>
