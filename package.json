@@ -47,7 +47,9 @@
     "typecheck": "tsc --noEmit",
     "docs:dev": "pnpm --filter yeelight-client-docs dev",
     "docs:build": "pnpm --filter yeelight-client-docs build",
-    "release": "pnpm build && pnpm changeset publish"
+    "typecheck": "tsc --noEmit",
+    "typecheck:all": "pnpm typecheck && pnpm --filter yeelight-cli typecheck",
+    "release": "pnpm typecheck:all && pnpm build && pnpm changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.30.0",

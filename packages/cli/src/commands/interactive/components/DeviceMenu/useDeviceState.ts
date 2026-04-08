@@ -11,18 +11,15 @@ export function useDeviceState(
   const toggle = useAsyncAction()
 
   useEffect(() => {
-    device.main
+    device
       .getState()
-      .then((s) => {
-        onFetched?.('main', s)
-        setMainState(s)
-      })
-      .catch(() => {})
-    device.background
-      ?.getState()
-      .then((s) => {
-        onFetched?.('bg', s)
-        setBgState(s)
+      .then(({ main, bg }) => {
+        onFetched?.('main', main)
+        setMainState(main)
+        if (bg) {
+          onFetched?.('bg', bg)
+          setBgState(bg)
+        }
       })
       .catch(() => {})
   }, [device])
@@ -46,7 +43,9 @@ export function useDeviceState(
     const ch = channel === 'bg' ? device.background! : device.main
     toggle.run(async () => {
       await ch.toggle()
-      const state = await ch.getState()
+      const { main, bg } = await device.getState()
+      const state = channel === 'bg' ? bg : main
+      if (!state) return
       onDone?.(state)
       if (channel === 'bg') setBgState(state)
       else setMainState(state)

@@ -60,8 +60,7 @@ export function StatusCommand({
     ;(async () => {
       try {
         const device = await resolveDevice(ip, { timeout, withMeta: true })
-        const main = await device.main.getState()
-        const bg = device.background ? await device.background.getState() : null
+        const { main, bg } = await device.getState()
         const raw = showRaw ? await device.getRawProps(rawPropNames) : {}
         setData({
           ip: device.ip,
