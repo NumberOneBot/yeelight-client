@@ -5,6 +5,7 @@
 ### Fixed
 
 - Power state detection for single-channel devices — `main_power` truthiness check now correctly falls through to `power` when the device returns an empty string
+- `discover()` SSDP scan returning 0 devices on Windows when virtual network adapters (Hyper-V, VMware) are present — the previous implementation used a single shared UDP socket with sequential `setMulticastInterface()` calls, which is a race condition in Node.js: all `send()` calls are asynchronous but `IP_MULTICAST_IF` is set synchronously, so all packets were sent through whichever interface was set last (typically a virtual one). Fixed by creating one UDP socket per physical interface
 
 ## 1.3.0 (2026-04-07)
 
