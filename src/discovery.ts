@@ -55,57 +55,59 @@ export function discover(
   timeoutMs = SSDP_TIMEOUT_MS,
   signal?: AbortSignal
 ): Promise<DeviceInfo[]> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (signal?.aborted) {
       resolve([])
       return
     }
-    const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true })
+
     const devices: DeviceInfo[] = []
     const seen = new Set<string>()
+    const buf = Buffer.from(SEARCH_MESSAGE)
 
-    socket.on('error', reject)
+    // One socket per physical interface — avoids the race condition where
+    // sequential setMulticastInterface + async send calls on a shared socket
+    // cause all packets to be sent through whichever interface was set last
+    // (a real problem on Windows with Hyper-V / VMware virtual adapters).
+    const addresses = physicalInterfaces()
+    if (addresses.length === 0) addresses.push('0.0.0.0')
 
-    socket.on('message', (msg) => {
-      const text = msg.toString('utf8')
-      const device = parseDeviceHeaders(text)
-      if (device && !seen.has(device.id || device.ip)) {
-        seen.add(device.id || device.ip)
-        devices.push(device)
-      }
-    })
-
-    socket.bind(() => {
-      const buf = Buffer.from(SEARCH_MESSAGE)
-
-      // Send M-SEARCH through every physical interface so the correct
-      // one reaches the lamp regardless of OS multicast routing.
-      const addresses = physicalInterfaces()
-      if (addresses.length === 0) addresses.push('0.0.0.0')
-
-      for (const addr of addresses) {
+    const sockets = addresses.map((addr) => {
+      const sock = dgram.createSocket({ type: 'udp4', reuseAddr: true })
+      sock.on('error', () => {
+        /* skip unreachable interfaces */
+      })
+      sock.on('message', (msg) => {
+        const device = parseDeviceHeaders(msg.toString('utf8'))
+        if (device && !seen.has(device.id || device.ip)) {
+          seen.add(device.id || device.ip)
+          devices.push(device)
+        }
+      })
+      sock.bind({ address: addr }, () => {
         try {
-          socket.setMulticastInterface(addr)
-          socket.send(buf, 0, buf.length, SSDP_PORT, SSDP_ADDRESS)
+          sock.setMulticastInterface(addr)
+          sock.send(buf, 0, buf.length, SSDP_PORT, SSDP_ADDRESS)
         } catch {
           // interface doesn't support multicast — skip
         }
-      }
-
-      setTimeout(() => {
-        socket.close()
-        resolve(devices)
-      }, timeoutMs)
-
-      signal?.addEventListener(
-        'abort',
-        () => {
-          socket.close()
-          resolve(devices)
-        },
-        { once: true }
-      )
+      })
+      return sock
     })
+
+    const finish = () => {
+      for (const sock of sockets) {
+        try {
+          sock.close()
+        } catch {
+          /* already closed */
+        }
+      }
+      resolve(devices)
+    }
+
+    setTimeout(finish, timeoutMs)
+    signal?.addEventListener('abort', finish, { once: true })
   })
 }
 
