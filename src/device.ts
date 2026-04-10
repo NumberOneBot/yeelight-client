@@ -128,6 +128,9 @@ export class YeelightDevice extends EventEmitter {
    * By default, tries unicast SSDP first to resolve model + capabilities;
    * falls back to get_prop probe if SSDP times out.
    *
+   * Pass `{ capabilities }` to use pre-known capabilities (e.g. from a prior
+   * scan) — skips all discovery, uses exactly the provided capabilities.
+   *
    * Pass `{ discover: false }` to skip all discovery — just TCP handshake.
    * Use this when the caller already knows what commands the device supports
    * (e.g. single-shot CLI control commands). Assumes full capabilities.
@@ -135,10 +138,22 @@ export class YeelightDevice extends EventEmitter {
   static async connect(
     ip: string,
     port = DEFAULT_PORT,
-    opts?: { discover?: boolean }
+    opts?: { discover?: boolean; capabilities?: Capabilities }
   ): Promise<YeelightDevice> {
     const transport = new Transport()
     await transport.connect(ip, port)
+
+    if (opts?.capabilities) {
+      return new YeelightDevice({
+        id: '',
+        ip,
+        port,
+        model: 'unknown',
+        name: '',
+        capabilities: opts.capabilities,
+        transport
+      })
+    }
 
     if (opts?.discover === false) {
       return new YeelightDevice({
@@ -333,12 +348,7 @@ export class YeelightDevice extends EventEmitter {
     const caps = this.main.capabilities
 
     if (raw.main_power) result.power = raw.main_power === 'on'
-    else if (raw.power !== undefined)
-      // `power` is used both by single-channel devices and in push notifications
-      // (props method) from dual-channel devices — the device sends `power`, not
-      // `main_power`, when the main LED state changes externally.
-      // Single-channel devices return '' for main_power — fall through to `power`.
-      result.power = raw.power === 'on'
+    else if (raw.power !== undefined) result.power = raw.power === 'on'
     if ('bright' in raw) result.brightness = parseInt(raw.bright, 10) || 0
     if ('ct' in raw) {
       const v = parseInt(raw.ct, 10)
