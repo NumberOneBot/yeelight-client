@@ -6,6 +6,7 @@ export { UnsupportedError, ConnectionError, DeviceError } from './errors.js'
 export type { Capabilities } from './capabilities.js'
 export type {
   ChannelState,
+  ColorMode,
   TransitionOptions,
   ChannelCapabilities,
   PowerMode,

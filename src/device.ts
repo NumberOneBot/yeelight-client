@@ -287,6 +287,7 @@ export class YeelightDevice extends EventEmitter {
       'bright',
       'ct',
       'rgb',
+      'color_mode',
       'flowing',
       'min_ct',
       'max_ct'
@@ -297,6 +298,8 @@ export class YeelightDevice extends EventEmitter {
           'bg_bright',
           'bg_ct',
           'bg_rgb',
+          'bg_color_mode',
+          'bg_lmode',
           'bg_flowing',
           'bg_min_ct',
           'bg_max_ct'
@@ -318,6 +321,7 @@ export class YeelightDevice extends EventEmitter {
           ? [ctMin, ctMax]
           : null,
       rgb: mainPartial.rgb ?? null,
+      colorMode: mainPartial.colorMode ?? null,
       flowing: mainPartial.flowing ?? false
     }
 
@@ -335,6 +339,7 @@ export class YeelightDevice extends EventEmitter {
           ? [bgCtMin, bgCtMax]
           : null,
       rgb: bgPartial.rgb ?? null,
+      colorMode: bgPartial.colorMode ?? null,
       flowing: bgPartial.flowing ?? false
     }
 
@@ -366,6 +371,10 @@ export class YeelightDevice extends EventEmitter {
           ? [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
           : null
     }
+    if ('color_mode' in raw) {
+      const v = parseInt(raw.color_mode, 10)
+      result.colorMode = v === 1 || v === 2 || v === 3 ? v : null
+    }
     if ('flowing' in raw) result.flowing = raw.flowing === '1'
 
     return result
@@ -392,6 +401,10 @@ export class YeelightDevice extends EventEmitter {
         caps.hasColor && !isNaN(v) && v > 0
           ? [(v >> 16) & 0xff, (v >> 8) & 0xff, v & 0xff]
           : null
+    }
+    if ('bg_color_mode' in raw || 'bg_lmode' in raw) {
+      const v = parseInt(raw.bg_color_mode || raw.bg_lmode, 10)
+      result.colorMode = v === 1 || v === 2 || v === 3 ? v : null
     }
     if ('bg_flowing' in raw) result.flowing = raw.bg_flowing === '1'
 

@@ -28,12 +28,16 @@ export interface PowerOptions extends TransitionOptions {
   mode?: PowerMode
 }
 
+/** Active color mode. 1=RGB, 2=CT, 3=HSV. Null when device does not report it. */
+export type ColorMode = 1 | 2 | 3
+
 export interface ChannelState {
   power: boolean
   brightness: number
   colorTemp: number | null
   ctRange: [number, number] | null
   rgb: [number, number, number] | null
+  colorMode: ColorMode | null
   flowing: boolean
 }
 
