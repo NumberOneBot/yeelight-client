@@ -10,6 +10,19 @@ A **TypeScript monorepo** for controlling Yeelight smart lights over LAN. It shi
 
 **Package manager:** pnpm workspaces (pnpm 10+). Runtime: Bun for CLI, Node.js for everything else.
 
+## Two Separate Git Repositories
+
+This workspace contains **two independent git repos**:
+
+| Repo               | Path                                                        | Remote                                     |
+| ------------------ | ----------------------------------------------------------- | ------------------------------------------ |
+| `yeelight-client`  | `c:\Users\dark\Documents\yeelight-client\`                  | `github.com/NumberOneBot/yeelight-client`  |
+| `yeelight-desktop` | `c:\Users\dark\Documents\yeelight-client\packages\desktop\` | `github.com/NumberOneBot/yeelight-desktop` |
+
+- The root `.gitignore` excludes `packages/desktop/` — desktop files are **never** tracked by the outer repo.
+- When committing changes inside `packages/desktop/**`, always `cd` into `packages/desktop` and commit there.
+- When committing changes outside `packages/desktop/`, commit from the root `yeelight-client` repo.
+
 ## Monorepo Structure
 
 ```
@@ -100,11 +113,14 @@ pnpm --filter yeelight-cli build:win        # compile CLI binary for Windows
 
 ### Architectural Change Protocol
 
-Before proposing or implementing any change that replaces or moves functionality:
+Before proposing or implementing **any change to a UI component** — including styling, hover states, colors, or layout — as well as any change that replaces or moves functionality:
 
-1. **Find all call sites** — use `vscode_listCodeUsages` or `grep_search` on every symbol being replaced. Cover the entire monorepo, not just the file being changed.
-2. **Enumerate dead code** — explicitly list what becomes unreachable after the change. Include methods, IPC handlers, preload bindings, and types.
-3. **Plan deletions alongside additions** — the change list must contain both. A proposal that only lists new code is incomplete.
+1. **Find all call sites** — use `vscode_listCodeUsages` or `grep_search` on every symbol being changed. Cover the entire monorepo, not just the file being changed.
+2. **If the same structure appears in 2+ places** — extract a shared component first, then make the change once. Never fix one instance and move on.
+3. **Enumerate dead code** — explicitly list what becomes unreachable after the change. Include methods, IPC handlers, preload bindings, and types.
+4. **Plan deletions alongside additions** — the change list must contain both. A proposal that only lists new code is incomplete.
+
+> "Small styling fix" is not an exemption from this protocol. Grep first, always.
 
 ### Naming
 
@@ -130,3 +146,18 @@ Sub-components are always preferred over inline render functions. Extract `const
 ### Reuse Before Build
 
 Before writing any new UI sub-component, check for an existing one. In the CLI — look at other command components. In the docs — check `packages/docs/components/`.
+
+### DRY: Extract Before Copy
+
+**Never duplicate render logic.** Before writing a second file that would contain the same JSX structure, data shape, or mapping pattern as an existing file — stop and extract a shared component first.
+
+The rule fires at the **second instance**, not the third:
+
+- Adding a new page that renders the same kind of data as an existing page? → shared component first, then both pages use it.
+- Same `map()` over a typed array, same conditional heading/text structure, same layout skeleton? → that's a component, not a copy.
+
+A file that only configures a shared component (passes props, imports content) is the correct end state. A file that re-implements the same render logic is always wrong.
+
+This applies even when the existing file is "simple". Complexity is irrelevant — duplication is the violation.
+
+**Check before writing:** look at sibling files in the same folder. If a new file's render would mirror an existing one, extract first.
