@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+      - 'yeelight-cli@*'
 
 permissions:
   contents: write
