@@ -1,4 +1,3 @@
-import React from 'react'
 import { Newline, Text } from 'ink'
 
 const lanHint = ' Make sure LAN Control is enabled.'

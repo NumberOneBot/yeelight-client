@@ -1,4 +1,3 @@
-import React from 'react'
 import { useCommand } from '../useCommand'
 import { resolveDevice } from '../resolve'
 import { ErrorText } from '../components'

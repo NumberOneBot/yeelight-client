@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Box, useInput } from 'ink'
 import type { ReactNode } from 'react'
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, Text, useApp } from 'ink'
 import type { CronTimer } from 'yeelight-client'
 import { useCommand } from '../useCommand'

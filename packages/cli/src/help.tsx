@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { Box, Text, useApp } from 'ink'
 
 function Cmd({
@@ -64,7 +64,7 @@ function StdOpts() {
 
 export function HelpScreen() {
   const { exit } = useApp()
-  React.useEffect(() => {
+  useEffect(() => {
     exit()
   }, [])
 
@@ -143,11 +143,11 @@ export function HelpScreen() {
 
 export function CommandHelpScreen({ cmd }: { cmd: string }) {
   const { exit } = useApp()
-  React.useEffect(() => {
+  useEffect(() => {
     exit()
   }, [])
 
-  const screens: Record<string, React.ReactNode> = {
+  const screens: Record<string, ReactNode> = {
     discover: (
       <>
         <UsageLine cmd="discover" />

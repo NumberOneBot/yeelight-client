@@ -1,3 +1,4 @@
+import { type JSX } from 'react'
 import { Box, Text } from 'ink'
 import type { ChannelState } from 'yeelight-client'
 import { ctToColor, rgbHex } from '../../../../../../utils/color'
