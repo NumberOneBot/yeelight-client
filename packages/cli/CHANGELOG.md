@@ -1,5 +1,12 @@
 # yeelight-cli
 
+## 1.3.6 (2026-04-24)
+
+### Patch Changes
+
+- Migrate to ink 7 and React 19
+- Remove unused `react-devtools-core` dev dependency
+
 ## 1.3.5 (2026-04-09)
 
 ### Patch Changes
