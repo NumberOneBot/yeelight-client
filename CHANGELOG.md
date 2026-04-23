@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.5 (2026-04-24)
+
+### Added
+
+- `ColorMode` type (`1`=RGB, `2`=CT, `3`=HSV) — exported from package index
+- `colorMode: ColorMode | null` field in `ChannelState` — tracks the active color mode reported by the device; Yeelight devices always return both `rgb` and `ct` values regardless of which mode is active, so without this field consumers had no way to know which value to display
+
+### Fixed
+
+- `getState()` now fetches `color_mode` for the main channel and `bg_color_mode` / `bg_lmode` for the background channel (`bg_lmode` is an empirically observed firmware alias)
+
 ## 1.3.4 (2026-04-09)
 
 ### Fixed

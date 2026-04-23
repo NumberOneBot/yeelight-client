@@ -1,5 +1,12 @@
 # yeelight-cli
 
+## 1.3.5 (2026-04-09)
+
+### Patch Changes
+
+- Move `yeelight-client` from `dependencies` to `devDependencies` — library is bundled into the CLI binary and does not need to be installed by consumers
+- Add `prepublishOnly` script to guarantee the build runs before every `npm publish`
+
 ## 1.3.4 (2026-04-09)
 
 ### Patch Changes
