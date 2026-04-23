@@ -46,7 +46,6 @@
     "@types/minimist": "^1.2.5",
     "@types/react": "^18.0.0",
     "rcedit": "^5.0.2",
-    "react-devtools-core": "^4.19.1",
     "yeelight-client": "workspace:*"
   },
   "dependencies": {

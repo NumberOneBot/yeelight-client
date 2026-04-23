@@ -51,9 +51,6 @@ importers:
       rcedit:
         specifier: ^5.0.2
         version: 5.0.2
-      react-devtools-core:
-        specifier: ^4.19.1
-        version: 4.28.5
       yeelight-client:
         specifier: workspace:*
         version: link:../..
@@ -5647,6 +5644,7 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    optional: true
 
   react-dom@19.2.4(react@19.2.4):
     dependencies:
@@ -5969,7 +5967,8 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  shell-quote@1.8.3: {}
+  shell-quote@1.8.3:
+    optional: true
 
   shiki@3.23.0:
     dependencies:
@@ -6294,7 +6293,8 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.2.0
 
-  ws@7.5.10: {}
+  ws@7.5.10:
+    optional: true
 
   ws@8.19.0: {}
 
