@@ -7,7 +7,7 @@
   "author": "NumberOneBot",
   "repository": {
     "type": "git",
-    "url": "https://github.com/NumberOneBot/yeelight-client.git",
+    "url": "git+https://github.com/NumberOneBot/yeelight-client.git",
     "directory": "packages/cli"
   },
   "homepage": "https://numberonebot.github.io/yeelight-client",
@@ -25,7 +25,7 @@
     "access": "public"
   },
   "bin": {
-    "ylc": "./dist/index.js"
+    "ylc": "dist/index.js"
   },
   "files": [
     "dist"
