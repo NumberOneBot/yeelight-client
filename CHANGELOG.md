@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.7
+
+### Patch Changes
+
+- Update dependencies to current versions and align the library and CLI to a shared version.
+
+  - CLI: react 19.2.7, ink 7.1.0, react-devtools-core 7, @types/react 19.2.17
+  - Library: @types/node 26, prettier 3.9.5, tsx 4.23.0, @types/bun 1.3.14
+  - Docs (internal): upgraded to Next 16; pinned zod to 4.3.6 to keep Nextra 4.6.1 rendering working
+
 ## 1.3.5 (2026-04-24)
 
 ### Added
