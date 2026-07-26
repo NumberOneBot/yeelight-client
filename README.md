@@ -440,7 +440,8 @@ pnpm install
 
 pnpm dev                                    # library watch mode
 pnpm build                                  # build library (ESM + CJS + DTS)
-pnpm --filter yeelight-cli dev              # CLI dev
+pnpm cli:dev                                # CLI dev (prints help without args)
+pnpm cli:i                                  # CLI dev in interactive mode
 pnpm --filter yeelight-client-docs dev      # docs dev server
 ```
 
