@@ -3,12 +3,13 @@
 # Requires: vhs, ttyd, ffmpeg on PATH; dist/ylc built (pnpm --filter yeelight-cli build:mac-arm64).
 # First run: grant Terminal "Local Network" permission so SSDP discovery works.
 
-Output ../assets/demo.gif
+Output ./demo.gif
 Set Shell zsh
+Set FontFamily "Cascadia Code"
 Set FontSize 16
-Set Width 1100
-Set Height 440
-Set Padding 24
+Set Width 940
+Set Height 500
+Set Padding 18
 Set TypingSpeed 80ms
 
 # setup out of frame: put the compiled ylc on PATH, clear the screen
@@ -18,31 +19,62 @@ Enter
 Type "clear"
 Enter
 Show
-Sleep 600ms
+Sleep 200ms
 
 # discover — native SSDP is fast (~3s), so this stays snappy (no scan trim needed)
 Type "ylc interactive"
 Sleep 400ms
 Enter
-Sleep 4s
-Sleep 1200ms
+Sleep 5s
 
 # browse the device list
-Down@700ms 2
-Sleep 900ms
-Up@700ms 2
-Sleep 900ms
+Down@400ms 4
+Sleep 600ms
+Up@400ms 4
+Sleep 600ms
 
 # connect to the first (color) lamp
 Enter
-Sleep 2500ms
-Sleep 1000ms
+Sleep 2000ms
+
+# turn on the lamp
+Enter
+Sleep 1200ms
 
 # browse the control menu
-Down@700ms 3
-Sleep 1s
-Up@700ms 3
-Sleep 900ms
+Down
+Sleep 600ms
+Enter
+Sleep 2000ms
+
+# brightness
+
+Up@400ms 5
+Sleep 600ms
+Enter
+Sleep 600ms
+Down@400ms 6
+Enter
+Sleep 1200ms
+
+# color temp
+
+Down
+Sleep 600ms
+Enter
+Sleep 1200ms
+Up@400ms 8
+Sleep 600ms
+Enter
+Sleep 1200ms
+Left
+Sleep 1200ms
+
+# show rgb color menu
+Down
+Sleep 600ms
+Enter
+Sleep 2000ms
 
 # back to the device list, then quit
 Left
