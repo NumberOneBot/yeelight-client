@@ -50,6 +50,7 @@
     "typecheck": "tsc --noEmit",
     "cli:dev": "pnpm --filter yeelight-cli dev",
     "cli:i": "pnpm --filter yeelight-cli dev:i",
+    "cli:i:ip": "pnpm --filter yeelight-cli dev:i:ip",
     "docs:dev": "pnpm --filter yeelight-client-docs dev",
     "docs:build": "pnpm --filter yeelight-client-docs build",
     "typecheck:all": "pnpm typecheck && pnpm --filter yeelight-cli typecheck",

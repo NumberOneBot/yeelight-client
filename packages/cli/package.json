@@ -33,6 +33,7 @@
   "scripts": {
     "dev": "bun run src/index.tsx",
     "dev:i": "bun run src/index.tsx interactive",
+    "dev:i:ip": "bun run src/index.tsx interactive --sort ip",
     "build:node": "tsup",
     "build:win": "bun build src/index.tsx --compile --target bun-windows-x64 --outfile dist/ylc.exe",
     "postbuild:win": "node scripts/set-icon.mjs",

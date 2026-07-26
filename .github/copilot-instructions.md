@@ -67,6 +67,7 @@ packages/
 pnpm dev                                    # library watch mode
 pnpm cli:dev                                # CLI (= bun run src/index.tsx)
 pnpm cli:i                                  # CLI in interactive mode (= ... interactive)
+pnpm cli:i:ip                               # interactive mode, list sorted by IP
 pnpm --filter yeelight-client-docs dev      # docs dev server
 pnpm build                                  # build library (tsup)
 pnpm --filter yeelight-cli build:win        # compile CLI binary for Windows

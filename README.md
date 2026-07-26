@@ -442,6 +442,7 @@ pnpm dev                                    # library watch mode
 pnpm build                                  # build library (ESM + CJS + DTS)
 pnpm cli:dev                                # CLI dev (prints help without args)
 pnpm cli:i                                  # CLI dev in interactive mode
+pnpm cli:i:ip                               # same, device list sorted by IP
 pnpm --filter yeelight-client-docs dev      # docs dev server
 ```
 
