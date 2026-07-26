@@ -26,6 +26,10 @@ jobs:
             script: build:mac-x64
             artifact: dist/ylc-x64
             asset: ylc-macos-x64
+          - os: ubuntu-latest
+            script: build:linux-x64
+            artifact: dist/ylc-linux-x64
+            asset: ylc-linux-x64
 
     runs-on: ${{ matrix.os }}
 

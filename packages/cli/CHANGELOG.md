@@ -1,5 +1,20 @@
 # yeelight-cli
 
+## 1.4.0
+
+### Minor Changes
+
+- Add `--sort <model|ip>` to interactive mode — order the device list by model (default) or IP (octet-aware, so `192.168.1.9` sorts before `192.168.1.10`; equal models fall back to IP for a stable order).
+
+  Interactive fixes:
+
+  - Lock the menu while a power toggle is in flight (`toggle()` plus a `getState()` round trip), so the cursor can no longer move or open a subscreen mid-switch; the focused row renders muted while input is ignored.
+  - Quit now works on non-Latin keyboard layouts — the physical `q` key on ЙЦУКЕН, Serbian/Macedonian Cyrillic and Arabic/Persian, not just Latin `q`.
+
+  Precompiled **Linux (x64)** binaries are now published to Releases, alongside the existing Windows and macOS builds.
+
+  Also: cleaner `npm publish` (bin path + repository metadata), and a macOS demo-recording guide with an interactive demo GIF embedded in the README and docs.
+
 ## 1.3.7
 
 ### Patch Changes
