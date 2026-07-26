@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Box, useInput } from 'ink'
 import type { ReactNode } from 'react'
+import { isQuitKey } from '../../../utils/keys'
 
 type Props<T> = {
   items: T[]
@@ -11,6 +12,8 @@ type Props<T> = {
   onCursorChange?: (cursor: number) => void
   isSelectable?: (item: T) => boolean
   initialCursor?: number
+  /** Ignore navigation/selection while a command is in flight (quit still works) */
+  disabled?: boolean
 }
 
 export function SelectList<T>({
@@ -21,7 +24,8 @@ export function SelectList<T>({
   onQuit,
   onCursorChange,
   isSelectable,
-  initialCursor
+  initialCursor,
+  disabled = false
 }: Props<T>) {
   const sel = (i: number) => !isSelectable || isSelectable(items[i])
 
@@ -50,6 +54,12 @@ export function SelectList<T>({
   }
 
   useInput((input, key) => {
+    if (isQuitKey(input)) {
+      setCursor((c) => c)
+      ;(onQuit ?? onCancel)?.()
+      return
+    }
+    if (disabled) return
     if (key.upArrow) move(-1)
     if (key.downArrow) move(1)
     if (key.return && sel(cursor)) {
@@ -59,10 +69,6 @@ export function SelectList<T>({
     if (key.escape || key.leftArrow) {
       setCursor((c) => c)
       onCancel?.()
-    }
-    if (input === 'q') {
-      setCursor((c) => c)
-      ;(onQuit ?? onCancel)?.()
     }
   })
 

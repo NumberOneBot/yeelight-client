@@ -189,6 +189,10 @@ export function CommandHelpScreen({ cmd }: { cmd: string }) {
             flag="--scan <ssdp|tcp>"
             desc="Discovery method: ssdp (default) or tcp subnet scan"
           />
+          <Opt
+            flag="--sort <model|ip>"
+            desc="Device list order: model (default) or ip"
+          />
           <Opt flag="--debug" desc="Log all device tx/rx frames to debug.log" />
         </Box>
       </>

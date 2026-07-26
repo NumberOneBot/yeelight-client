@@ -23,9 +23,7 @@ export function PropRow({
     return (
       <Box gap={1} marginTop={1}>
         <Text color={focused ? 'cyan' : undefined}>{focused ? '›' : ' '}</Text>
-        <Text bold={focused} color={focused ? 'cyan' : undefined}>
-          ↩ Back
-        </Text>
+        <Text color={focused ? 'cyan' : undefined}>↩ Back</Text>
       </Box>
     )
   }
@@ -59,10 +57,7 @@ export function PropRow({
     <Box gap={1} marginTop={isCustom ? 1 : 0}>
       <Text color={focused ? 'cyan' : undefined}>{focused ? '›' : ' '}</Text>
       <Box minWidth={labelWidth}>
-        <Text
-          bold={focused || cur}
-          color={cur ? 'green' : focused ? 'cyan' : undefined}
-        >
+        <Text color={cur ? 'green' : focused ? 'cyan' : undefined}>
           {label}
         </Text>
       </Box>

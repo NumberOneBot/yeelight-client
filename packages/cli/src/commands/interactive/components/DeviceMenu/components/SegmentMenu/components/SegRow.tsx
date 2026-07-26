@@ -21,9 +21,7 @@ export function SegRow({
     return (
       <Box gap={1} marginTop={1}>
         <Text color={focused ? 'cyan' : undefined}>{focused ? '›' : ' '}</Text>
-        <Text bold={focused} color={focused ? 'cyan' : undefined}>
-          ↩ Back
-        </Text>
+        <Text color={focused ? 'cyan' : undefined}>↩ Back</Text>
       </Box>
     )
   }
@@ -33,11 +31,7 @@ export function SegRow({
     return (
       <Box gap={1} marginTop={1}>
         <Text color={active ? 'cyan' : undefined}>{active ? '›' : ' '}</Text>
-        <Text
-          bold={active}
-          color={active ? 'cyan' : undefined}
-          dimColor={!ready}
-        >
+        <Text color={active ? 'cyan' : undefined} dimColor={!ready}>
           Apply
         </Text>
       </Box>

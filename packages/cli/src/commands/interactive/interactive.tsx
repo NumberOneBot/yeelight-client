@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Box, Text, useApp, useInput } from 'ink'
 import { YeelightDevice } from 'yeelight-client'
 import { Dots, ErrorText } from '../../components'
+import { isQuitKey } from '../../utils/keys'
+import type { DeviceSort } from '../../utils/sort'
 import { DeviceMenu, DevicePicker } from './components'
 
 type Screen =
@@ -16,12 +18,14 @@ export function InteractiveCommand({
   timeout,
   debug,
   ip,
-  scanMethod = 'ssdp'
+  scanMethod = 'ssdp',
+  sort = 'model'
 }: {
   timeout: number
   debug?: boolean
   ip?: string
   scanMethod?: 'ssdp' | 'tcp'
+  sort?: DeviceSort
 }) {
   const { exit } = useApp()
   const [screen, setScreen] = useState<Screen>(
@@ -40,7 +44,7 @@ export function InteractiveCommand({
   // always works after screen transitions (Ink/Windows stdin pause issue).
   // Also handles q during connecting screens where no child useInput is active.
   useInput((input) => {
-    if (input === 'q') onQuit()
+    if (isQuitKey(input)) onQuit()
   })
 
   useEffect(() => {
@@ -125,6 +129,7 @@ export function InteractiveCommand({
       <DevicePicker
         timeout={timeout}
         scanMethod={scanMethod}
+        sort={sort}
         initialDevices={cachedDevices}
         initialCursor={pickerCursor}
         onDevicesFound={setCachedDevices}

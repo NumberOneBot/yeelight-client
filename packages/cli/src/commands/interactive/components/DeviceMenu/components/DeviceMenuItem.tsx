@@ -6,11 +6,14 @@ import { RowValue } from './RowValue'
 export function DeviceMenuItem({
   row,
   focused,
-  state
+  state,
+  locked = false
 }: {
   row: MenuRow
   focused: boolean
   state: ChannelState | null
+  /** A command is in flight — input is ignored, so the cursor renders muted */
+  locked?: boolean
 }) {
   if (row.kind === 'section') {
     return (
@@ -33,12 +36,13 @@ export function DeviceMenuItem({
 
   return (
     <Box gap={1} marginTop={row.sep ? 1 : 0}>
-      <Text color={active ? 'cyan' : undefined}>{active ? '›' : ' '}</Text>
+      <Text color={active && !locked ? 'cyan' : undefined} dimColor={locked}>
+        {active ? '›' : ' '}
+      </Text>
       <Box minWidth={14}>
         <Text
-          bold={isBack && active}
-          color={active ? 'cyan' : undefined}
-          dimColor={disabled}
+          color={active && !locked ? 'cyan' : undefined}
+          dimColor={disabled || (active && locked)}
         >
           {row.label}
         </Text>

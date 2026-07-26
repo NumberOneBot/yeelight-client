@@ -41,7 +41,7 @@ export function DeviceRow({
   return (
     <Box gap={2}>
       <Box minWidth={15}>
-        <Text bold={focused} color={focused ? 'cyan' : undefined}>
+        <Text color={focused ? 'cyan' : undefined}>
           {device.ip}
         </Text>
       </Box>

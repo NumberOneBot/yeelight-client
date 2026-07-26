@@ -45,17 +45,18 @@ ylc segment <left> <right>          Left/right segment colors (lamp15)
 
 ## Options
 
-| Flag              | Description                                 |
-| ----------------- | ------------------------------------------- |
-| `--bg`            | Target background channel                   |
-| `--ip <address>`  | Device IP (auto-discover if omitted)        |
-| `--duration <ms>` | Transition duration in ms (default: 0)      |
-| `--timeout <ms>`  | Discovery timeout in ms (default: 3000)     |
-| `--raw`           | Dump all raw property values (status)       |
-| `--commands`      | Show supported commands (status, via SSDP)  |
-| `--debug`         | Log tx/rx frames to debug.log (interactive) |
-| `-h, --help`      | Show help                                   |
-| `-V, --version`   | Show version                                |
+| Flag                 | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `--bg`               | Target background channel                       |
+| `--ip <address>`     | Device IP (auto-discover if omitted)            |
+| `--duration <ms>`    | Transition duration in ms (default: 0)          |
+| `--timeout <ms>`     | Discovery timeout in ms (default: 3000)         |
+| `--sort <model\|ip>` | Device list order (interactive, default: model) |
+| `--raw`              | Dump all raw property values (status)           |
+| `--commands`         | Show supported commands (status, via SSDP)      |
+| `--debug`            | Log tx/rx frames to debug.log (interactive)     |
+| `-h, --help`         | Show help                                       |
+| `-V, --version`      | Show version                                    |
 
 ## Examples
 

@@ -16,12 +16,13 @@ import {
   ToggleCommand
 } from './commands'
 import { HelpScreen, CommandHelpScreen } from './help'
+import { parseSort } from './utils/sort'
 import pkg from '../package.json'
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ['bg', 'help', 'version', 'raw', 'commands', 'debug'],
-  string: ['ip', 'scan'],
-  default: { duration: 0, timeout: 3000, scan: 'ssdp' },
+  string: ['ip', 'scan', 'sort'],
+  default: { duration: 0, timeout: 3000, scan: 'ssdp', sort: 'model' },
   alias: { h: 'help', V: 'version' }
 })
 
@@ -36,6 +37,7 @@ if (argv.version) {
 
 const { ip, bg, duration, timeout, help, raw, commands, debug } = argv
 const scanMethod: 'ssdp' | 'tcp' = argv.scan === 'tcp' ? 'tcp' : 'ssdp'
+const sort = parseSort(argv.sort)
 
 async function main() {
   if (help && subcmd) {
@@ -142,6 +144,7 @@ async function main() {
           debug={debug}
           ip={ip}
           scanMethod={scanMethod}
+          sort={sort}
         />
       ).waitUntilExit()
       break

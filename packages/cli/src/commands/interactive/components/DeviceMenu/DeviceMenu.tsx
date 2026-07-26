@@ -151,10 +151,12 @@ export function DeviceMenu({
         onSelect={handleSelect}
         onCancel={onBack}
         onQuit={onQuit}
+        disabled={toggle.executing}
         renderItem={(row, focused) => (
           <DeviceMenuItem
             row={row}
             focused={focused}
+            locked={toggle.executing}
             state={row.channel === 'bg' ? bgState : mainState}
           />
         )}

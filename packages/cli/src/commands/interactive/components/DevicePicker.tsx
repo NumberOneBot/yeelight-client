@@ -4,6 +4,7 @@ import { YeelightDevice } from 'yeelight-client'
 import { Dots } from '../../../components/Dots'
 import { HintBar } from './HintBar'
 import { channelCaps, DeviceRow } from '../../../components/DeviceRow'
+import { compareDevices, type DeviceSort } from '../../../utils/sort'
 import { SelectList } from './SelectList'
 
 type PickerItem = YeelightDevice | { type: 'rescan' }
@@ -11,6 +12,7 @@ type PickerItem = YeelightDevice | { type: 'rescan' }
 export function DevicePicker({
   timeout,
   scanMethod = 'ssdp',
+  sort = 'model',
   initialDevices = null,
   initialCursor,
   onDevicesFound,
@@ -20,6 +22,7 @@ export function DevicePicker({
 }: {
   timeout: number
   scanMethod?: 'ssdp' | 'tcp'
+  sort?: DeviceSort
   initialDevices?: YeelightDevice[] | null
   initialCursor?: number
   onDevicesFound?: (devices: YeelightDevice[]) => void
@@ -43,7 +46,7 @@ export function DevicePicker({
         : YeelightDevice.discover({ timeout })
     discover
       .then((found: YeelightDevice[]) => {
-        const sorted = [...found].sort((a, b) => a.model.localeCompare(b.model))
+        const sorted = [...found].sort(compareDevices(sort))
         setDevices(sorted)
         onDevicesFound?.(sorted)
       })
@@ -101,9 +104,7 @@ export function DevicePicker({
                 <Text color={focused ? 'cyan' : undefined}>
                   {focused ? '›' : ' '}
                 </Text>
-                <Text bold={focused} color={focused ? 'cyan' : undefined}>
-                  ↺ Rescan
-                </Text>
+                <Text color={focused ? 'cyan' : undefined}>↺ Rescan</Text>
               </Box>
             )
           return (
