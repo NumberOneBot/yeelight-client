@@ -3,5 +3,11 @@ packages:
   - packages/cli
   - packages/docs
 
-onlyBuiltDependencies:
-  - esbuild
+engineStrict: true
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+
+overrides:
+  zod: 4.3.6
