@@ -13,6 +13,10 @@
   <a href="https://github.com/NumberOneBot/yeelight-client/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NumberOneBot/yeelight-client" alt="license" /></a>
 </p>
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/NumberOneBot/yeelight-client/main/packages/cli/demo/demo.gif" width="700" alt="yeelight-cli interactive mode" />
+</p>
+
 ---
 
 > One-shot commands and an interactive TUI for Yeelight devices. Powered by [`yeelight-client`](https://www.npmjs.com/package/yeelight-client).

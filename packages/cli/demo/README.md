@@ -2,8 +2,8 @@
 
 How the interactive-mode GIF in the README and docs is produced.
 
-The tape lives here (`interactive.mac.tape`); rendering it with VHS produces the
-GIF. The published GIF is referenced as `../assets/demo.gif`.
+The tape lives here (`interactive.mac.tape`); rendering it with VHS produces
+`demo.gif` in this folder, which the package READMEs and the docs site embed.
 
 Generate the demo on a **Mac that is on the same LAN as the lamps** — discovery is
 live over SSDP, so `ylc interactive` finds the lamps in a few seconds, exactly what
@@ -63,8 +63,8 @@ bare `ylc`, matching what a user with the package installed would type.
    ```zsh
    vhs demo/interactive.mac.tape
    ```
-   The `Output` line in the tape sets the destination; point it at
-   `../assets/demo.gif` for the published GIF.
+   The tape's `Output ./demo.gif` writes `demo.gif` alongside the tape — the
+   location the READMEs and docs reference.
 3. **Review the GIF, not the tape.** Timings that read fine as numbers are often
    too fast on screen — the device list and each menu need a beat before the next
    keypress.

@@ -15,6 +15,12 @@
   <a href="https://github.com/NumberOneBot/yeelight-client"><img src="https://img.shields.io/badge/TypeScript-5.7-blue" alt="TypeScript" /></a>
 </p>
 
+<p align="center">
+  <img src="packages/cli/demo/demo.gif" width="700" alt="yeelight-cli interactive mode" />
+  <br />
+  <em>The companion CLI, <a href="packages/cli">yeelight-cli</a>, in interactive mode.</em>
+</p>
+
 ---
 
 > **Zero-dependency** TypeScript library for Yeelight devices. SSDP discovery, dual-channel control, color flows, segment lighting — all over your local network.
