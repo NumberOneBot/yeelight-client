@@ -1,0 +1,164 @@
+---
+title: LAN Control
+---
+
+# Enabling LAN Control on Locked Devices
+
+Some Yeelight/Xiaomi lamps ship with **LAN Control disabled and no toggle in the app UI**.
+
+Until it is enabled, the device: **(1)** does **not** answer SSDP discovery, and **(2)** keeps TCP port `55443` closed, so this library cannot reach it. The only way to switch it on is to send the miIO command
+`set_developer_mode 1` over Xiaomi's local `miio` protocol (UDP `54321`). That packet is
+**encrypted with a per-device token** that only the Xiaomi cloud knows — so the procedure is
+always two parts: **(1) obtain the token, (2) flip the flag**. Once the flag is set, the cloud
+and the token are no longer needed — control happens over plain TCP `55443`.
+
+---
+
+## Prerequisites
+
+- The lamp is **powered on** and on the **same Wi-Fi/LAN** as the computer running the commands.
+- Python 3 with [`python-miio`](https://python-miio.readthedocs.io/) installed:
+
+  ```bash
+  pip install python-miio
+  ```
+
+- A Xiaomi account (the one the lamp is paired to) with access to its email for 2FA.
+
+---
+
+## Step 1 — Get the device token
+
+The token is a **32-character hex string** bound to the device at provisioning. You cannot make
+one up; you have to pull it from the Xiaomi cloud. Two ways below — the extractor is the
+recommended one (and works well on Windows).
+
+### Method A — Xiaomi Cloud Tokens Extractor (recommended)
+
+[Xiaomi-cloud-tokens-extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor)
+by PiotrMachowski logs into your Xiaomi cloud account and lists every device with its token.
+
+**Run it:**
+
+- **Windows** — download and run `token_extractor.exe` from the
+  [latest release](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor/releases).
+- **Linux / Home Assistant OS:**
+
+  ```bash
+  bash <(curl -L https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor/raw/master/run.sh)
+  ```
+
+- **Docker:**
+
+  ```bash
+  bash <(curl -L https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor/raw/master/run_docker.sh)
+  ```
+
+- **Manual (from source):**
+
+  ```bash
+  pip3 install -r requirements.txt
+  python3 token_extractor.py
+  ```
+
+**It will prompt you for:**
+
+| Prompt         | What to enter                                                                                      |
+| -------------- | -------------------------------------------------------------------------------------------------- |
+| Username       | Your Xiaomi account — email, phone, or Xiaomi Cloud account ID (**not** a Mi/Roborock/other login) |
+| Password       | The Xiaomi account password                                                                        |
+| Server region  | `cn`, `de`, `us`, `ru`, `sg`, `tw`, `i2`, `in`, … — **leave empty to scan all regions**            |
+| 2FA (if asked) | A verification code sent to your account email                                                     |
+
+**It outputs**, for every device on the account:
+
+- Device **name**
+- **IP address**
+- **Token** ← this is what you need
+- **Model** (e.g. `yeelink.light.lamp1`)
+- **MAC address**
+- (for BLE devices) the BLE encryption key
+
+> The lamp's region matters: token and IDs differ between the China / Europe / Russia / …
+> servers. If your device isn't listed, leave the region blank to scan all of them.
+
+**Gotchas (from the tool's own docs):**
+
+- 2FA is **rate-limited to 3–5 requests per day** depending on region. Don't spam it.
+- Use the **Xiaomi Home / Mi Home** credentials — not credentials from another app (Roborock, etc.).
+- Disable **DNS blockers and ad blockers** while running it, or login can fail silently.
+- If the 2FA code doesn't arrive, check the **spam folder**.
+
+### Method B — `miiocli cloud` (alternative)
+
+`python-miio` ships its own cloud fetch (via `micloud`):
+
+```bash
+miiocli cloud
+```
+
+It asks for the same username / password / region and prints the device list with `ip`, `token`,
+and `did`. Handy if you already have `python-miio` installed and don't want a second tool.
+
+### Method C — from an Android app backup (legacy)
+
+Documented by python-miio, kept here for completeness — extracts the token from a Yeelight
+Android app backup:
+
+```bash
+adb backup -noapk com.yeelight.cherry -f yeelight.ab
+miio-extract-tokens yeelight.ab --password a
+```
+
+---
+
+## Step 2 — Enable developer / LAN mode
+
+With the device's `IP` and `TOKEN` from Step 1:
+
+```bash
+miiocli yeelight --ip <IP> --token <TOKEN> set_developer_mode 1
+```
+
+**Success** looks like:
+
+```
+Setting developer mode to True.
+['ok']
+```
+
+This opens port `55443` and enables the Yeelight inter-operation protocol. The command travels
+over the local `miio` transport (UDP `54321`, AES-encrypted with the token) — the cloud is not
+involved.
+
+---
+
+## Step 3 — Verify
+
+```bash
+miiocli yeelight --ip <IP> --token <TOKEN> status
+```
+
+A valid response (power, brightness, color mode, RGB/HSV, temperature) confirms the device is
+live. From here it also answers SSDP discovery and accepts TCP connections on `55443`, so you can
+switch to this library / the `ylc` CLI — **no token or cloud needed anymore.**
+
+---
+
+## Caveats
+
+- **Not always persistent.** Some firmwares reset `developer_mode` after a reboot or OTA update —
+  you may have to repeat Step 2.
+- **Re-pairing changes the token.** Moving the lamp to a new Wi-Fi network or re-adding it in the
+  app rotates the token; re-run Step 1 if control stops working.
+- `miiocli` itself has only basic Yeelight support; it's used here purely to flip the flag.
+
+---
+
+## References
+
+- [Xiaomi-cloud-tokens-extractor (PiotrMachowski)](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) — cloud token / BLE key extractor (Windows exe, Docker, source)
+- [python-miio — Yeelight docs](https://python-miio.readthedocs.io/en/latest/device_docs/yeelight.html) — `miiocli yeelight` commands and token extraction from app backups
+- [python-miio](https://python-miio.readthedocs.io/) — the `miiocli` tool and `miiocli cloud`
+- [Enable LAN Mode on Yeelight Devices (gist, lorenzoraimondi)](https://gist.github.com/lorenzoraimondi/4925378dbe908829b749ee4134328816) — end-to-end walkthrough incl. the `click` pin
+- [Yeelight Forum — Bedside Lamp 2 LAN control removed in 2.0.6_0041](https://forum.yeelight.com/t/topic/22664?page=61)
