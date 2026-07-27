@@ -47,7 +47,7 @@ The tape shows the command line, so it must run the real `ylc`, never
 published CLI.
 
 ```zsh
-pnpm --filter yeelight-cli build:mac-arm64   # produces dist/ylc  (Intel: build:mac-x64)
+pnpm --filter yeelight-cli build:mac-arm64   # produces dist/ylc
 ```
 
 The tape puts `dist` on PATH inside a hidden setup block, so the prompt reads a

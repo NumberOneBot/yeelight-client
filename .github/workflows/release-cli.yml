@@ -17,15 +17,11 @@ jobs:
           - os: windows-latest
             script: build:win
             artifact: dist/ylc.exe
-            asset: ylc-windows-x64.exe
+            asset: ylc.exe
           - os: macos-latest
             script: build:mac-arm64
             artifact: dist/ylc
             asset: ylc-macos-arm64
-          - os: macos-latest
-            script: build:mac-x64
-            artifact: dist/ylc-x64
-            asset: ylc-macos-x64
           - os: ubuntu-latest
             script: build:linux-x64
             artifact: dist/ylc-linux-x64
@@ -59,11 +55,18 @@ jobs:
       - name: Build binary
         run: pnpm --filter yeelight-cli ${{ matrix.script }}
 
+      - name: Rename binary to release asset name
+        shell: bash
+        run: |
+          src="packages/cli/${{ matrix.artifact }}"
+          dst="packages/cli/dist/${{ matrix.asset }}"
+          [ "$src" = "$dst" ] || mv "$src" "$dst"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}
-          path: packages/cli/${{ matrix.artifact }}
+          path: packages/cli/dist/${{ matrix.asset }}
 
   release:
     needs: build
