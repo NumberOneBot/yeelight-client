@@ -5,6 +5,12 @@ on:
     tags:
       - 'v*'
       - 'yeelight-cli@*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to rebuild and re-upload assets for'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -31,6 +37,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -83,5 +91,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
           files: artifacts/*
           generate_release_notes: true
