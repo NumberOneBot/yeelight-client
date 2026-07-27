@@ -145,9 +145,12 @@ await device.main.setAdjust('circle', 'color') // cycle through hues
 await device.main.adjustBrightness(+20) // +20% brightness
 await device.main.adjustBrightness(-10, 500) // -10% over 500ms
 await device.main.adjustColorTemp(-30) // -30% color temp
-await device.main.adjustColor() // cycle through basic colors
-await device.main.adjustColor(1000) // cycle over 1000ms
+await device.main.adjustColor() // step to the next color in the firmware cycle
+await device.main.adjustColor(1000) // same, transition over 1000ms
 ```
+
+> `adjustColor()` / `setAdjust('circle', 'color')` step to the next color in a firmware-defined
+> hue cycle — palette and order are device-controlled, not selectable. For a specific color use `setRGB()` / `setHSV()`.
 
 ### Sleep Timer
 
@@ -436,7 +439,7 @@ ylc timer status                     # check remaining time
 ylc timer cancel                     # cancel timer
 ylc adjust brightness 20             # relative adjust (+/- 1..100)
 ylc adjust ct -10
-ylc adjust color
+ylc adjust color                    # cycle to next color (firmware-defined hue cycle)
 ```
 
 ## Development
